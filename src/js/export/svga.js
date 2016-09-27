@@ -1,5 +1,5 @@
 /**
- * @file     : svga-web-canvas
+ * @file     : this-web-canvas
  * @author   : lijialiang
  * @team     : UED中心
  * @export   : umd
@@ -12,10 +12,11 @@ import Animation from './modules/Animation';
 module.exports = class Svga extends Animation {
 
     // 固定 worker 地址
-    // FIXME 跨域问题
-    static worker = new Worker('http://172.25.151.225:3000/js/export/modules/svga-worker.js');
+    // FIXME: 跨域问题
+    // worker = new Worker('http://172.25.151.225:3000/assets/this-worker.min.js');
+    worker = new Worker('http://172.25.151.225:3000/js/export/modules/svga-worker.js');
 
-    static options = {
+    optionsInSvga = {
         canvas: '',
         assets: '',
         autoPlay: true,
@@ -25,9 +26,9 @@ module.exports = class Svga extends Animation {
 
         super(args);
 
-        for(let item in Svga.options){
+        for(let item in this.optionsInSvga){
 		    if(typeof args[item] !== 'undefined'){
-				Svga.options[item] = args[item];
+				this.optionsInSvga[item] = args[item];
 			}
 		}
 
@@ -40,35 +41,31 @@ module.exports = class Svga extends Animation {
 
     // TODO: 启动 work 加载解析资源
     _init () {
-        const { canvas, assets } = Svga.options;
 
-        Svga.options.canvas = document.querySelector(canvas);
+        const { canvas, assets } = this.optionsInSvga;
 
-        Svga.worker.postMessage({
-            action: 'loadAssets',
-            args  : {
-                url: assets,
-            }
-        });
+        this.optionsInSvga.canvas = document.querySelector(canvas);
 
-        Svga.worker.onmessage = ({ data }) => {
+        this.worker.postMessage(assets);
+
+        this.worker.onmessage = ({ data }) => {
             this._loadAssetsComplete(data);
         };
     }
 
     _loadAssetsComplete ({ files, movie, images }) {
         super._init({
-            canvas : Svga.canvas,
+            canvas : this.canvas,
             movie  : movie.movie,
             sprites: movie.sprites,
             images,
-            canvas: Svga.options.canvas,
+            canvas: this.optionsInSvga.canvas,
         })
 
         this.ready(this);
 
         // 自动播放
-        if(Svga.options.autoPlay){
+        if(this.optionsInSvga.autoPlay){
             this.play();
         }
     }
@@ -76,14 +73,14 @@ module.exports = class Svga extends Animation {
     ready () {}
 
     play () {
-        if(Svga.options.canvas.width === ''){
-            Svga.options.canvas.style.width = Animation.movie.viewBox.width;
-            Svga.options.canvas.style.height = Animation.movie.viewBox.height;
-            Svga.options.canvas.width = Animation.movie.viewBox.width;
-            Svga.options.canvas.height = Animation.movie.viewBox.height;
+        if(this.optionsInSvga.canvas.width === ''){
+            this.optionsInSvga.canvas.style.width = this.movie.viewBox.width;
+            this.optionsInSvga.canvas.style.height = this.movie.viewBox.height;
+            this.optionsInSvga.canvas.width = this.movie.viewBox.width;
+            this.optionsInSvga.canvas.height = Animation.movie.viewBox.height;
         }else{
-            let stageWidth  = Svga.options.canvas.width / Animation.movie.viewBox.width;
-            let stageHeight = Svga.options.canvas.height / Animation.movie.viewBox.height;
+            let stageWidth  = this.optionsInSvga.canvas.width / this.movie.viewBox.width;
+            let stageHeight = this.optionsInSvga.canvas.height / this.movie.viewBox.height;
             if(stageWidth <= stageHeight){
                 super._stageResize(stageWidth, stageWidth);
             }else{
@@ -96,7 +93,6 @@ module.exports = class Svga extends Animation {
 
     destroy () {
         super._destroy();
-        Svga = null;
     }
 
     complete (cb) {

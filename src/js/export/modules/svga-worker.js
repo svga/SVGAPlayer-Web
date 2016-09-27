@@ -1,7 +1,7 @@
 const actions = {
 
 	// TODO 请求加载资源
-	loadAssets: ({ url }) => {
+	loadAssets: (url) => {
 		let xhr = new XMLHttpRequest();
         xhr.open('GET', url, true);
         xhr.onreadystatechange = function () {
@@ -34,9 +34,7 @@ const actions = {
 }
 
 onmessage = ({ data }) => {
-	if(actions[data.action]){
-		actions[data.action](data.args);
-	}
+	actions['loadAssets'](data);
 };
 
 // zip decode

@@ -3,9 +3,11 @@
  * @author: lijialiang
  */
 
+// require('./easeljs.min');
+
 module.exports = class Animation {
 
-	static validMethods = {
+	validMethods = {
         'M': 1,
         'm': 1,
         'L': 1,
@@ -26,36 +28,38 @@ module.exports = class Animation {
         'z': 1,
     };
 
-	static canvas;
-	static movie;
-    static sprites;
-	static images = {};
-	static stage;
-	static options = {
+	ticker;
+
+	movie;
+    sprites;
+	images = {};
+	stage;
+	optionsInAnimation = {
         playCount: 0,
 		loop     : false,
     };
 
-	static currentFrameNum = 0;
-    static alreadyPlayCount = 0;
+	currentFrameNum = 0;
+    alreadyPlayCount = 0;
 
 	constructor (args) {
-		for(let item in Animation.options){
+		for(let item in this.optionsInAnimation){
 		    if(typeof args[item] !== 'undefined'){
-				Animation.options[item] = args[item];
+				this.optionsInAnimation[item] = args[item];
 			}
 		}
     }
 
 	// TODO: 初始化 动画必要元素
 	_init ({ canvas, movie, sprites,  images}) {
-		Animation.stage = new createjs.Stage(canvas.getAttribute('id'));
 
-		Animation.movie   = movie;
-		Animation.sprites = sprites;
+		this.stage = new createjs.Stage(canvas.getAttribute('id'));
+
+		this.movie   = movie;
+		this.sprites = sprites;
 
 		for(let item in images){
-            Animation.images[item] = btoa(String.fromCharCode.apply(null, images[item]));
+            this.images[item] = btoa(String.fromCharCode.apply(null, images[item]));
         }
 	}
 
@@ -63,38 +67,40 @@ module.exports = class Animation {
 	_play() {
 
 		// 重新播
-		if(Animation.stage.children.length === 0){
+		if(this.stage.children.length === 0){
 			this._drawSprites();
-	        createjs.Ticker.framerate = Animation.movie.fps;
+	        createjs.Ticker.framerate = this.movie.fps;
 		}
 
-        createjs.Ticker.addEventListener('tick', this._next.bind(this));
+        // createjs.Ticker.addEventListener('tick', this._next.bind(this));
+		this.ticker = createjs.Ticker.on('tick',  this._next.bind(this));
 	}
 
 	// TODO: 设置精灵
 	_drawSprites () {
-        Animation.sprites.forEach((item) => {
+        this.sprites.forEach((item) => {
             let image = document.createElement('img');
-            image.src = 'data:image/png;base64,' + Animation.images[item.imageKey];
+            image.src = 'data:image/png;base64,' + this.images[item.imageKey];
             let bitmap = new createjs.Bitmap(image);
-            Animation.stage.addChild(bitmap);
+            this.stage.addChild(bitmap);
         })
     }
 
 	// TODO: 下一帧
     _next () {
-        Animation.currentFrameNum++;
-        if (Animation.currentFrameNum < Animation.movie.frames) {
-            this._update(Animation.currentFrameNum);
+        this.currentFrameNum++;
+        if (this.currentFrameNum < this.movie.frames) {
+            this._update(this.currentFrameNum);
         }else{
-            ++Animation.alreadyPlayCount;
-            if(!Animation.options.loop && (Animation.options.playCount > 0 && Animation.alreadyPlayCount >= Animation.options.playCount)){
-				Animation.alreadyPlayCount = 0;
+            ++this.alreadyPlayCount;
+
+            if(!this.optionsInAnimation.loop || (this.optionsInAnimation.playCount > 0 && this.alreadyPlayCount >= this.optionsInAnimation.playCount)){
+				this.alreadyPlayCount = 0;
                 this.stop();
 				this.complete();
             }else{
-                Animation.currentFrameNum = 0;
-                this._update(Animation.currentFrameNum);
+                this.currentFrameNum = 0;
+                this._update(this.currentFrameNum);
             }
         }
     }
@@ -102,38 +108,40 @@ module.exports = class Animation {
 	// TODO: 停止动画
 	stop () {
         this._clear();
-		Animation.currentFrameNum = 0;
-		Animation.alreadyPlayCount = 0;
-		createjs.Ticker.removeAllEventListeners();
+		this.currentFrameNum = 0;
+		this.alreadyPlayCount = 0;
+		// createjs.Ticker.removeAllEventListeners();
+		createjs.Ticker.off('tick', this.ticker);
     }
 
 	// TODO: 销毁内部属性
 	_destroy () {
 		this.stop();
-		Animation = null;
 	}
 
 	// TODO: 清除 stage
     _clear () {
-        Animation.stage.removeAllChildren();
-        Animation.stage.update();
+        this.stage.removeAllChildren();
+        this.stage.update();
     }
 
 	// TODO: 暂停动画
 	pause () {
-		createjs.Ticker.removeAllEventListeners();
+		console.log(this.stage.canvas);
+		// createjs.Ticker.removeAllEventListeners();
+		createjs.Ticker.off('tick', this.ticker);
 	}
 
 	// TODO: 重置 stage 大小
 	_stageResize (w, h) {
-		Animation.stage.setTransform(0, 0, w, h);
+		this.stage.setTransform(0, 0, w, h);
 	}
 
 	// TODO: 更新 stage 精灵
     _update (frameNum) {
-        for (var index = 0; index < Animation.stage.children.length; index++) {
-            var element = Animation.stage.children[index];
-            var frame = Animation.sprites[index].frames[frameNum];
+        for (var index = 0; index < this.stage.children.length; index++) {
+            var element = this.stage.children[index];
+            var frame = this.sprites[index].frames[frameNum];
             if(frame !== undefined) {
                 if(frame.alpha !== undefined) {
                     element.alpha = frame.alpha;
@@ -166,7 +174,7 @@ module.exports = class Animation {
                 }
             }
         }
-        Animation.stage.update();
+        this.stage.update();
     }
 
     _mask (frame) {
@@ -188,7 +196,7 @@ module.exports = class Animation {
                 continue;
             }
             var firstLetter = item.substr(0, 1);
-            if (Animation.validMethods[firstLetter] === 1) {
+            if (this.validMethods[firstLetter] === 1) {
                 if (tempArg.length > 0) {
                     args.push(tempArg);
                     tempArg = [];
