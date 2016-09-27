@@ -1,3 +1,8 @@
+/**
+ * @file  : 基类 动画类 依赖 easeljs
+ * @author: lijialiang
+ */
+
 module.exports = class Animation {
 
 	static validMethods = {
@@ -42,6 +47,7 @@ module.exports = class Animation {
 		}
     }
 
+	// TODO: 初始化 动画必要元素
 	_init ({ canvas, movie, sprites,  images}) {
 		Animation.stage = new createjs.Stage(canvas.getAttribute('id'));
 
@@ -53,6 +59,7 @@ module.exports = class Animation {
         }
 	}
 
+	// TODO: 播放动画
 	_play() {
 
 		// 重新播
@@ -64,6 +71,7 @@ module.exports = class Animation {
         createjs.Ticker.addEventListener('tick', this._next.bind(this));
 	}
 
+	// TODO: 设置精灵
 	_drawSprites () {
         Animation.sprites.forEach((item) => {
             let image = document.createElement('img');
@@ -73,6 +81,7 @@ module.exports = class Animation {
         })
     }
 
+	// TODO: 下一帧
     _next () {
         Animation.currentFrameNum++;
         if (Animation.currentFrameNum < Animation.movie.frames) {
@@ -90,6 +99,7 @@ module.exports = class Animation {
         }
     }
 
+	// TODO: 停止动画
 	stop () {
         this._clear();
 		Animation.currentFrameNum = 0;
@@ -97,24 +107,29 @@ module.exports = class Animation {
 		createjs.Ticker.removeAllEventListeners();
     }
 
+	// TODO: 销毁内部属性
 	_destroy () {
 		this.stop();
 		Animation = null;
 	}
 
+	// TODO: 清除 stage
     _clear () {
         Animation.stage.removeAllChildren();
         Animation.stage.update();
     }
 
+	// TODO: 暂停动画
 	pause () {
 		createjs.Ticker.removeAllEventListeners();
 	}
 
+	// TODO: 重置 stage 大小
 	_stageResize (w, h) {
 		Animation.stage.setTransform(0, 0, w, h);
 	}
 
+	// TODO: 更新 stage 精灵
     _update (frameNum) {
         for (var index = 0; index < Animation.stage.children.length; index++) {
             var element = Animation.stage.children[index];

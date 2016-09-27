@@ -1,4 +1,6 @@
 const actions = {
+
+	// 请求加载资源
 	loadAssets: ({ url }) => {
 		let xhr = new XMLHttpRequest();
         xhr.open('GET', url, true);
@@ -12,12 +14,17 @@ const actions = {
         xhr.responseType = 'arraybuffer';
         xhr.send();
 	},
+
+	// 转码资源文件
 	decodeAssets: (files) => {
 		const movie = JSON.parse(new TextDecoder('utf-8').decode(files['movie.spec'].inflate()));
+
 		const images = {};
 		for(let item in movie.images){
 			images[item] = files[`${ item }.png`].inflate();
 		}
+
+		// 回调主线程
 		postMessage({
 			files,
 			movie,

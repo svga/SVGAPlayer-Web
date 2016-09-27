@@ -11,6 +11,8 @@ import Animation from './modules/Animation';
 
 module.exports = class Svga extends Animation {
 
+    // 固定 worker 地址
+    // FIXME 跨域问题
     static worker = new Worker('http://172.25.151.225:3000/js/export/modules/svga-worker.js');
 
     static options = {
@@ -36,6 +38,7 @@ module.exports = class Svga extends Animation {
         this._init();
     }
 
+    // TODO: 启动 work 加载解析资源
     _init () {
         const { canvas, assets } = Svga.options;
 

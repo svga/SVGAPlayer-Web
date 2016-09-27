@@ -10,6 +10,9 @@
 * 性能优化，运算开销较大的 SVGA 源文件下载转码过程 迁移到 web worker，避免影响主线程，造成页面卡顿
 * UMD 规范，全局引用，或使用模块加载
 
+## DEMO
+
+[前往测试地址]()
 
 ## 使用
 
@@ -69,4 +72,4 @@ Svga.destroy() ➜ 销毁内部属性
 
 ## 调试构建工具
 
-使用 [LegoFlow](http://uedfe.yypm.com/md/book/LegoFlow/) 进行开发、构建
+使用 [LegoFlow](http://uedfe.yypm.com/md/book/LegoFlow/) 进行调试、构建
