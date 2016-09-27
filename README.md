@@ -2,7 +2,7 @@
 
 ## 说明
 
-![SVGA](http://code.yy.com/ued/SVGA-Format) 格式 Web Canvas 实现方式
+[SVGA](http://code.yy.com/ued/SVGA-Format) 格式 Web Canvas 实现方式
 
 ## 实现
 
@@ -12,6 +12,9 @@
 
 
 ## 使用
+
+* 下载 dist/svga.min.js
+* HTML 直接外链使用 或 JS 模块 require 使用
 
 ```js
 let svga = new Svga({
@@ -63,3 +66,7 @@ Svga.stop() ➜ 停止动画
 
 Svga.destroy() ➜ 销毁内部属性
 ```
+
+## 调试构建工具
+
+使用 [LegoFlow](http://uedfe.yypm.com/md/book/LegoFlow/) 进行开发、构建
