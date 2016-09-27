@@ -1,0 +1,95 @@
+/* @name: 转为REM单位fn
+ * @ps: 默认宽度为750px
+ */
+@function toRem($px , $width: 750px) {
+	// 动态尺寸单位
+	$ppr: $width / 16 / 1rem;
+	@return ($px / $ppr);
+}
+
+/* @name: 上下左右居中 (未知高度)
+ * @ps: 需要设置父元素 display:table
+ */
+@mixin centers{
+	display:table-cell;
+	vertical-align:middle;
+}
+
+/* @name: 上下左右居中 （确定高度）*/
+@mixin centersHight{
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    margin: auto;
+}
+
+/*
+ * @name: 文字溢出显示省略号
+ * @ps: 需要设置宽度
+ */
+@mixin ellipsis{
+    white-space: nowrap;
+    word-wrap: normal;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: left;
+}
+
+/* @name: 强制不换行 */
+@mixin nowrap{
+    white-space: nowrap;
+    word-wrap: normal;
+    word-break: keep-all;
+}
+
+/* @name: 清除浮动 */
+@mixin clearFix{
+	overflow: hidden;
+	clear: both;
+}
+
+/*
+ * @name:  三角形
+ * @param: $size  大小
+ * @param: $color 颜色
+ * @param: $type {string}  类型 (up || down || left || right || topleft || topright || bottomleft || bottomright)
+ */
+ @mixin triangle(
+    $size: 50px,
+    $type: up,
+    $color: #6699FF
+ ){
+    width: 0;
+    height: 0;
+    @if $type == up {
+        border-left: $size/2 solid transparent;
+        border-right: $size/2 solid transparent;
+        border-bottom: $size solid $color;
+    }@else if $type == down {
+        border-left: $size/2 solid transparent;
+        border-right: $size/2 solid transparent;
+        border-top: $size solid $color;
+    }@else if $type == left {
+        border-top: $size/2 solid transparent;
+        border-right: $size/2 solid $color;
+        border-bottom: $size solid transparent;
+    }@else if $type == right {
+        border-top: $size/2 solid transparent;
+        border-left: $size/2 solid $color;
+        border-bottom: $size solid transparent;
+    }@else if $type == topleft {
+        border-top: $size solid $color;
+        border-right: $size solid transparent;
+    }@else if $type == topright {
+        border-top: $size solid $color;
+        border-left: $size solid transparent;
+    }@else if $type == bottomleft {
+        border-bottom: $size solid $color;
+        border-right: $size solid transparent;
+    }@else if $type == bottomright {
+        border-bottom: $size solid $color;
+        border-left: $size solid transparent;
+    }
+ }

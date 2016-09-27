@@ -1,0 +1,50 @@
+/*
+
+Lego纯CSS自适应方案
+
+1，设计稿尺寸
+
+    默认设计稿宽带 750px，可通过变量 $psd-size 进行修改
+
+2，对应的 meta 标签写法：
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+
+3，px to rem 需要用到小学算术
+
+    100px = 1rem / 1px = 0.01rem
+
+Notes:
+
+    断点参考：http://screensiz.es/phone
+
+    横屏断点：384px, 480px, 533px, 568px, 640px, 667px, 699px, 736px
+    某些手机厂商系统的虚拟SmartBar会改变Screen的值，又是坑，建议统一横屏提示规避
+
+    避免使用 min-device-width
+    https://developers.google.com/web/fundamentals/design-and-ui/responsive/fundamentals/use-media-queries?hl=zh-cn#min-device-width-
+
+    __Changelog__
+    2016.05.04：添加 393px 699px 断点，小米note 1080 屏幕，DPR=2.75
+
+*/
+
+// 定义基准数
+$base-fontSize: 100px !default;
+
+// 定义设计稿尺寸
+$psd-size: 750px !default;
+
+// 定义竖屏断点
+$responsives: 320px, 360px, 375px, 393px, 400px, 414px;
+
+// 定义根元素font-size
+@mixin rem($values){
+    font-size: $values * $base-fontSize / $psd-size;
+}
+
+// 遍历输出断点
+@each $responsive in $responsives{
+  @media only screen and (min-width: #{$responsive}) {
+        html{ @include rem($responsive);}
+   }
+}
