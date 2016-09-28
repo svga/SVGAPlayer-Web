@@ -16,17 +16,17 @@
 
 ## 使用
 
-* 下载 dist/svga.min.js
+* 下载 dist/svga.min.js & dist/svga-worker.min.js
 * HTML 直接外链使用 或 JS 模块 require 使用
 
 ```js
 let svga = new Svga({
-	worker: `${ window.location.origin }/assets/svga-worker.min.js`,
-	canvas: '#canvas',
-	assets: `${ window.location.origin }/assets/rose.svga`,
+	worker   : `${ window.location.origin }/assets/svga-worker.min.js`,
+	canvas   : '#canvas',
+	assets   : `${ window.location.origin }/assets/rose.svga`,
 	playCount: 2,
-	autoPlay: false,
-	loop: true,
+	autoPlay : false,
+	loop     : true,
 }, (event) => {
 	console.log('svga is ready');
 	svga.play();
