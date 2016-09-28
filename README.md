@@ -21,6 +21,7 @@
 
 ```js
 let svga = new Svga({
+	worker: `${ window.location.origin }/assets/svga-worker.min.js`,
 	canvas: '#canvas',
 	assets: `${ window.location.origin }/assets/rose.svga`,
 	playCount: 2,
@@ -48,8 +49,9 @@ svga.destroy();
 
 | 名称 | 类型 | 说明 |
 |-----|------|-----|
+| worker | String | 同域 worker 文件地址 |
 | canvas | String | 选择器字符串 |
-| assets | String | SVGA源文件地址 |
+| assets | String | 同域 SVGA源文件地址 |
 | playCount | Number | 动画播放次数 |
 | autoPlay | Boolean | 加载完成后是否自动播放 |
 | loop | Boolean | 是否循环播放 |
