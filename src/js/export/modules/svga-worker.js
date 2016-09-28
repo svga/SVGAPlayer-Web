@@ -1,3 +1,12 @@
+const largeuint8ArrToString = (uint8arr, callback) => {
+    let bb = new Blob([uint8arr]);
+    let f = new FileReader();
+    f.onload = (e) => {
+        callback(e.target.result);
+    };
+    f.readAsText(bb);
+}
+
 const actions = {
 
 	// TODO 请求加载资源
@@ -18,18 +27,23 @@ const actions = {
 
 	// TODO 转码资源文件
 	decodeAssets: (files) => {
-		const movie = JSON.parse(new TextDecoder('utf-8').decode(files['movie.spec'].inflate()));
+		// console.log(String.fromCharCode.apply(null, files['movie.spec'].inflate()))
+		// const movie = JSON.parse(new TextDecoder('utf-8').decode(files['movie.spec'].inflate()));
+		const movie = files['movie.spec'].inflate();
+		largeuint8ArrToString(movie, (data) => {
+			const movieData = JSON.parse(data);
+			const images = {};
 
-		const images = {};
-		for(let item in movie.images){
-			images[item] = files[`${ item }.png`].inflate();
-		}
+			for(let item in movieData.images){
+				images[item] = files[`${ item }.png`].inflate();
+			}
 
-		// 回调主线程
-		postMessage({
-			files,
-			movie,
-			images,
+			// 回调主线程
+			postMessage({
+				files,
+				movie: movieData,
+				images,
+			})
 		})
 	}
 }

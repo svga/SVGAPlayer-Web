@@ -1,3 +1,12 @@
+var largeuint8ArrToString = function largeuint8ArrToString(uint8arr, callback) {
+	var bb = new Blob([uint8arr]);
+	var f = new FileReader();
+	f.onload = function (e) {
+		callback(e.target.result);
+	};
+	f.readAsText(bb);
+};
+
 var actions = {
 
 	// TODO 请求加载资源
@@ -18,18 +27,23 @@ var actions = {
 
 	// TODO 转码资源文件
 	decodeAssets: function decodeAssets(files) {
-		var movie = JSON.parse(new TextDecoder('utf-8').decode(files['movie.spec'].inflate()));
+		// console.log(String.fromCharCode.apply(null, files['movie.spec'].inflate()))
+		// const movie = JSON.parse(new TextDecoder('utf-8').decode(files['movie.spec'].inflate()));
+		var movie = files['movie.spec'].inflate();
+		largeuint8ArrToString(movie, function (data) {
+			var movieData = JSON.parse(data);
+			var images = {};
 
-		var images = {};
-		for (var item in movie.images) {
-			images[item] = files[item + '.png'].inflate();
-		}
+			for (var item in movieData.images) {
+				images[item] = files[item + '.png'].inflate();
+			}
 
-		// 回调主线程
-		postMessage({
-			files: files,
-			movie: movie,
-			images: images
+			// 回调主线程
+			postMessage({
+				files: files,
+				movie: movieData,
+				images: images
+			});
 		});
 	}
 };

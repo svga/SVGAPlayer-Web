@@ -14,7 +14,7 @@ module.exports = class Svga extends Animation {
     // 固定 worker 地址
     // FIXME: 跨域问题
     static worker;
-    
+
     optionsInSvga = {
         canvas: '',
         assets: '',
@@ -30,7 +30,7 @@ module.exports = class Svga extends Animation {
             Svga.worker = new Worker(args.worker);
         }
         // 复用 worker
-        else if(Svga.work === null){
+        else if(Svga.work === undefined){
             Svga.worker = new Worker(`${ window.location.origin }/js/export/modules/svga-worker.js`);
         }
 
@@ -66,6 +66,7 @@ module.exports = class Svga extends Animation {
     }
 
     _loadAssetsComplete ({ files, movie, images }) {
+
         super._init({
             canvas : this.canvas,
             movie  : movie.movie,

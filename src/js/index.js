@@ -2,7 +2,7 @@ import Svga from './export/svga.js';
 
 console.time('下载转码耗时');
 let svga = new Svga({
-	worker: `${ window.location.origin }/assets/svga-worker.min.js`,
+	// worker: `${ window.location.origin }/assets/svga-worker.min.js`,
 	canvas: '#canvas',
 	assets: `${ window.location.origin }/assets/rose.svga`,
 	playCount: 1,
