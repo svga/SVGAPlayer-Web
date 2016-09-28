@@ -42,7 +42,6 @@ svga.pause();
 
 svga.stop();
 
-svga.destroy();
 ```
 
 ## 参数
@@ -69,7 +68,6 @@ Svga.pause() ➜ 暂停动画
 
 Svga.stop() ➜ 停止动画
 
-Svga.destroy() ➜ 销毁内部属性
 ```
 
 ## 调试构建工具
