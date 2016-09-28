@@ -3,7 +3,7 @@
  * @author: lijialiang
  */
 
-// require('./easeljs.min');
+require('./easeljs.min');
 
 module.exports = class Animation {
 
@@ -114,11 +114,6 @@ module.exports = class Animation {
 		createjs.Ticker.off('tick', this.ticker);
     }
 
-	// TODO: 销毁内部属性
-	_destroy () {
-		this.stop();
-	}
-
 	// TODO: 清除 stage
     _clear () {
         this.stage.removeAllChildren();
@@ -127,7 +122,6 @@ module.exports = class Animation {
 
 	// TODO: 暂停动画
 	pause () {
-		console.log(this.stage.canvas);
 		// createjs.Ticker.removeAllEventListeners();
 		createjs.Ticker.off('tick', this.ticker);
 	}
@@ -139,9 +133,9 @@ module.exports = class Animation {
 
 	// TODO: 更新 stage 精灵
     _update (frameNum) {
-        for (var index = 0; index < this.stage.children.length; index++) {
-            var element = this.stage.children[index];
-            var frame = this.sprites[index].frames[frameNum];
+        for (let index = 0; index < this.stage.children.length; index++) {
+            let element = this.stage.children[index];
+            let frame   = this.sprites[index].frames[frameNum];
             if(frame !== undefined) {
                 if(frame.alpha !== undefined) {
                     element.alpha = frame.alpha;
@@ -178,24 +172,24 @@ module.exports = class Animation {
     }
 
     _mask (frame) {
-        var path = frame.clipPath;
-        var shape = new createjs.Shape();
-        var g = shape.graphics;
+        let path = frame.clipPath;
+        let shape = new createjs.Shape();
+        let g = shape.graphics;
         shape.x = 0;
         shape.y = 0;
-        var args = [];
-        var tempArg = [];
-        var items = path.replace(/,/g, ' ').split(' ');
-        var point = {
+        let args = [];
+        let tempArg = [];
+        let items = path.replace(/,/g, ' ').split(' ');
+        let point = {
             x: 0,
             y: 0,
         };
-        for (var i = 0; i < items.length; i++) {
-            var item = items[i];
+        for (let i = 0; i < items.length; i++) {
+            let item = items[i];
             if (item.length < 1) {
                 continue;
             }
-            var firstLetter = item.substr(0, 1);
+            let firstLetter = item.substr(0, 1);
             if (this.validMethods[firstLetter] === 1) {
                 if (tempArg.length > 0) {
                     args.push(tempArg);
@@ -207,8 +201,8 @@ module.exports = class Animation {
                 tempArg.push(item);
             }
         }
-        for (var i = 0; i < args.length; i++) {
-            var arg = args[i];
+        for (let i = 0; i < args.length; i++) {
+            let arg = args[i];
             if (!(arg[0] == 'C' || arg[0] == 'c')) {
                 delete (point.x1);
                 delete (point.y1);

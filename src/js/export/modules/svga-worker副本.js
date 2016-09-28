@@ -1,40 +1,42 @@
-const actions = {
+var actions = {
 
 	// TODO 请求加载资源
-	loadAssets: (url) => {
-		let xhr = new XMLHttpRequest();
+	loadAssets: function loadAssets(url) {
+		var xhr = new XMLHttpRequest();
 		// worker 使用同步
-        xhr.open('GET', url, false);
-        xhr.onreadystatechange = function () {
-            if (this.readyState == 4) {
-                if (this.response != null) {
-					actions.decodeAssets((Zip.inflate(new Uint8Array(this.response))).files);
-                }
-            }
-        };
-        xhr.responseType = 'arraybuffer';
-        xhr.send();
+		xhr.open('GET', url, false);
+		xhr.onreadystatechange = function () {
+			if (this.readyState == 4) {
+				if (this.response != null) {
+					actions.decodeAssets(Zip.inflate(new Uint8Array(this.response)).files);
+				}
+			}
+		};
+		xhr.responseType = 'arraybuffer';
+		xhr.send();
 	},
 
 	// TODO 转码资源文件
-	decodeAssets: (files) => {
-		const movie = JSON.parse(new TextDecoder('utf-8').decode(files['movie.spec'].inflate()));
+	decodeAssets: function decodeAssets(files) {
+		var movie = JSON.parse(new TextDecoder('utf-8').decode(files['movie.spec'].inflate()));
 
-		const images = {};
-		for(let item in movie.images){
-			images[item] = files[`${ item }.png`].inflate();
+		var images = {};
+		for (var item in movie.images) {
+			images[item] = files[item + '.png'].inflate();
 		}
 
 		// 回调主线程
 		postMessage({
-			files,
-			movie,
-			images,
-		})
+			files: files,
+			movie: movie,
+			images: images
+		});
 	}
-}
+};
 
-onmessage = ({ data }) => {
+onmessage = function onmessage(_ref) {
+	var data = _ref.data;
+
 	actions['loadAssets'](data);
 };
 

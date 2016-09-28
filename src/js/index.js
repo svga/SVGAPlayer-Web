@@ -1,14 +1,17 @@
 import Svga from './export/svga.js';
 
+console.time('下载转码耗时');
 let svga = new Svga({
+	worker: `${ window.location.origin }/assets/svga-worker.min.js`,
 	canvas: '#canvas',
 	assets: `${ window.location.origin }/assets/rose.svga`,
-	// playCount: 1,
+	playCount: 1,
 	autoPlay: false,
 	loop: true,
 }, (event) => {
 	console.log('svga is ready');
-	svga.play();
+	// svga.play();
+	console.timeEnd('下载转码耗时');
 })
 
 svga.complete(() => {
@@ -27,18 +30,15 @@ document.getElementById('stop').addEventListener('click', () => {
 	svga.stop();
 });
 
-document.getElementById('destroy').addEventListener('click', () => {
-	svga.destroy();
-});
-
-setTimeout(() => {
-	new Svga({
-		canvas: '#canvas2',
-		assets: `${ window.location.origin }/assets/rose.svga`,
-		// playCount: 1,
-		autoPlay: true,
-		loop: true,
-	}, (event) => {
-		console.log('svga2 is ready');
-	})
-}, 1000)
+//
+// setTimeout(() => {
+// 	new Svga({
+// 		canvas: '#canvas2',
+// 		assets: `${ window.location.origin }/assets/rose.svga`,
+// 		// playCount: 1,
+// 		autoPlay: true,
+// 		loop: true,
+// 	}, (event) => {
+// 		console.log('svga2 is ready');
+// 	})
+// }, 1000)
