@@ -16,7 +16,7 @@
 
 ## 使用
 
-* 下载 dist/svga.min.js & dist/svga-worker.min.js
+* 下载 build/svga.min.js & build/svga-worker.min.js
 * HTML 直接外链使用 或 JS 模块 require 使用
 
 ```js
