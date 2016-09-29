@@ -57,10 +57,7 @@ module.exports = class Animation {
 
 		this.movie   = movie;
 		this.sprites = sprites;
-
-		for(let item in images){
-            this.images[item] = btoa(String.fromCharCode.apply(null, images[item]));
-        }
+		this.images  = images;
 	}
 
 	// TODO: 播放动画

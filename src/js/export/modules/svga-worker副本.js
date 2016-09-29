@@ -1,57 +1,93 @@
 var largeuint8ArrToString = function largeuint8ArrToString(uint8arr, callback) {
-	var bb = new Blob([uint8arr]);
-	var f = new FileReader();
-	f.onload = function (e) {
-		callback(e.target.result);
-	};
-	f.readAsText(bb);
+    var bb = new Blob([uint8arr]);
+    var f = new FileReader();
+    f.onload = function (e) {
+        callback(e.target.result);
+    };
+    f.readAsText(bb);
+};
+
+var base64ArrayBuffer = function base64ArrayBuffer(arrayBuffer) {
+    var base64 = '';
+    var encodings = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
+
+    var bytes = new Uint8Array(arrayBuffer);
+    var byteLength = bytes.byteLength;
+    var byteRemainder = byteLength % 3;
+    var mainLength = byteLength - byteRemainder;
+
+    var a = void 0,
+        b = void 0,
+        c = void 0,
+        d = void 0;
+    var chunk = void 0;
+
+    for (var i = 0; i < mainLength; i = i + 3) {
+        chunk = bytes[i] << 16 | bytes[i + 1] << 8 | bytes[i + 2];
+        a = (chunk & 16515072) >> 18;
+        b = (chunk & 258048) >> 12;
+        c = (chunk & 4032) >> 6;
+        d = chunk & 63;
+        base64 += encodings[a] + encodings[b] + encodings[c] + encodings[d];
+    }
+
+    if (byteRemainder == 1) {
+        chunk = bytes[mainLength];
+        a = (chunk & 252) >> 2;
+        b = (chunk & 3) << 4;
+        base64 += encodings[a] + encodings[b] + '==';
+    } else if (byteRemainder == 2) {
+        chunk = bytes[mainLength] << 8 | bytes[mainLength + 1];
+        a = (chunk & 64512) >> 10;
+        b = (chunk & 1008) >> 4;
+        c = (chunk & 15) << 2;
+        base64 += encodings[a] + encodings[b] + encodings[c] + '=';
+    }
+    return base64;
 };
 
 var actions = {
 
-	// TODO 请求加载资源
-	loadAssets: function loadAssets(url) {
-		var xhr = new XMLHttpRequest();
-		// worker 使用同步
-		xhr.open('GET', url, false);
-		xhr.onreadystatechange = function () {
-			if (this.readyState == 4) {
-				if (this.response != null) {
-					actions.decodeAssets(Zip.inflate(new Uint8Array(this.response)).files);
-				}
-			}
-		};
-		xhr.responseType = 'arraybuffer';
-		xhr.send();
-	},
+    // TODO 请求加载资源
+    loadAssets: function loadAssets(url) {
+        var xhr = new XMLHttpRequest();
+        // worker 使用同步
+        xhr.open('GET', url, false);
+        xhr.onreadystatechange = function () {
+            if (this.readyState == 4) {
+                if (this.response != null) {
+                    actions.decodeAssets(Zip.inflate(new Uint8Array(this.response)).files);
+                }
+            }
+        };
+        xhr.responseType = 'arraybuffer';
+        xhr.send();
+    },
 
-	// TODO 转码资源文件
-	decodeAssets: function decodeAssets(files) {
-		// console.log(String.fromCharCode.apply(null, files['movie.spec'].inflate()))
-		// const movie = JSON.parse(new TextDecoder('utf-8').decode(files['movie.spec'].inflate()));
-		var movie = files['movie.spec'].inflate();
-		largeuint8ArrToString(movie, function (data) {
-			var movieData = JSON.parse(data);
-			var images = {};
+    // TODO 转码资源文件
+    decodeAssets: function decodeAssets(files) {
+        var movie = files['movie.spec'].inflate();
+        largeuint8ArrToString(movie, function (data) {
+            var movieData = JSON.parse(data);
+            var images = {};
 
-			for (var item in movieData.images) {
-				images[item] = files[item + '.png'].inflate();
-			}
+            for (var item in movieData.images) {
+                images[item] = base64ArrayBuffer(files[item + '.png'].inflate());
+            }
 
-			// 回调主线程
-			postMessage({
-				files: files,
-				movie: movieData,
-				images: images
-			});
-		});
-	}
+            // 回调主线程
+            postMessage({
+                movie: movieData,
+                images: images
+            });
+        });
+    }
 };
 
 onmessage = function onmessage(_ref) {
-	var data = _ref.data;
+    var data = _ref.data;
 
-	actions['loadAssets'](data);
+    actions['loadAssets'](data);
 };
 
 // zip decode

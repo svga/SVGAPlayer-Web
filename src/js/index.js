@@ -1,13 +1,15 @@
+import SvgaDB from './export/modules/svga-db.js';
 import Svga from './export/svga.js';
 
 console.time('下载转码耗时');
 let svga = new Svga({
-	// worker: `${ window.location.origin }/assets/svga-worker.min.js`,
+	worker: `${ window.location.origin }/assets/svga-worker.min.js`,
 	canvas: '#canvas',
 	assets: `${ window.location.origin }/assets/rose.svga`,
-	playCount: 1,
-	autoPlay: false,
+	// playCount: 1,
+	autoPlay: true,
 	loop: true,
+	// db: SvgaDB,
 }, (event) => {
 	console.log('svga is ready');
 	// svga.play();

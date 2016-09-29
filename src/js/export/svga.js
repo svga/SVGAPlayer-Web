@@ -13,6 +13,8 @@ module.exports = class Svga extends Animation {
     // FIXME: 跨域问题
     static worker;
 
+    static DB;
+
     optionsInSvga = {
         canvas: '',
         assets: '',
@@ -46,15 +48,52 @@ module.exports = class Svga extends Animation {
             this.ready = readyFunction;
         }
 
+        if(args.db){
+            this._initDB(args.db);
+        }else{
+            this._initWorker();
+        }
+
         this._init();
     }
 
-    // TODO: 启动 work 加载解析资源
+    _initDB (SvgaDB) {
+        Svga.DB = new SvgaDB();
+
+        Svga.DB.find(this.optionsInSvga.assets, (images, movie, err) => {
+            if(!err){
+                this._initAminstion(images, movie);
+            }else{
+                this._initWorker();
+            }
+
+            // Svga.DB.clear(1);
+        })
+    }
+
     _init () {
 
-        const { canvas, assets } = this.optionsInSvga;
+        const { canvas } = this.optionsInSvga;
 
         this.optionsInSvga.canvas = document.querySelector(canvas);
+    }
+
+    _loadAssetsComplete ({ movie, images }) {
+
+        if(Svga.DB){
+            Svga.DB.add({
+                url : this.optionsInSvga.assets,
+                movie,
+                images,
+            })
+        }
+
+        this._initAminstion(images, movie);
+    }
+
+    // TODO: 启动 work 加载解析资源
+    _initWorker () {
+        const { assets } = this.optionsInSvga;
 
         Svga.worker.postMessage(assets);
 
@@ -63,8 +102,8 @@ module.exports = class Svga extends Animation {
         };
     }
 
-    _loadAssetsComplete ({ files, movie, images }) {
-
+    // TODO: 初始化基类
+    _initAminstion (images, movie) {
         super._init({
             canvas : this.canvas,
             movie  : movie.movie,
