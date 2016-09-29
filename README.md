@@ -20,6 +20,8 @@
 * 下载 build/svga.min.js & build/svga-worker.min.js
 * HTML 直接外链使用 或 JS 模块 require 使用
 
+例子
+
 ```js
 let svga = new Svga({
 	worker   : `${ window.location.origin }/assets/svga-worker.min.js`,
@@ -47,14 +49,15 @@ svga.stop();
 
 ## 参数
 
-| 名称 | 类型 | 说明 |
-|-----|------|-----|
-| worker | String | 同域 worker 文件地址 |
-| canvas | String | 选择器字符串 |
-| assets | String | 同域 SVGA源文件地址 |
-| playCount | Number | 动画播放次数 |
-| autoPlay | Boolean | 加载完成后是否自动播放 |
-| loop | Boolean | 是否循环播放 |
+| 名称 | 类型 | 是否必要 | 说明 |
+|-----|------|-----|---|
+| worker | String | 是 | 同域 worker 文件地址 |
+| canvas | String | 是 | 选择器字符串 |
+| assets | String | 是 | 同域 SVGA源文件地址 |
+| playCount | Number | 否 | 动画播放次数 |
+| autoPlay | Boolean | 否 | 加载完成后是否自动播放 |
+| loop | Boolean | 否 |是否循环播放 |
+| db | Object | 否 | SvgaDB 对象 |
 
 ## 方法
 
@@ -69,6 +72,31 @@ Svga.pause() ➜ 暂停动画
 
 Svga.stop() ➜ 停止动画
 
+```
+
+## 插件 Svga-DB
+
+通过 Web SQL Database 存储常用 svga 源文件，无需重复下载
+
+## 使用
+
+* 下载 build/svga-db.min.js 文件
+* HTML 直接外链使用 或 JS 模块 require 使用
+* SvgaDB 类 在实例化时候作为 db 参数传入
+
+例子
+
+```js
+import SvgaDB from './svga-db.min';
+
+new Svga({
+	worker   : `${ window.location.origin }/assets/svga-worker.min.js`,
+	canvas   : '#canvas',
+	assets   : `${ window.location.origin }/assets/rose.svga`,
+	autoPlay : true,
+	loop     : true,
+	db 		 : SvgaDB,
+})
 ```
 
 ## 调试构建工具
