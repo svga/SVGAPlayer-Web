@@ -6,8 +6,9 @@
 
 ## 实现
 
+* 修复 [原有player](http://code.yy.com/ued/SVGAPlayer-WebCanvas) 实际使用反馈的 bug
 * 轻量化，重构依赖模块，不足 100K
-* 性能优化，运算开销较大的 SVGA 源文件下载转码过程 迁移到 web worker，尽量避免影响主线程，造成页面卡顿
+* 性能优化，运算开销较大 SVGA 源文件下载转码过程 迁移到 web worker，尽量避免影响主线程，造成页面卡顿
 * UMD 规范，全局引用，或使用模块加载
 
 ## DEMO

@@ -1,10 +1,8 @@
 /**
- * @file     : this-web-canvas
- * @author   : lijialiang
- * @team     : UED中心
- * @export   : umd
- * @document : http://uedfe.yypm.com/md/
- * @update   : 2016-08-30 15:15:18
+ * @file   : svga-web-canvas
+ * @author : lijialiang
+ * @team   : UED中心
+ * @export : umd
  */
 
 import Animation from './modules/Animation';
