@@ -79,11 +79,13 @@ Svga.stop() ➜ 停止动画
 
 ```
 
-## 插件 SVGA-DB
+## 插件
+
+### SVGA-DB
 
 通过 Web SQL Database 存储常用 SVGA 源文件，无需重复下载
 
-## 使用
+#### 使用
 
 * 下载 build/svga-db.min.js 文件
 * HTML 直接外链使用 或 JS 模块 require 使用
