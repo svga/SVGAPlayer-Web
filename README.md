@@ -1,5 +1,10 @@
 # SVGA-Web-Canvas
 
+## 最近更新
+
+* 增加插件 SVGA-DB，使用可持久化常用 SVGA 源文件
+* 优化 worker 转码
+
 ## 说明
 
 [SVGA](http://code.yy.com/ued/SVGA-Format) 格式 Web Canvas 实现方式
@@ -74,9 +79,9 @@ Svga.stop() ➜ 停止动画
 
 ```
 
-## 插件 Svga-DB
+## 插件 SVGA-DB
 
-通过 Web SQL Database 存储常用 svga 源文件，无需重复下载
+通过 Web SQL Database 存储常用 SVGA 源文件，无需重复下载
 
 ## 使用
 
