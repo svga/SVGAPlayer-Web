@@ -42,6 +42,9 @@ module.exports = class Animation {
 	currentFrameNum = 0;
     alreadyPlayCount = 0;
 
+	dynamicImages = {};
+	dynamicText = {};
+
 	constructor (args) {
 		for(let item in this.optionsInAnimation){
 		    if(typeof args[item] !== 'undefined'){
@@ -49,6 +52,14 @@ module.exports = class Animation {
 			}
 		}
     }
+
+	setDynamicImage (src, key) {
+		this.dynamicImages[key] = src;
+	}
+
+	setDynamicText ({ text, size, family, color, key }) {
+		this.dynamicText[key] = new createjs.Text(text, `${ size } family`, color);
+	}
 
 	// TODO: 初始化 动画必要元素
 	_init ({ canvas, movie, sprites,  images}) {
@@ -58,6 +69,7 @@ module.exports = class Animation {
 		this.movie   = movie;
 		this.sprites = sprites;
 		this.images  = images;
+
 	}
 
 	// TODO: 播放动画
@@ -71,16 +83,25 @@ module.exports = class Animation {
 
         // createjs.Ticker.addEventListener('tick', this._next.bind(this));
 		this.ticker = createjs.Ticker.on('tick',  this._next.bind(this));
+
 	}
 
 	// TODO: 设置精灵
 	_drawSprites () {
-        this.sprites.forEach((item) => {
+		this.sprites.forEach((sprite, index) => {
             let image = document.createElement('img');
-            image.src = 'data:image/png;base64,' + this.images[item.imageKey];
+            image.src = 'data:image/png;base64,' + this.images[sprite.imageKey];
+            if (this.dynamicImages[sprite.imageKey] !== undefined) {
+                image.src = this.dynamicImages[sprite.imageKey];
+            }
             let bitmap = new createjs.Bitmap(image);
             this.stage.addChild(bitmap);
-        })
+            if (this.dynamicText[sprite.imageKey] !== undefined) {
+                this.dynamicText[sprite.imageKey].isText = true;
+                this.stage.addChild(this.dynamicText[sprite.imageKey]);
+            }
+        });
+        // this.update(0);
     }
 
 	// TODO: 下一帧
@@ -130,9 +151,16 @@ module.exports = class Animation {
 
 	// TODO: 更新 stage 精灵
     _update (frameNum) {
-        for (let index = 0; index < this.stage.children.length; index++) {
-            let element = this.stage.children[index];
-            let frame   = this.sprites[index].frames[frameNum];
+		let textCount = 0;
+		for (let index = 0; index < this.stage.children.length; index++) {
+			let element = this.stage.children[index];
+			let spriteIndex = index;
+			if (element.isText === true) {
+				textCount++;
+			}
+			spriteIndex -= textCount;
+			let frame = this.sprites[spriteIndex].frames[frameNum];
+
             if(frame !== undefined) {
                 if(frame.alpha !== undefined) {
                     element.alpha = frame.alpha;
@@ -153,7 +181,20 @@ module.exports = class Animation {
                 }
 
                 if(frame.transform !== undefined) {
-                    element.transformMatrix = new createjs.Matrix2D(frame.transform.a, frame.transform.b, frame.transform.c, frame.transform.d, frame.transform.tx, frame.transform.ty);
+					let newTransform = {
+                        a: frame.transform.a,
+                        b: frame.transform.b,
+                        c: frame.transform.c,
+                        d: frame.transform.d,
+                        tx: frame.transform.tx,
+                        ty: frame.transform.ty,
+                    }
+                    if (element.isText === true) {
+                        newTransform.tx += (frame.layout.width * frame.transform.a - element.getBounds().width) / 2.0;
+                        newTransform.ty += (frame.layout.height * frame.transform.d - element.getBounds().height) / 2.0;
+                    }
+                    element.transformMatrix = new createjs.Matrix2D(newTransform.a, newTransform.b, newTransform.c, newTransform.d, newTransform.tx, newTransform.ty);
+
                 }else{
                     element.transformMatrix = new createjs.Matrix2D(1.0, 0.0, 0.0, 1.0, 0.0, 0.0);
                 }

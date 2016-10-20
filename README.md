@@ -4,6 +4,7 @@
 
 * 增加插件 SVGA-DB，使用可持久化常用 SVGA 源文件
 * 优化 worker 转码
+* 更新 Dynamic 功能
 
 ## 说明
 
