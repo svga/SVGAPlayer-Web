@@ -32,12 +32,24 @@
 let svga = new Svga({
 	worker   : `${ window.location.origin }/assets/svga-worker.min.js`,
 	canvas   : '#canvas',
-	assets   : `${ window.location.origin }/assets/rose.svga`,
+	// assets   : `${ window.location.origin }/assets/rose.svga`,
+	assets: `${ window.location.origin }/assets/kingset_dyn.svga`,
 	playCount: 2,
 	autoPlay : false,
 	loop     : true,
 }, (event) => {
 	console.log('svga is ready');
+
+	svga.setDynamicImage('../assets/avatar.png', '99');
+
+	svga.setDynamicText({
+		text  : '崔小姐不吃鱼 送了帝王套',
+		size  : '30px',
+		family: 'Arial',
+		color : '#ffe0a4',
+		key   : 'banner',
+	})
+
 	svga.play();
 })
 
@@ -78,6 +90,9 @@ Svga.pause() ➜ 暂停动画
 
 Svga.stop() ➜ 停止动画
 
+Svga.setDynamicImage() ➜ 设置 Dynamic 图片
+
+Svga.setDynamicText() ➜ 设置 Dynamic 文本
 ```
 
 ## 插件
