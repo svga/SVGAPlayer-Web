@@ -1,4 +1,4 @@
-import SvgaDB from './export/modules/svga-db.js';
+import SvgaDB from './export/svga-db.js';
 import Svga from './export/svga.js';
 
 console.time('下载转码耗时');
@@ -28,7 +28,6 @@ let svga = new Svga({
 	})
 
 	svga.play();
-
 })
 
 svga.complete(() => {
@@ -37,14 +36,17 @@ svga.complete(() => {
 
 document.getElementById('play').addEventListener('click', () => {
 	svga.play();
+	console.log(svga.getState());
 });
 
 document.getElementById('pause').addEventListener('click', () => {
 	svga.pause();
+	console.log(svga.getState());
 });
 
 document.getElementById('stop').addEventListener('click', () => {
 	svga.stop();
+	console.log(svga.getState());
 });
 
 //

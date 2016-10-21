@@ -45,6 +45,8 @@ module.exports = class Animation {
 	dynamicImages = {};
 	dynamicText = {};
 
+	state = 'stop';
+
 	constructor (args) {
 		for(let item in this.optionsInAnimation){
 		    if(typeof args[item] !== 'undefined'){
@@ -53,11 +55,15 @@ module.exports = class Animation {
 		}
     }
 
+	getState () {
+		return this.state;
+	}
+
 	setDynamicImage (src, key) {
 		this.dynamicImages[key] = src;
 	}
 
-	setDynamicText ({ text, size, family, color, key }) {
+	setDynamicText ({ text = '', size = '', family = '', color = '', key }) {
 		this.dynamicText[key] = new createjs.Text(text, `${ size } family`, color);
 	}
 
@@ -74,16 +80,17 @@ module.exports = class Animation {
 
 	// TODO: 播放动画
 	_play() {
+		if(this.state !== 'play'){
+			this.state = 'play';
+			// 重新播
+			if(this.stage.children.length === 0){
+				this._drawSprites();
+		        createjs.Ticker.framerate = this.movie.fps;
+			}
 
-		// 重新播
-		if(this.stage.children.length === 0){
-			this._drawSprites();
-	        createjs.Ticker.framerate = this.movie.fps;
+	        // createjs.Ticker.addEventListener('tick', this._next.bind(this));
+			this.ticker = createjs.Ticker.on('tick',  this._next.bind(this));
 		}
-
-        // createjs.Ticker.addEventListener('tick', this._next.bind(this));
-		this.ticker = createjs.Ticker.on('tick',  this._next.bind(this));
-
 	}
 
 	// TODO: 设置精灵
@@ -125,11 +132,14 @@ module.exports = class Animation {
 
 	// TODO: 停止动画
 	stop () {
-        this._clear();
-		this.currentFrameNum = 0;
-		this.alreadyPlayCount = 0;
-		// createjs.Ticker.removeAllEventListeners();
-		createjs.Ticker.off('tick', this.ticker);
+		if(this.state !== 'stop'){
+			this.state = 'stop';
+	        this._clear();
+			this.currentFrameNum = 0;
+			this.alreadyPlayCount = 0;
+			// createjs.Ticker.removeAllEventListeners();
+			createjs.Ticker.off('tick', this.ticker);
+		}
     }
 
 	// TODO: 清除 stage
@@ -140,8 +150,11 @@ module.exports = class Animation {
 
 	// TODO: 暂停动画
 	pause () {
-		// createjs.Ticker.removeAllEventListeners();
-		createjs.Ticker.off('tick', this.ticker);
+		if(this.state !== 'pause'){
+			this.state = 'pause';
+			// createjs.Ticker.removeAllEventListeners();
+			createjs.Ticker.off('tick', this.ticker);
+		}
 	}
 
 	// TODO: 重置 stage 大小

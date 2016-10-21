@@ -1,17 +1,17 @@
 'use strict';
 
 /**
- * @file     : svga-db
- * @author   : lijialiang
- * @team     : UED中心
- * @export   : umd
+ * @file  : svga-db
+ * @author: lijialiang
+ * @team  : UED中心
+ * @export: umd
  */
 
 module.exports = class SvgaDB {
 
 	static db;
 	static table = {
-		name: 'gift',
+		name: 'svga',
 		attribute: 'url, movie, images, time',
 	};
 
@@ -22,7 +22,7 @@ module.exports = class SvgaDB {
 
 	// TODO: 初始化 DB
 	_initDB () {
-		SvgaDB.db = openDatabase('svgadb', '1.0', 'Svga DB', 5 * 1024 * 1024);
+		SvgaDB.db = openDatabase('legox', '1.0', 'LegoX DB', 5 * 1024 * 1024);
 	}
 
 	// TODO: SQL 错误回调

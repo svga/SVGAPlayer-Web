@@ -5,6 +5,7 @@
 * 增加插件 SVGA-DB，使用可持久化常用 SVGA 源文件
 * 优化 worker 转码
 * 更新 Dynamic 功能
+* 增加 getState 获取播放状态
 
 ## 说明
 
@@ -75,7 +76,7 @@ svga.stop();
 | playCount | Number | 否 | 动画播放次数 |
 | autoPlay | Boolean | 否 | 加载完成后是否自动播放 |
 | loop | Boolean | 否 |是否循环播放 |
-| db | Object | 否 | SvgaDB 对象 |
+| db | Object | 否 | SvgaDb 对象 |
 
 ## 方法
 
@@ -90,9 +91,11 @@ Svga.pause() ➜ 暂停动画
 
 Svga.stop() ➜ 停止动画
 
-Svga.setDynamicImage() ➜ 设置 Dynamic 图片
+Svga.setDynamicImage() ➜ 设置 动态图片
 
-Svga.setDynamicText() ➜ 设置 Dynamic 文本
+Svga.setDynamicText() ➜ 设置 动态文本
+
+Svga.getState() ➜ 获取播放状态 ( play || pause || stop )
 ```
 
 ## 插件
@@ -105,21 +108,39 @@ Svga.setDynamicText() ➜ 设置 Dynamic 文本
 
 * 下载 build/svga-db.min.js 文件
 * HTML 直接外链使用 或 JS 模块 require 使用
-* SvgaDB 类 在实例化时候作为 db 参数传入
+* SvgaDb 类 在实例化时候作为 db 参数传入
 
 例子
 
 ```js
-import SvgaDB from './svga-db.min';
+// 模块引用
+import SvgaDb from './svga-db.min';
 
 new Svga({
-	worker   : `${ window.location.origin }/assets/svga-worker.min.js`,
-	canvas   : '#canvas',
-	assets   : `${ window.location.origin }/assets/rose.svga`,
-	autoPlay : true,
-	loop     : true,
-	db 		 : SvgaDB,
+	worker  : `${ window.location.origin }/assets/svga-worker.min.js`,
+	canvas  : '#canvas',
+	assets  : `${ window.location.origin }/assets/rose.svga`,
+	autoPlay: true,
+	loop    : true,
+	db 		: SvgaDb,
 })
+```
+
+```html
+<!-- 外链使用 -->
+<script src="./svga-db.min.js" charset="utf-8"></script>
+<script src="./svga.min.js" charset="utf-8"></script>
+
+<script>
+new Svga({
+	worker  : `${ window.location.origin }/assets/svga-worker.min.js`,
+	canvas  : '#canvas',
+	assets  : `${ window.location.origin }/assets/rose.svga`,
+	autoPlay: true,
+	loop    : true,
+	db 		: window.SvgaDb,
+})
+</script>
 ```
 
 ## 调试构建工具
