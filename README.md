@@ -142,7 +142,6 @@ new Svga({
 })
 </script>
 ```
-
 ## 调试构建工具
 
-使用 [LegoFlow](http://uedfe.yypm.com/md/book/LegoFlow/) 进行调试、构建
+使用 [LegoFlow](http://legox.yy.com/md/book/LegoFlow/) 进行调试、构建
