@@ -30,9 +30,9 @@ module.exports = class Svga extends Animation {
             Svga.worker = new Worker(args.worker);
         }
         // 复用 worker
-        else if(Svga.work === undefined){
-            Svga.worker = new Worker(`${ window.location.origin }/js/export/modules/svga-worker.js`);
-        }
+        // else if(typeof Svga.worker !== 'undefined'){
+        //     Svga.worker = new Worker(Svga.worker);
+        // }
 
         Svga.worker.onerror = (err) => {
             console.log('[SVGA Web Canvas]: worker is error');
