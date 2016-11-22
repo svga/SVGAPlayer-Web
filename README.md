@@ -22,6 +22,14 @@
 
 [前往测试地址](http://uedfe.yypm.com/assets/lab/lijialiang/svga/)
 
+## 注意
+
+因浏览器安全策略问题，以下文件需要同域，并不能跨域
+
+* svga-worker.min.js
+* svga.min.js
+* svga 源文件
+
 ## 使用
 
 * 下载 build/svga.min.js & build/svga-worker.min.js
