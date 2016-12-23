@@ -40,10 +40,12 @@
 
 ```js
 let svga = new Svga({
+	// 依赖 worker 版本需要指定 同域下 worker 路径
 	worker   : `${ window.location.origin }/assets/svga-worker.min.js`,
-	canvas   : '#canvas',
+	// 同域下 svga 源文件
 	// assets   : `${ window.location.origin }/assets/rose.svga`,
 	assets: `${ window.location.origin }/assets/kingset_dyn.svga`,
+	canvas   : '#canvas',
 	playCount: 2,
 	autoPlay : false,
 	loop     : true,
