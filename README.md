@@ -2,6 +2,7 @@
 
 ## 最近更新
 
+* 增加 无使用 worker 版本 build/svga-not-worker.min.js ( gzip 50K )
 * 增加插件 SVGA-DB，使用可持久化常用 SVGA 源文件
 * 优化 worker 转码
 * 更新 动态对象功能
@@ -14,7 +15,7 @@
 ## 实现
 
 * 修复 [原有player](http://code.yy.com/ued/SVGAPlayer-WebCanvas) 实际使用反馈的 bug
-* 轻量化，重构依赖模块，不足 100K ( gzip 后 30K )
+* 轻量化，重构依赖模块，gzip 30K
 * 性能优化，运算开销较大 SVGA 源文件下载转码过程 迁移到 web worker，尽量避免影响主线程，造成页面卡顿
 * UMD 规范，全局引用，或使用模块加载
 
