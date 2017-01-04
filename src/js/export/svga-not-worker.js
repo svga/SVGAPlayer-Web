@@ -3,6 +3,7 @@
  * @author : lijialiang
  * @team   : UED中心
  * @export : umd
+ * @export name: Svga
  */
 
 import Animation from './modules/Animation';
