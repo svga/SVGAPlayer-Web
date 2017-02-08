@@ -3,15 +3,13 @@
  * @author : lijialiang
  * @team   : UED中心
  * @export : umd
+ * @export name: Svga
  */
 
 import Animation from './modules/Animation';
+import MockWorker from './modules/svga-mock-worker';
 
 module.exports = class Svga extends Animation {
-
-    // 固定 worker 地址
-    // FIXME: 跨域问题
-    static worker;
 
     static DB;
 
@@ -24,19 +22,6 @@ module.exports = class Svga extends Animation {
     constructor ( args, readyFunction ) {
 
         super(args);
-
-        // 创建 worker
-        if (args.worker) {
-            Svga.worker = new Worker(args.worker);
-        }
-        // 复用 worker
-        else if (typeof Svga.worker !== 'undefined') {
-            Svga.worker = new Worker(Svga.worker);
-        }
-
-        Svga.worker.onerror = ( err ) => {
-            console.log('[SVGA Web Canvas]: worker is error');
-        };
 
         for (let item in this.optionsInSvga) {
 		    if (typeof args[item] !== 'undefined') {
@@ -95,11 +80,10 @@ module.exports = class Svga extends Animation {
     _initWorker () {
         const { assets } = this.optionsInSvga;
 
-        Svga.worker.postMessage(assets);
-
-        Svga.worker.onmessage = ({ data }) => {
+        MockWorker(assets, (data) => {
             this._loadAssetsComplete(data);
-        };
+        });
+
     }
 
     // TODO: 初始化基类

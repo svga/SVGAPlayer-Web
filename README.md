@@ -5,6 +5,7 @@
 * 1.0.1
 	* 增加 添加播放回调函数，获取当前动画播放进度
 * 1.0.0
+	* 增加 无使用 worker 版本 build/svga-not-worker.min.js ( gzip 50K )
 	* 增加插件 SVGA-DB，使用可持久化常用 SVGA 源文件
 	* 优化 worker 转码
 	* 更新 动态对象功能
@@ -17,13 +18,21 @@
 ## 实现
 
 * 修复 [原有player](http://code.yy.com/ued/SVGAPlayer-WebCanvas) 实际使用反馈的 bug
-* 轻量化，重构依赖模块，不足 100K ( gzip 后 30K )
+* 轻量化，重构依赖模块，gzip 30K
 * 性能优化，运算开销较大 SVGA 源文件下载转码过程 迁移到 web worker，尽量避免影响主线程，造成页面卡顿
 * UMD 规范，全局引用，或使用模块加载
 
 ## DEMO
 
 [前往测试地址](http://uedfe.yypm.com/assets/lab/lijialiang/svga/)
+
+## 注意
+
+因浏览器安全策略问题，以下文件需要同域，并不能跨域
+
+* svga-worker.min.js
+* svga.min.js
+* svga 源文件
 
 ## 使用
 
@@ -34,10 +43,12 @@
 
 ```js
 let svga = new Svga({
+	// 依赖 worker 版本需要指定 同域下 worker 路径
 	worker   : `${ window.location.origin }/assets/svga-worker.min.js`,
-	canvas   : '#canvas',
+	// 同域下 svga 源文件
 	// assets   : `${ window.location.origin }/assets/rose.svga`,
 	assets: `${ window.location.origin }/assets/kingset_dyn.svga`,
+	canvas   : '#canvas',
 	playCount: 2,
 	autoPlay : false,
 	loop     : true,
@@ -149,7 +160,6 @@ new Svga({
 })
 </script>
 ```
-
 ## 调试构建工具
 
-使用 [LegoFlow](http://uedfe.yypm.com/md/book/LegoFlow/) 进行调试、构建
+使用 [LegoFlow](http://legox.yy.com/md/book/LegoFlow/) 进行调试、构建

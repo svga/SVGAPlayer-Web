@@ -1,5 +1,6 @@
 import SvgaDB from './export/svga-db.js';
 import Svga from './export/svga.js';
+// import Svga from './export/svga-not-worker';
 
 console.time('下载转码耗时');
 let svga = new Svga({
@@ -10,7 +11,7 @@ let svga = new Svga({
 	// playCount: 1,
 	// autoPlay: true,
 	autoPlay: false,
-	loop: true,
+	// loop: true,
 	// db: SvgaDB,
 }, ( event ) => {
 	console.log('svga is ready');

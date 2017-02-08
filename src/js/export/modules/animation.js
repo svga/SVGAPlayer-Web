@@ -125,7 +125,8 @@ module.exports = class Animation {
 			}
             if(!this.optionsInAnimation.loop || (this.optionsInAnimation.playCount > 0 && this.alreadyPlayCount >= this.optionsInAnimation.playCount)){
 				this.alreadyPlayCount = 0;
-                this.stop();
+                // this.stop();
+				this._complete();
 				this.complete();
             } else {
                 this.currentFrameNum = 0;
@@ -145,6 +146,17 @@ module.exports = class Animation {
 			createjs.Ticker.off('tick', this.ticker);
 		}
     }
+
+	_complete () {
+		if(this.state !== 'complete'){
+			this.state = 'complete';
+			this.currentFrameNum = 0;
+			this.alreadyPlayCount = 0;
+			// createjs.Ticker.removeAllEventListeners();
+			createjs.Ticker.off('tick', this.ticker);
+		}
+	}
+
 
 	// TODO: 清除 stage
     _clear () {
