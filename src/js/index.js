@@ -12,7 +12,7 @@ let svga = new Svga({
 	autoPlay: false,
 	loop: true,
 	// db: SvgaDB,
-}, (event) => {
+}, ( event ) => {
 	console.log('svga is ready');
 	// svga.play();
 	console.timeEnd('下载转码耗时');
@@ -27,7 +27,9 @@ let svga = new Svga({
 		key   : 'banner',
 	})
 
-	svga.play();
+	svga.play(( percentage ) => {
+		console.log(percentage);
+	});
 })
 
 svga.complete(() => {
@@ -35,7 +37,9 @@ svga.complete(() => {
 })
 
 document.getElementById('play').addEventListener('click', () => {
-	svga.play();
+	svga.play(( percentage ) => {
+		console.log(percentage);
+	});
 	console.log(svga.getState());
 });
 

@@ -79,16 +79,15 @@ module.exports = class Animation {
 	}
 
 	// TODO: 播放动画
-	_play() {
-		if(this.state !== 'play'){
+	_play ( callback = () => {} ) {
+		if (this.state !== 'play') {
 			this.state = 'play';
+			this.callback = callback;
 			// 重新播
 			if(this.stage.children.length === 0){
 				this._drawSprites();
 		        createjs.Ticker.framerate = this.movie.fps;
 			}
-
-	        // createjs.Ticker.addEventListener('tick', this._next.bind(this));
 			this.ticker = createjs.Ticker.on('tick',  this._next.bind(this));
 		}
 	}
@@ -116,14 +115,19 @@ module.exports = class Animation {
         this.currentFrameNum++;
         if (this.currentFrameNum < this.movie.frames) {
             this._update(this.currentFrameNum);
-        }else{
+			if (typeof this.callback == 'function') {
+				this.callback(this.currentFrameNum / this.movie.frames);
+			}
+        } else {
             ++this.alreadyPlayCount;
-
+			if (typeof this.callback == 'function') {
+				this.callback(1);
+			}
             if(!this.optionsInAnimation.loop || (this.optionsInAnimation.playCount > 0 && this.alreadyPlayCount >= this.optionsInAnimation.playCount)){
 				this.alreadyPlayCount = 0;
                 this.stop();
 				this.complete();
-            }else{
+            } else {
                 this.currentFrameNum = 0;
                 this._update(this.currentFrameNum);
             }

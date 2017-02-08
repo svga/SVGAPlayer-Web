@@ -2,10 +2,13 @@
 
 ## 最近更新
 
-* 增加插件 SVGA-DB，使用可持久化常用 SVGA 源文件
-* 优化 worker 转码
-* 更新 动态对象功能
-* 增加 getState 获取播放状态
+* 1.0.1
+	* 增加 添加播放回调函数，获取当前动画播放进度
+* 1.0.0
+	* 增加插件 SVGA-DB，使用可持久化常用 SVGA 源文件
+	* 优化 worker 转码
+	* 更新 动态对象功能
+	* 增加 getState 获取播放状态
 
 ## 说明
 
@@ -51,14 +54,18 @@ let svga = new Svga({
 		key   : 'banner',
 	})
 
-	svga.play();
+	svga.play(( percentage ) => {
+		console.log(percentage);
+	});
 })
 
 svga.complete(() => {
 	console.log('svga complete');
-})
+});
 
-svga.play();
+svga.play(( percentage ) => {
+	console.log(percentage);
+});
 
 svga.pause();
 
@@ -85,7 +92,7 @@ new Svga(...) ➜ 构造方法，返回实例对象
 
 Svga.complete(() => { }) ➜ 动画完成后回调
 
-Svga.play() ➜ 播放动画
+Svga.play( callback = ( percentage ) => {} ) ➜ 播放动画
 
 Svga.pause() ➜ 暂停动画
 
