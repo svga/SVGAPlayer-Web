@@ -12,7 +12,7 @@ let svga = new Svga({
 	// playCount: 1,
 	autoPlay: true,
 	// autoPlay: false,
-	// loop: true,
+	loop: true,
 	// db: SvgaDB,
 }, ( event ) => {
 	console.log('svga is ready');

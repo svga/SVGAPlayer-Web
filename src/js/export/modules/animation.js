@@ -4,7 +4,6 @@
  */
 
 require('./easeljs.min');
-import Bezier from './bezier/bezier';
 
 module.exports = class Animation {
 
@@ -200,15 +199,12 @@ module.exports = class Animation {
 			let frame = this.sprites[spriteIndex].frames[frameNum];
 
             if(frame !== undefined) {
-
 				let element = this.stage.children[spriteIndex];
-
 				if(frame.shapes){
 					frame.shapes.forEach((item, index) => {
 					    this._drawShape(element, item);
 					})
 				}
-
                 if(frame.alpha !== undefined) {
                     element.alpha = frame.alpha;
                 }else{
@@ -226,7 +222,6 @@ module.exports = class Animation {
                     element.width = undefined;
                     element.height = undefined;
                 }
-
                 if(frame.transform !== undefined) {
 					let newTransform = {
                         a: frame.transform.a,
@@ -245,7 +240,12 @@ module.exports = class Animation {
                 }else{
                     element.transformMatrix = new createjs.Matrix2D(1.0, 0.0, 0.0, 1.0, 0.0, 0.0);
                 }
-
+				if (frame.clipPath !== undefined) {
+					element.mask = this._path(frame.clipPath);
+				}
+				else {
+					element.mask = null;
+				}
             }
         }
         this.stage.update();
@@ -255,56 +255,57 @@ module.exports = class Animation {
 		switch (item.type) {
 			case 'shape':
 				shape.graphics.clear();
-				this._mask(item, shape);
+				this._shape_style(item.styles, shape.graphics);
+				this._path(item.args.d, item.transform, shape);
 				break;
 			case 'keep':
 				break;
 			case 'ellipse':
 				shape.graphics.clear();
-				this._mask_style(item, shape.graphics);
+				this._shape_style(item.styles, shape.graphics);
 				shape.graphics.drawEllipse((item.args.x - item.args.radiusX / 2), (item.args.y - item.args.radiusY / 2), item.args.radiusX, item.args.radiusY);
+                if (item.transform) {
+                    shape.transformMatrix = new createjs.Matrix2D(item.transform.a, item.transform.b, item.transform.c, item.transform.d, item.transform.tx, item.transform.ty);
+                }
 				break;
 			case  'rect':
-				console.log('oop');
+                shape.graphics.clear();
+				this._shape_style(item.styles, shape.graphics);
+				shape.graphics.drawRoundRect(item.args.x, item.args.y, item.args.width, item.args.height, item.args.cornerRadius);
+                if (item.transform) {
+                    shape.transformMatrix = new createjs.Matrix2D(item.transform.a, item.transform.b, item.transform.c, item.transform.d, item.transform.tx, item.transform.ty);
+                }
 				break;
 			default:
 				console.log(123);
 		}
 	}
 
-	_mask_style (frame, g) {
-		if(frame.styles && frame.styles.stroke){
-			g.beginStroke(`rgba(${ parseInt(frame.styles.stroke[0] * 255) }, ${ parseInt(frame.styles.stroke[1] * 255) }, ${ parseInt(frame.styles.stroke[2] * 255) }, ${ frame.styles.stroke[3] })`);
+	_shape_style (styles, g) {
+		if(styles && styles.stroke){
+			g.beginStroke(`rgba(${ parseInt(styles.stroke[0] * 255) }, ${ parseInt(styles.stroke[1] * 255) }, ${ parseInt(styles.stroke[2] * 255) }, ${ styles.stroke[3] })`);
 		}
-
-		if(frame.styles && frame.styles.stroke){
-			g.beginStroke(`rgba(${ parseInt(frame.styles.stroke[0] * 255) }, ${ parseInt(frame.styles.stroke[1] * 255) }, ${ parseInt(frame.styles.stroke[2] * 255) }, ${ frame.styles.stroke[3] })`)
+		if(styles && styles.stroke){
+			g.beginStroke(`rgba(${ parseInt(styles.stroke[0] * 255) }, ${ parseInt(styles.stroke[1] * 255) }, ${ parseInt(styles.stroke[2] * 255) }, ${ styles.stroke[3] })`)
 		}
-
-		if(frame.styles){
-			const width = frame.styles.strokeWidth || 0;
-			const caps = frame.styles.lineCap || '';
-			const joints = frame.styles.lineJoin || '';
-			const miterLimit = frame.styles.miterLimit || '';
+		if(styles){
+			const width = styles.strokeWidth || 0;
+			const caps = styles.lineCap || '';
+			const joints = styles.lineJoin || '';
+			const miterLimit = styles.miterLimit || '';
 			g.setStrokeStyle(width, caps, joints, miterLimit, true);
 		}
-
-		if(frame.styles && frame.styles.fill){
-			g.beginFill(`rgba(${ parseInt(frame.styles.fill[0] * 255) }, ${ parseInt(frame.styles.fill[1] * 255) }, ${ parseInt(frame.styles.fill[2] * 255) }, ${ frame.styles.fill[3] })`);
+		if(styles && styles.fill){
+			g.beginFill(`rgba(${ parseInt(styles.fill[0] * 255) }, ${ parseInt(styles.fill[1] * 255) }, ${ parseInt(styles.fill[2] * 255) }, ${ styles.fill[3] })`);
 		}
-
-		if(frame.styles && frame.styles.lineDash){
-			g.setStrokeDash([frame.styles.lineDash[0], frame.styles.lineDash[1]], frame.styles.lineDash[2]);
+		if(styles && styles.lineDash){
+			g.setStrokeDash([styles.lineDash[0], styles.lineDash[1]], styles.lineDash[2]);
 		}
 	}
 
-    _mask (frame, elShape) {
-        let path = frame.clipPath || frame.args.d;
+    _path (path, transform, elShape) {
         let shape = elShape || new createjs.Shape();
         let g = shape.graphics;
-
-		this._mask_style(frame, g);
-
         shape.x = 0;
         shape.y = 0;
         let args = [];
@@ -349,109 +350,37 @@ module.exports = class Animation {
                 case 'M':
                     point.x = Number(arg[1]);
                     point.y = Number(arg[2]);
-					if(frame.styles && frame.styles.trim){
-						const { start, end } = frame.styles.trim;
-						if(point.x < start){
-							point.x = start;
-						}
-						if(point.y > end){
-							point.y = end;
-						}
-					}
                     g.mt(point.x, point.y);
                     break;
                 case 'm':
                     point.x += Number(arg[1]);
                     point.y += Number(arg[2]);
-					if(frame.styles && frame.styles.trim){
-						const { start, end } = frame.styles.trim;
-						if(point.x < start){
-							point.x = start;
-						}
-						if(point.y > end){
-							point.y = end;
-						}
-					}
                     g.mt(point.x, point.y);
                     break;
                 case 'L':
                     point.x = Number(arg[1]);
                     point.y = Number(arg[2]);
-					if(frame.styles && frame.styles.trim){
-						const { start, end } = frame.styles.trim;
-						if(point.x < start){
-							point.x = start;
-						}
-						if(point.y > end){
-							point.y = end;
-						}
-					}
                     g.lt(point.x, point.y);
                     break;
                 case 'l':
                     point.x += Number(arg[1]);
                     point.y += Number(arg[2]);
-					if(frame.styles && frame.styles.trim){
-						const { start, end } = frame.styles.trim;
-						if(point.x < start){
-							point.x = start;
-						}
-						if(point.y > end){
-							point.y = end;
-						}
-					}
                     g.lt(point.x, point.y);
                     break;
                 case 'H':
                     point.x = Number(arg[1]);
-					if(frame.styles && frame.styles.trim){
-						const { start, end } = frame.styles.trim;
-						if(point.x < start){
-							point.x = start;
-						}
-						if(point.y > end){
-							point.y = end;
-						}
-					}
                     g.lt(point.x, point.y);
                     break;
                 case 'h':
                     point.x += Number(arg[1]);
-					if(frame.styles && frame.styles.trim){
-						const { start, end } = frame.styles.trim;
-						if(point.x < start){
-							point.x = start;
-						}
-						if(point.y > end){
-							point.y = end;
-						}
-					}
                     g.lt(point.x, point.y);
                     break;
                 case 'V':
                     point.y = Number(arg[1]);
-					if(frame.styles && frame.styles.trim){
-						const { start, end } = frame.styles.trim;
-						if(point.x < start){
-							point.x = start;
-						}
-						if(point.y > end){
-							point.y = end;
-						}
-					}
                     g.lt(point.x, point.y);
                     break;
                 case 'v':
                     point.y += Number(arg[1]);
-					if(frame.styles && frame.styles.trim){
-						const { start, end } = frame.styles.trim;
-						if(point.x < start){
-							point.x = start;
-						}
-						if(point.y > end){
-							point.y = end;
-						}
-					}
                     g.lt(point.x, point.y);
                     break;
                 case 'C':
@@ -461,18 +390,6 @@ module.exports = class Animation {
                     point.y2 = Number(arg[4]);
                     point.x = Number(arg[5]);
                     point.y = Number(arg[6]);
-					if(frame.styles && frame.styles.trim){
-						const { start, end } = frame.styles.trim;
-						let curve = new Bezier(point.x1, point.y1, point.x2, point.y2, point.x, point.y).split(start, end);
-						console.log(curve.points);
-						console.log(curve.split(start, end).points);
-						point.x1 = curve.points[0].x;
-						point.y1 = curve.points[0].y;
-						point.x2 = curve.points[1].x;
-						point.y2 = curve.points[1].y;
-						point.x  = curve.points[2].x;
-						point.y  = curve.points[2].y;
-					}
                     g.bt(point.x1, point.y1, point.x2, point.y2, point.x, point.y);
                     break;
                 case 'c':
@@ -544,10 +461,9 @@ module.exports = class Animation {
                     break;
             }
         }
-        if (frame.transform) {
-            shape.transformMatrix = new createjs.Matrix2D(frame.transform.a, frame.transform.b, frame.transform.c, frame.transform.d, frame.transform.tx, frame.transform.ty);
+        if (transform) {
+            shape.transformMatrix = new createjs.Matrix2D(transform.a, transform.b, transform.c, transform.d, transform.tx, transform.ty);
         }
-
         return shape;
     }
 }
