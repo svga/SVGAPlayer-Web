@@ -5,7 +5,7 @@ import SVGAParser from './export/svga-parser';
 
 let player = new SVGAPlayer(document.getElementById('canvas'));
 let parser = new SVGAParser(`${ window.location.origin }/assets/svga-worker.min.js`, SVGADB)
-parser.load(`${ window.location.origin }/assets/angel.svga`, (videoItem) => {
+parser.load(`${ window.location.origin }/assets/rose.svga`, (videoItem) => {
 	player.setVideoItem(videoItem);
 	player.startAnimation();
 });

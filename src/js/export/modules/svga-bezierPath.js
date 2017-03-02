@@ -25,9 +25,9 @@ module.exports = class SVGABezierPath {
     _shape;
 
     constructor(d, transform, styles) {
-        this._shape = createShape(d, transform)
+        this._shape = this.createShape(d, transform)
         if (styles) {
-            resetStyle(styles)
+            this.resetStyle(styles)
         }
     }
 
