@@ -121,6 +121,10 @@ module.exports = class SVGAVideoSpriteEntity {
                     if (layer.vectorLayer && typeof layer.vectorLayer.stepToFrame === "function") {
                         layer.vectorLayer.stepToFrame(frame);
                     }
+                    if (layer.textLayer) {
+                        layer.textLayer.x = (frameItem.layout.width - layer.textLayer.getBounds().width) / 2.0 + layer.textLayer.offset.x;
+                        layer.textLayer.y = (frameItem.layout.height - layer.textLayer.getBounds().height) / 2.0 + layer.textLayer.offset.y;
+                    }
                 }
                 else {
                     layer.visible = false;
@@ -132,7 +136,12 @@ module.exports = class SVGAVideoSpriteEntity {
 
     _attachBitmapLayer(layer, bitmap) {
         let imgTag = document.createElement('img');
-        imgTag.src = 'data:image/png;base64,' + bitmap;
+        if (bitmap.indexOf("iVBO") === 0 || bitmap.indexOf("/9j/2w") === 0) {
+            imgTag.src = 'data:image/png;base64,' + bitmap;
+        }
+        else {
+            imgTag.src = bitmap;
+        }
         layer.bitmapLayer = new createjs.Bitmap(imgTag);
         layer.bitmapLayer.frames = this.frames;
         layer.bitmapLayer.stepToFrame = (frame) => {}

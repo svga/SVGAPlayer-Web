@@ -208,11 +208,8 @@ module.exports = class SVGABezierPath {
 		if(styles && styles.stroke){
 			this._shape.graphics.beginStroke(`rgba(${ parseInt(styles.stroke[0] * 255) }, ${ parseInt(styles.stroke[1] * 255) }, ${ parseInt(styles.stroke[2] * 255) }, ${ styles.stroke[3] })`);
 		}
-		if(styles && styles.stroke){
-			this._shape.graphics.beginStroke(`rgba(${ parseInt(styles.stroke[0] * 255) }, ${ parseInt(styles.stroke[1] * 255) }, ${ parseInt(styles.stroke[2] * 255) }, ${ styles.stroke[3] })`)
-		}
 		if(styles){
-			const width = styles.strokeWidth || 0;
+			const width = styles.strokeWidth || 0.0;
 			const caps = styles.lineCap || '';
 			const joints = styles.lineJoin || '';
 			const miterLimit = styles.miterLimit || '';

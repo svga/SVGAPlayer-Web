@@ -29,7 +29,7 @@ module.exports = class SVGAPlayer {
         this.stopAnimation(false);
         this._loopCount = 0;
         createjs.Ticker.framerate = 60;
-        createjs.Ticker.addEventListener("tick", this._onTick.bind(this));
+        this._tickListener = createjs.Ticker.addEventListener("tick", this._onTick.bind(this));
     }
 
     pauseAnimation() {
@@ -40,34 +40,51 @@ module.exports = class SVGAPlayer {
         if (clear === undefined) {
             clear = this.clearsAfterStop
         }
-        createjs.Ticker.removeEventListener("tick", this._onTick);
+        createjs.Ticker.removeEventListener("tick", this._tickListener);
         if (clear) {
             this.clear();
         }
     }
 
     clear() {
-
+        this._stageLayer.removeAllChildren();
+        this._stageLayer.update();
     }
 
     stepToFrame(frame, andPlay) {
-
+        if (frame >= this._videoItem.frames || frame < 0) {
+            return;
+        }
+        this.pauseAnimation();
+        this._currentFrame = frame;
+        this._update();
+        if (andPlay) {
+            createjs.Ticker.framerate = 60;
+            this._tickListener = createjs.Ticker.addEventListener("tick", this._onTick.bind(this));
+        }
     }
 
     stepToPercentage(percentage, andPlay) {
-
+        let frame = parseInt(percentage * this._videoItem.frames);
+        if (frame >= this._videoItem.frames && frame > 0) {
+            frame = this._videoItem.frames - 1;
+        }
+        this.stepToFrame(frame, andPlay);
     }
 
-    setImage(image, forKey) {
-
+    setImage(urlORbase64, forKey) {
+        this._dynamicImage[forKey] = urlORbase64;
     }
 
-    setText(image, forKey) {
-
+    setText(text, size, family, color, offset, forKey) {
+        let textLayer = new createjs.Text(text, `${ size } family`, color);
+        textLayer.offset = offset || {x: 0.0, y: 0.0};
+        this._dynamicText[forKey] = textLayer;
     }
 
-    clearDynamicObjects(image, forKey) {
-
+    clearDynamicObjects() {
+        this._dynamicImage = {};
+        this._dynamicText = {};
     }
 
     /**
@@ -80,13 +97,16 @@ module.exports = class SVGAPlayer {
     _drawLayer = null;
     _loopCount = 0;
     _currentFrame = 0;
+    _tickListener = null;
+    _dynamicImage = {};
+    _dynamicText = {};
      
     _nextTickTime = 0;
     _onTick() {
         if (typeof this._videoItem === "object") {
-            if ((new Date()).getTime() - this._nextTickTime >= -1) {
+            if ((new Date()).getTime() >= this._nextTickTime) {
+                this._nextTickTime = parseInt(1000 / this._videoItem.FPS) + (new Date()).getTime() - (60 / this._videoItem.FPS) * 2
                 this._next();
-                this._nextTickTime = parseInt(1000 / this._videoItem.FPS) + (new Date()).getTime()
             }
         }
     }
@@ -110,9 +130,15 @@ module.exports = class SVGAPlayer {
         this._videoItem.sprites.forEach(function(sprite) {
             let bitmap;
             if (sprite.imageKey) {
-                bitmap = self._videoItem.images[sprite.imageKey];
+                bitmap = self._dynamicImage[sprite.imageKey] || self._videoItem.images[sprite.imageKey];
             }
             let contentLayer = sprite.requestLayer(bitmap);
+            if (sprite.imageKey) {
+                if (self._dynamicText[sprite.imageKey]) {
+                    contentLayer.textLayer = self._dynamicText[sprite.imageKey];
+                    contentLayer.addChild(self._dynamicText[sprite.imageKey])
+                }
+            }
             self._drawLayer.addChild(contentLayer);
         })
         this._stageLayer.addChild(this._drawLayer);
