@@ -2,6 +2,77 @@
 require('./easeljs.min')
 
 import SVGAVideoSpriteFrameEntity from './svga-videoSpriteFrameEntity'
+import SVGABezierPath from './svga-bezierPath'
+import SVGARectPath from './svga-rectPath'
+import SVGAEllipsePath from './svga-ellipsePath'
+
+class SVGAVectorLayer extends createjs.Container {
+
+    drawedFrame = 0;
+    frames = [];
+    keepFrameCache = {};
+
+    constructor(frames) {
+        super()
+        this.frames = frames;
+        this.resetKeepFrameCache()
+    }
+
+    stepToFrame = (frame) => {
+        if (frame < this.frames.length) {
+            this.drawFrame(frame);
+        }
+    }
+
+    resetKeepFrameCache() {
+        this.keepFrameCache = {}
+        let lastKeep = 0;
+        this.frames.forEach((obj, idx) => {
+            if (!this.isKeepFrame(obj)) {
+                lastKeep = idx;
+            }
+            else {
+                this.keepFrameCache[idx] = lastKeep;
+            }
+        });
+    }
+
+    requestKeepFrame = (frame) => {
+        return this.keepFrameCache[frame]
+    }
+
+    isKeepFrame(frameItem) {
+        return frameItem.shapes && frameItem.shapes.length > 0 && frameItem.shapes[0].type === "keep";
+    }
+
+    drawFrame = (frame) => {
+        if (frame < this.frames.length) {
+            let frameItem = this.frames[frame];
+            if (this.isKeepFrame(frameItem)) {
+                if (this.drawedFrame === this.requestKeepFrame(frame)) {
+                    return;
+                }
+            }
+            this.removeAllChildren();
+            frameItem.shapes.forEach((shape) => {
+                if (shape.type === "shape" && shape.args && shape.args.d) {
+                    let bezierPath = new SVGABezierPath(shape.args.d, shape.transform, shape.styles);
+                    this.addChild(bezierPath.getShape());
+                }
+                if (shape.type === "ellipse" && shape.args) {
+                    let bezierPath = new SVGAEllipsePath(parseFloat(shape.args.x) || 0.0, parseFloat(shape.args.y) || 0.0, parseFloat(shape.args.radiusX) || 0.0, parseFloat(shape.args.radiusY) || 0.0, shape.transform, shape.styles);
+                    this.addChild(bezierPath.getShape());
+                }
+                if (shape.type === "rect" && shape.args) {
+                    let bezierPath = new SVGARectPath(parseFloat(shape.args.x) || 0.0, parseFloat(shape.args.y) || 0.0, parseFloat(shape.args.width) || 0.0, parseFloat(shape.args.height) || 0.0, parseFloat(shape.args.cornerRadius) || 0.0, shape.transform, shape.styles);
+                    this.addChild(bezierPath.getShape());
+                }
+            })
+            this.drawedFrame = frame;
+        }
+    }
+
+}
 
 module.exports = class SVGAVideoSpriteEntity {
     
@@ -41,6 +112,9 @@ module.exports = class SVGAVideoSpriteEntity {
                     layer.setBounds(frameItem.layout.x, frameItem.layout.y, frameItem.layout.width, frameItem.layout.height);
                     layer.transformMatrix = new createjs.Matrix2D(frameItem.transform.a, frameItem.transform.b, frameItem.transform.c, frameItem.transform.d, frameItem.transform.tx, frameItem.transform.ty);
                     layer.mask = frameItem.maskShape;
+                    if (layer.mask) {
+                        layer.mask.transformMatrix = layer.transformMatrix
+                    }
                     if (layer.bitmapLayer && typeof layer.bitmapLayer.stepToFrame === "function") {
                         layer.bitmapLayer.stepToFrame(frame);
                     }
@@ -61,18 +135,12 @@ module.exports = class SVGAVideoSpriteEntity {
         imgTag.src = 'data:image/png;base64,' + bitmap;
         layer.bitmapLayer = new createjs.Bitmap(imgTag);
         layer.bitmapLayer.frames = this.frames;
-        layer.bitmapLayer.stepToFrame = (frame) => {
-
-        }
+        layer.bitmapLayer.stepToFrame = (frame) => {}
         layer.addChild(layer.bitmapLayer);
     }
 
     _attachVectorLayer(layer) {
-        layer.vectorLayer = new createjs.Container();
-        layer.vectorLayer.frames = this.frames;
-        layer.vectorLayer.stepToFrame = (frame) => {
-
-        }
+        layer.vectorLayer = new SVGAVectorLayer(this.frames);
         layer.addChild(layer.vectorLayer);
     }
 

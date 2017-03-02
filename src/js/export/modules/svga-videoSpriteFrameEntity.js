@@ -54,7 +54,7 @@ module.exports = class SVGAVideoSpriteFrameEntity {
             }
             if (spec.clipPath && spec.clipPath.length > 0) {
                 let bezierPath = new SVGABezierPath(spec.clipPath);
-                maskShape = bezierPath.getShape();
+                this.maskShape = bezierPath.getShape();
             }
             if (spec.shapes) {
                 this.shapes = spec.shapes

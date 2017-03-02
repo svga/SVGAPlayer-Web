@@ -1,4 +1,6 @@
 
+require('./easeljs.min')
+
 let validMethods = {
     'M': 1,
     'm': 1,
@@ -25,18 +27,22 @@ module.exports = class SVGABezierPath {
     _shape;
 
     constructor(d, transform, styles) {
-        this._shape = this.createShape(d, transform)
+        this._shape = new createjs.Shape();
+        if (d === undefined) {
+            return;
+        }
         if (styles) {
             this.resetStyle(styles)
         }
+        this.createShape(d, transform, this._shape)
     }
 
     getShape() {
         return this._shape
     }
 
-    createShape(d, transform) {
-        let shape = new createjs.Shape();
+    createShape(d, transform, outShape) {
+        let shape = outShape || new createjs.Shape();
         let g = shape.graphics;
         shape.x = 0;
         shape.y = 0;
@@ -196,7 +202,6 @@ module.exports = class SVGABezierPath {
         if (transform) {
             shape.transformMatrix = new createjs.Matrix2D(transform.a, transform.b, transform.c, transform.d, transform.tx, transform.ty);
         }
-        return shape;
     }
 
     resetStyle (styles) {

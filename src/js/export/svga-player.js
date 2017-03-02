@@ -15,7 +15,7 @@ module.exports = class SVGAPlayer {
     clearsAfterStop = true;
 
     constructor (canvas) {
-        this._canvas = canvas;
+        this._canvas = typeof canvas === "string" ? document.querySelector(canvas) : canvas;
         this._stageLayer = new createjs.Stage(this._canvas);
     }
 
@@ -122,7 +122,6 @@ module.exports = class SVGAPlayer {
     }
 
     _resize() {
-        let canvas = typeof this._canvas === "string" ? document.querySelector(this._canvas) : this._canvas;
         let ratio = this._canvas.width / this._videoItem.videoSize.width;
         this._drawLayer.transformMatrix = new createjs.Matrix2D(ratio, 0.0, 0.0, ratio, 0.0, 0.0);
     }
