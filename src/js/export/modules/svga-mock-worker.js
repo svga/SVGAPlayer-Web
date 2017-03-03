@@ -45,8 +45,11 @@ const base64ArrayBuffer = (arrayBuffer) => {
 
 const actions = {
 
-	// TODO 请求加载资源
 	loadAssets: (url, cb) => {
+        if (url instanceof File) {
+            actions.loadFile(url, cb);
+            return;
+        }
 		let xhr = new XMLHttpRequest();
 		// worker 使用同步
         xhr.open('GET', url, true);
@@ -61,7 +64,15 @@ const actions = {
         xhr.send();
 	},
 
-	// TODO 转码资源文件
+	loadFile: (file, cb) => {
+        var reader = new FileReader();
+        reader.readAsArrayBuffer(file);
+        reader.onload = function (e) {
+            var arrayBuffer = new Uint8Array(reader.result);
+            actions.decodeAssets(Zip.inflate(arrayBuffer).files, cb);
+        }
+	},
+
 	decodeAssets: (files, cb) => {
 		const movie = files['movie.spec'].inflate();
 		largeuint8ArrToString(movie, (data) => {
