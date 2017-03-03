@@ -168,11 +168,12 @@ module.exports = class SVGAPlayer {
         this._stageLayer.addChild(this._drawLayer);
         this._currentFrame = 0;
         this._update();
-        this._resize();
     }
 
     _resize() {
-        let ratio = this._canvas.width / this._videoItem.videoSize.width;
+        this._canvas.width = this._canvas.offsetWidth;
+        this._canvas.height = this._canvas.offsetHeight;
+        let ratio = this._canvas.offsetWidth / this._videoItem.videoSize.width;
         this._drawLayer.transformMatrix = new createjs.Matrix2D(ratio, 0.0, 0.0, ratio, 0.0, 0.0);
     }
 
@@ -182,6 +183,7 @@ module.exports = class SVGAPlayer {
                 child.stepToFrame(this._currentFrame);
             }
         });
+        this._resize();
         this._stageLayer.update();
     }
 

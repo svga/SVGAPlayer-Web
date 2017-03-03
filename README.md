@@ -44,7 +44,9 @@
 * 下载 build/svga.min.js & build/svga-worker.min.js & build/zip.js
 * HTML 直接外链使用 或 JS 模块 require 使用
 
-### 例子
+### 手动加载动画
+
+可以通过创建 Player 和 Parser，手动加载 SVGA 动画。
 
 ```html
 <html lang="zh-cmn-Hans">
@@ -56,7 +58,7 @@
     <meta name="format-detection" content="telephone=no,address=no,email=no">
     <meta http-equiv="Cache-Control" content="no-transform">
     <meta http-equiv="Cache-Control" content="no-siteapp">
-    <title> Example </title>
+    <title>Example</title>
 </head>
 <body>
 
@@ -69,11 +71,45 @@
 
 	<script>
         let player = new Svga.Player('#canvas');
-        let parser = new Svga.Parser(`../build/svga-worker.min.js`, Svga.DB)
+        let parser = new Svga.Parser(`../build/svga-worker.min.js`, Svga.DB); // 可以不传任何参数，达到不使用 Worker，不使用 DB 的目的。
         parser.load('../example/EmptyState.svga', (videoItem) => {
             player.setVideoItem(videoItem);
             player.startAnimation();
         });
+	</script>
+
+</body>
+</html>
+```
+
+### 自动加载动画
+
+可以为 canvas 标签设置 src 值，将 svga 源文件地址设为其值，然后执行 ```Svga.autoload()```。
+
+```html
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="description" content="">
+    <meta name="keywords" content="">
+    <meta name="format-detection" content="telephone=no,address=no,email=no">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <title>Example</title>
+</head>
+<body>
+
+    <div id="test">
+        <canvas src="../example/EmptyState.svga" style="background-color: #000000; width: 500px; height: 500px;"></canvas>
+    </div>
+
+    <script src="../build/zip.js" charset="utf-8"></script>
+	<script src="../build/svga.min.js" charset="utf-8"></script>
+
+	<script>
+        Svga.autoload(); // 第一个参数可以是DOM对象，或者 undefined。
+        // Svga.autoload(undefined, new Svga.Parser(`../build/svga-worker.min.js`, Svga.DB)); // 可以自定义一个 Parser， 以启用 Worker 和 DB。
 	</script>
 
 </body>

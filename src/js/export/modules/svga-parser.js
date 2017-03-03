@@ -49,6 +49,7 @@ module.exports = class SVGAParser {
     
     loadViaWorker(url, callback) {
         if (SVGAParser.worker) {
+            console.log("using worker.");
             SVGAParser.worker.postMessage(url);
             SVGAParser.worker.onmessage = ({ data }) => {
                 let movie = data.movie;
