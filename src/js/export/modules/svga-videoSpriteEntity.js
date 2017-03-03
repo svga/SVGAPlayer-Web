@@ -122,8 +122,9 @@ module.exports = class SVGAVideoSpriteEntity {
                         layer.vectorLayer.stepToFrame(frame);
                     }
                     if (layer.textLayer) {
+                        layer.textLayer.textBaseline = "middle"
                         layer.textLayer.x = (frameItem.layout.width - layer.textLayer.getBounds().width) / 2.0 + layer.textLayer.offset.x;
-                        layer.textLayer.y = (frameItem.layout.height - layer.textLayer.getBounds().height) / 2.0 + layer.textLayer.offset.y;
+                        layer.textLayer.y = frameItem.layout.height / 2.0 + layer.textLayer.offset.y;
                     }
                 }
                 else {

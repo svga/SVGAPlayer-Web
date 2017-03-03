@@ -1,13 +1,7 @@
-/**
- * @file   : svga-web-canvas
- * @author : lijialiang
- * @team   : UED中心
- * @export : umd
- */
+'use strict';
 
-require('./modules/easeljs.min')
-
-import SVGAVideoEntity from './modules/svga-videoEntity'
+require('./easeljs.min')
+import SVGAVideoEntity from './svga-videoEntity'
 
 module.exports = class SVGAPlayer {
 
@@ -76,15 +70,33 @@ module.exports = class SVGAPlayer {
         this._dynamicImage[forKey] = urlORbase64;
     }
 
-    setText(text, size, family, color, offset, forKey) {
+    setText(textORMap, forKey) {
+        let text = typeof textORMap === "string" ? textORMap : textORMap.text;
+        // , size, family, color, offset
+        let size = (typeof textORMap === "object" ? textORMap.size : "14px") || "14px";
+        let family = (typeof textORMap === "object" ? textORMap.family : "") || "";
+        let color = (typeof textORMap === "object" ? textORMap.color : "#000000") || "#000000";
+        let offset = (typeof textORMap === "object" ? textORMap.offset : {x: 0.0, y: 0.0}) || {x: 0.0, y: 0.0};
         let textLayer = new createjs.Text(text, `${ size } family`, color);
-        textLayer.offset = offset || {x: 0.0, y: 0.0};
+        textLayer.offset = offset;
         this._dynamicText[forKey] = textLayer;
     }
 
     clearDynamicObjects() {
         this._dynamicImage = {};
         this._dynamicText = {};
+    }
+
+    onFinished(callback) {
+        this._onFinished = callback;
+    }
+
+    onFrame(callback) {
+        this._onFrame = callback;
+    }
+
+    onPercentage(callback) {
+        this._onPercentage = callback;
     }
 
     /**
@@ -100,6 +112,9 @@ module.exports = class SVGAPlayer {
     _tickListener = null;
     _dynamicImage = {};
     _dynamicText = {};
+    _onFinished = null;
+    _onFrame = null;
+    _onPercentage = null;
      
     _nextTickTime = 0;
     _onTick() {
@@ -118,9 +133,18 @@ module.exports = class SVGAPlayer {
             this._loopCount++;
             if (this.loops > 0 && this._loopCount >= this.loops) {
                 this.stopAnimation();
+                if (typeof this._onFinished === "function") {
+                    this._onFinished();
+                }
             }
         }
         this._update();
+        if (typeof this._onFrame === "function") {
+            this._onFrame(this._currentFrame);
+        }
+        if (typeof this._onPercentage === "function") {
+            this._onPercentage(parseFloat(this._currentFrame + 1) / parseFloat(this._videoItem.frames));
+        }
     }
 
     _draw() {

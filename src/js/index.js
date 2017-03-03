@@ -1,12 +1,9 @@
-import SVGADB from './export/svga-db.js';
-import SVGAPlayer from './export/svga-player';
-import SVGAParser from './export/svga-parser';
-// import Svga from './export/svga-not-worker';
+import SVGA from './export/svga.js';
 
-let player = new SVGAPlayer('#canvas');
+let player = new SVGA.Player('#canvas');
 // player.setImage(`${ window.location.origin }/assets/avatar.png`, "99");
-player.setText('崔小姐不吃鱼 送了帝王套', "18px", "Arial", "#ffe0a4", {x: 0.0, y: -3.0}, "FL_11_png");
-let parser = new SVGAParser(`${ window.location.origin }/assets/svga-worker.min.js`, SVGADB)
+player.setText({text: '崔小姐不吃鱼 送了帝王套', size: "18px", color: "#ffe0a4"}, "FL_11_png");
+let parser = new SVGA.Parser(`${ window.location.origin }/assets/svga-worker.min.js`, SVGA.DB)
 parser.load(`${ window.location.origin }/assets/halloween.svga`, (videoItem) => {
 	player.setVideoItem(videoItem);
 	player.startAnimation();
