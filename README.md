@@ -101,7 +101,7 @@
 <body>
 
     <div id="test">
-        <canvas src="../example/EmptyState.svga" style="background-color: #000000; width: 500px; height: 500px;"></canvas>
+        <canvas id="TestCanvas" src="../example/EmptyState.svga" loops="0" clearsAfterStop="true" style="background-color: #000000; width: 500px; height: 500px;"></canvas>
     </div>
 
     <script src="../build/zip.js" charset="utf-8"></script>
@@ -110,6 +110,7 @@
 	<script>
         Svga.autoload(); // 第一个参数可以是DOM对象，或者 undefined。
         // Svga.autoload(undefined, new Svga.Parser(`../build/svga-worker.min.js`, Svga.DB)); // 可以自定义一个 Parser， 以启用 Worker 和 DB。
+        var player = document.getElementById('TestCanvas').player; // 可以通过这种方式取得 SVGAPlayer 对象，直接操纵动画。
 	</script>
 
 </body>

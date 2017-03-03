@@ -18,11 +18,20 @@ let autoLoader = (element, customParser) => {
     if (element) {
         if (element.tagName === "CANVAS" && element.attributes.src && element.attributes.src.value.endsWith(".svga")) {
             let src = element.attributes.src.value;
+            let player = new SVGAPlayer(element);
             parser.load(src, (videoItem) => {
-                let player = new SVGAPlayer(element);
+                if (element.attributes.loops) {
+                    let loops = parseFloat(element.attributes.loops.value) || 0;
+                    player.loops = loops;
+                }
+                if (element.attributes.clearsAfterStop) {
+                    let clearsAfterStop = !(element.attributes.clearsAfterStop.value === "false")
+                    player.clearsAfterStop = clearsAfterStop;
+                }
                 player.setVideoItem(videoItem);
                 player.startAnimation();
             });
+            element.player = player;
         }
     }
     else {

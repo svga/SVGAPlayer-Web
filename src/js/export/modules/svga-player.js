@@ -32,7 +32,7 @@ module.exports = class SVGAPlayer {
 
     stopAnimation(clear) {
         if (clear === undefined) {
-            clear = this.clearsAfterStop
+            clear = this.clearsAfterStop;
         }
         createjs.Ticker.removeEventListener("tick", this._tickListener);
         if (clear) {
