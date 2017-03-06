@@ -16,7 +16,7 @@ let sharedParser = new SVGAParser();
 let autoLoader = (element, customParser) => {
     let parser = customParser || sharedParser;
     if (element) {
-        if (element.tagName === "CANVAS" && element.attributes.src && element.attributes.src.value.endsWith(".svga")) {
+        if (element.tagName === "CANVAS" && element.attributes.src && element.attributes.src.value.indexOf(".svga") === element.attributes.src.value.length - 5) {
             let src = element.attributes.src.value;
             let player = new SVGAPlayer(element);
             parser.load(src, (videoItem) => {

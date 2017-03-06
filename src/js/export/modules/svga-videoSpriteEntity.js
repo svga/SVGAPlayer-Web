@@ -6,72 +6,65 @@ import SVGABezierPath from './svga-bezierPath'
 import SVGARectPath from './svga-rectPath'
 import SVGAEllipsePath from './svga-ellipsePath'
 
-class SVGAVectorLayer extends createjs.Container {
-
-    drawedFrame = 0;
-    frames = [];
-    keepFrameCache = {};
-
-    constructor(frames) {
-        super()
-        this.frames = frames;
-        this.resetKeepFrameCache()
-    }
-
-    stepToFrame = (frame) => {
-        if (frame < this.frames.length) {
-            this.drawFrame(frame);
-        }
-    }
-
-    resetKeepFrameCache() {
-        this.keepFrameCache = {}
-        let lastKeep = 0;
-        this.frames.forEach((obj, idx) => {
-            if (!this.isKeepFrame(obj)) {
-                lastKeep = idx;
+let SVGAVectorLayerAssigner = (obj) => {
+    Object.assign(obj, {
+        drawedFrame: 0,
+        frames: [],
+        keepFrameCache: {},
+        init(frames) {
+            obj.frames = frames;
+            obj.resetKeepFrameCache();
+        },
+        stepToFrame: (frame) => {
+            if (frame < obj.frames.length) {
+                obj.drawFrame(frame);
             }
-            else {
-                this.keepFrameCache[idx] = lastKeep;
+        },
+        resetKeepFrameCache() {
+            obj.keepFrameCache = {}
+            let lastKeep = 0;
+            obj.frames.forEach((obj2, idx) => {
+                if (!obj.isKeepFrame(obj2)) {
+                    lastKeep = idx;
+                }
+                else {
+                    obj2.keepFrameCache[idx] = lastKeep;
+                }
+            });
+        },
+        requestKeepFrame: (frame) => {
+            return obj.keepFrameCache[frame]
+        },
+        isKeepFrame: (frameItem) => {
+            return frameItem.shapes && frameItem.shapes.length > 0 && frameItem.shapes[0].type === "keep";
+        },
+        drawFrame: (frame) => {
+            if (frame < obj.frames.length) {
+                let frameItem = obj.frames[frame];
+                if (obj.isKeepFrame(frameItem)) {
+                    if (obj.drawedFrame === obj.requestKeepFrame(frame)) {
+                        return;
+                    }
+                }
+                obj.removeAllChildren();
+                frameItem.shapes.forEach((shape) => {
+                    if (shape.type === "shape" && shape.args && shape.args.d) {
+                        let bezierPath = new SVGABezierPath(shape.args.d, shape.transform, shape.styles);
+                        obj.addChild(bezierPath.getShape());
+                    }
+                    if (shape.type === "ellipse" && shape.args) {
+                        let bezierPath = new SVGAEllipsePath(parseFloat(shape.args.x) || 0.0, parseFloat(shape.args.y) || 0.0, parseFloat(shape.args.radiusX) || 0.0, parseFloat(shape.args.radiusY) || 0.0, shape.transform, shape.styles);
+                        obj.addChild(bezierPath.getShape());
+                    }
+                    if (shape.type === "rect" && shape.args) {
+                        let bezierPath = new SVGARectPath(parseFloat(shape.args.x) || 0.0, parseFloat(shape.args.y) || 0.0, parseFloat(shape.args.width) || 0.0, parseFloat(shape.args.height) || 0.0, parseFloat(shape.args.cornerRadius) || 0.0, shape.transform, shape.styles);
+                        obj.addChild(bezierPath.getShape());
+                    }
+                })
+                obj.drawedFrame = frame;
             }
-        });
-    }
-
-    requestKeepFrame = (frame) => {
-        return this.keepFrameCache[frame]
-    }
-
-    isKeepFrame(frameItem) {
-        return frameItem.shapes && frameItem.shapes.length > 0 && frameItem.shapes[0].type === "keep";
-    }
-
-    drawFrame = (frame) => {
-        if (frame < this.frames.length) {
-            let frameItem = this.frames[frame];
-            if (this.isKeepFrame(frameItem)) {
-                if (this.drawedFrame === this.requestKeepFrame(frame)) {
-                    return;
-                }
-            }
-            this.removeAllChildren();
-            frameItem.shapes.forEach((shape) => {
-                if (shape.type === "shape" && shape.args && shape.args.d) {
-                    let bezierPath = new SVGABezierPath(shape.args.d, shape.transform, shape.styles);
-                    this.addChild(bezierPath.getShape());
-                }
-                if (shape.type === "ellipse" && shape.args) {
-                    let bezierPath = new SVGAEllipsePath(parseFloat(shape.args.x) || 0.0, parseFloat(shape.args.y) || 0.0, parseFloat(shape.args.radiusX) || 0.0, parseFloat(shape.args.radiusY) || 0.0, shape.transform, shape.styles);
-                    this.addChild(bezierPath.getShape());
-                }
-                if (shape.type === "rect" && shape.args) {
-                    let bezierPath = new SVGARectPath(parseFloat(shape.args.x) || 0.0, parseFloat(shape.args.y) || 0.0, parseFloat(shape.args.width) || 0.0, parseFloat(shape.args.height) || 0.0, parseFloat(shape.args.cornerRadius) || 0.0, shape.transform, shape.styles);
-                    this.addChild(bezierPath.getShape());
-                }
-            })
-            this.drawedFrame = frame;
-        }
-    }
-
+        },
+    });
 }
 
 module.exports = class SVGAVideoSpriteEntity {
@@ -150,7 +143,9 @@ module.exports = class SVGAVideoSpriteEntity {
     }
 
     _attachVectorLayer(layer) {
-        layer.vectorLayer = new SVGAVectorLayer(this.frames);
+        layer.vectorLayer = new createjs.Container();
+        SVGAVectorLayerAssigner(layer.vectorLayer);
+        layer.vectorLayer.init(this.frames)
         layer.addChild(layer.vectorLayer);
     }
 
