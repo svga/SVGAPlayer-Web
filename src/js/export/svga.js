@@ -20,6 +20,8 @@ let autoLoader = (element, customParser) => {
             let src = element.attributes.src.value;
             let player = new SVGAPlayer(element);
             parser.load(src, (videoItem) => {
+                window.videoItem = videoItem;
+                console.log(videoItem)
                 if (element.attributes.loops) {
                     let loops = parseFloat(element.attributes.loops.value) || 0;
                     player.loops = loops;
