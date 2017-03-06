@@ -23,12 +23,12 @@ let SVGAVectorLayerAssigner = (obj) => {
         resetKeepFrameCache() {
             obj.keepFrameCache = {}
             let lastKeep = 0;
-            obj.frames.forEach((obj2, idx) => {
-                if (!obj.isKeepFrame(obj2)) {
+            obj.frames.forEach((frameItem, idx) => {
+                if (!obj.isKeepFrame(frameItem)) {
                     lastKeep = idx;
                 }
                 else {
-                    obj2.keepFrameCache[idx] = lastKeep;
+                    obj.keepFrameCache[idx] = lastKeep;
                 }
             });
         },
