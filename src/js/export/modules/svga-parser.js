@@ -9,7 +9,7 @@ module.exports = class SVGAParser {
     static database;
 
     constructor(worker, dbClass) {
-        if (worker) {
+        if (worker && window.Worker) {
             SVGAParser.worker = new Worker(worker);
             SVGAParser.worker.onerror = ( err ) => {
                 console.log('[SVGA Web Canvas]: worker is error');
@@ -21,7 +21,7 @@ module.exports = class SVGAParser {
                 console.log('[SVGA Web Canvas]: worker is error');
             };
         }
-        if (dbClass) {
+        if (dbClass && window.openDatabase) {
             SVGAParser.database = new dbClass();
         }
     }

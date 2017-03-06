@@ -6,6 +6,7 @@
 	* 完全重构，模块划分为 SVGAParser / SVGAPlayer 以及 SVGAWorker / SVGADB
 	* 新增 stepToFrame / stepToPercentage 方法，新增 onFrame / onPercentage 回调
 	* 新增矢量对象渲染支持，匹配 SVGA-Format_v1.1，向下兼容 SVGA-Format_v1.0
+    * 新增 IE9+ 支持
 
 * 1.0.1
 	* 增加 添加播放回调函数，获取当前动画播放进度
@@ -29,7 +30,7 @@
 
 ## DEMO
 
-[前往测试地址](http://uedfe.yypm.com/assets/lab/lijialiang/svga/)
+[前往测试地址](http://legox.yy.com/svga/svgaplayer/)
 
 ## 注意
 
@@ -41,7 +42,7 @@
 
 ## 使用
 
-* 下载 build/svga.min.js & build/svga-worker.min.js & build/zip.js
+* 下载 build/svga.min.js & build/svga-worker.min.js
 * HTML 直接外链使用 或 JS 模块 require 使用
 
 ### 手动加载动画
@@ -66,7 +67,8 @@
         <canvas id="canvas" width="750" height="750" style="background-color: #000000"></canvas>
     </div>
 
-    <script src="../build/zip.js" charset="utf-8"></script>
+    <!--[if !IE]><!--><script src="http://assets.dwstatic.com/common/lib/yyzip/0.0.1/yyzip.min.js" charset="utf-8"></script><!--<![endif]-->
+    <!--[if IE]><script src="http://assets.dwstatic.com/common/lib/??jszip/3.1.3/jszip.min.js,jszip/3.1.3/jszip-utils.min.js,jszip/3.1.3/jszip-utils-ie.min.js" charset="utf-8"></script><![endif]-->
 	<script src="../build/svga.min.js" charset="utf-8"></script>
 
 	<script>
