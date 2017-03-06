@@ -1,0 +1,28 @@
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="description" content="">
+    <meta name="keywords" content="">
+    <meta name="format-detection" content="telephone=no,address=no,email=no">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <title>Example</title>
+</head>
+<body>
+
+    <div id="test">
+        <canvas id="TestCanvas" src="../example/EmptyState.svga" loops="0" clearsAfterStop="true" style="background-color: #000000; width: 500px; height: 500px;"></canvas>
+    </div>
+
+    <script src="../build/zip.js" charset="utf-8"></script>
+	<script src="../build/svga.min.js" charset="utf-8"></script>
+
+	<script>
+        Svga.autoload();
+        // Svga.autoload(undefined, new Svga.Parser(`../build/svga-worker.min.js`, Svga.DB));
+        var player = document.getElementById('TestCanvas').player; // 可以通过这种方式取得 SVGAPlayer 对象，直接操纵动画。
+	</script>
+
+</body>
+</html>

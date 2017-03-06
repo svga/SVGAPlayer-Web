@@ -1,150 +1,51 @@
+'use strict';
+
 /**
- * @file   : svga-web-canvas
- * @author : lijialiang
- * @team   : UED中心
- * @export : umd
+ * @file  : svga
+ * @author: lijialiang
+ * @team  : UED中心
+ * @export: umd
  */
 
-import Animation from './modules/Animation';
+import SVGAParser from './modules/svga-parser'
+import SVGAPlayer from './modules/svga-player'
+import SVGADB from './modules/svga-db'
 
-module.exports = class Svga extends Animation {
+let sharedParser = new SVGAParser();
 
-    // 固定 worker 地址
-    // FIXME: 跨域问题
-    static worker;
-
-    static DB;
-
-    optionsInSvga = {
-        canvas: '',
-        assets: '',
-        autoPlay: true,
-    };
-
-    constructor ( args, readyFunction ) {
-
-        super(args);
-
-        // 创建 worker
-        if (args.worker) {
-            Svga.worker = new Worker(args.worker);
-        }
-        // 复用 worker
-        else if (typeof Svga.worker !== 'undefined') {
-            Svga.worker = new Worker(Svga.worker);
-        }
-
-        Svga.worker.onerror = ( err ) => {
-            console.log('[SVGA Web Canvas]: worker is error');
-        };
-
-        for (let item in this.optionsInSvga) {
-		    if (typeof args[item] !== 'undefined') {
-				this.optionsInSvga[item] = args[item];
-			}
-		}
-
-        if (typeof readyFunction == 'function') {
-            this.ready = readyFunction;
-        }
-
-        if (args.db) {
-            this._initDB(args.db);
-        } else {
-            this._initWorker();
-        }
-
-        this._init();
-    }
-
-    _initDB (SvgaDB) {
-        Svga.DB = new SvgaDB();
-
-        Svga.DB.find(this.optionsInSvga.assets, ( images, movie, err ) => {
-            if (!err) {
-                this._initAminstion(images, movie);
-            } else {
-                this._initWorker();
-            }
-
-            // Svga.DB.clear(1);
-        });
-    }
-
-    _init () {
-
-        const { canvas } = this.optionsInSvga;
-
-        this.optionsInSvga.canvas = document.querySelector(canvas);
-    }
-
-    _loadAssetsComplete ({ movie, images }) {
-
-        if (Svga.DB) {
-            Svga.DB.add({
-                url : this.optionsInSvga.assets,
-                movie,
-                images,
+let autoLoader = (element, customParser) => {
+    let parser = customParser || sharedParser;
+    if (element) {
+        if (element.tagName === "CANVAS" && element.attributes.src && element.attributes.src.value.indexOf(".svga") === element.attributes.src.value.length - 5) {
+            let src = element.attributes.src.value;
+            let player = new SVGAPlayer(element);
+            parser.load(src, (videoItem) => {
+                if (element.attributes.loops) {
+                    let loops = parseFloat(element.attributes.loops.value) || 0;
+                    player.loops = loops;
+                }
+                if (element.attributes.clearsAfterStop) {
+                    let clearsAfterStop = !(element.attributes.clearsAfterStop.value === "false")
+                    player.clearsAfterStop = clearsAfterStop;
+                }
+                player.setVideoItem(videoItem);
+                player.startAnimation();
             });
-        }
-
-        this._initAminstion(images, movie);
-    }
-
-    // TODO: 启动 work 加载解析资源
-    _initWorker () {
-        const { assets } = this.optionsInSvga;
-
-        Svga.worker.postMessage(assets);
-
-        Svga.worker.onmessage = ({ data }) => {
-            this._loadAssetsComplete(data);
-        };
-    }
-
-    // TODO: 初始化基类
-    _initAminstion (images, movie) {
-        super._init({
-            canvas : this.canvas,
-            movie  : movie.movie,
-            sprites: movie.sprites,
-            images,
-            canvas: this.optionsInSvga.canvas,
-        });
-
-        this.ready(this);
-
-        // 自动播放
-        if (this.optionsInSvga.autoPlay) {
-            this.play();
+            element.player = player;
         }
     }
-
-    ready () { }
-
-    play ( callback = () => {} ) {
-        let canvas = this.optionsInSvga.canvas;
-        let viewBox = this.movie.viewBox;
-        if (canvas.width === '') {
-            canvas.style.width = viewBox.width;
-            canvas.style.height = viewBox.height;
-            canvas.width = viewBox.width;
-            canvas.height = Animation.movie.viewBox.height;
-        } else {
-            let stageWidth = canvas.width / viewBox.width;
-            let stageHeight = canvas.height / viewBox.height;
-            if (stageWidth <= stageHeight) {
-                super._stageResize(stageWidth, stageWidth);
-            } else {
-                super._stageResize(stageHeight, stageHeight);
-            }
+    else {
+        var elements = document.getElementsByTagName("canvas");
+        for (var index = 0; index < elements.length; index++) {
+            var element = elements[index];
+            autoLoader(element);
         }
-
-        super._play(callback);
     }
+}
 
-    complete (cb) {
-        this.complete = cb;
-    }
-
+module.exports = {
+    Parser: SVGAParser,
+    Player: SVGAPlayer,
+    DB: SVGADB,
+    autoload: autoLoader,
 }

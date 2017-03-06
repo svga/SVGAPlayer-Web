@@ -45,23 +45,45 @@ const base64ArrayBuffer = (arrayBuffer) => {
 
 const actions = {
 
-	// TODO 请求加载资源
 	loadAssets: (url, cb) => {
-		let xhr = new XMLHttpRequest();
-		// worker 使用同步
-        xhr.open('GET', url, true);
-        xhr.onreadystatechange = function () {
-            if (this.readyState == 4) {
-                if (this.response != null) {
-					actions.decodeAssets((Zip.inflate(new Uint8Array(this.response))).files, cb);
+        if (window.File && url instanceof File) {
+            actions.loadFile(url, cb);
+            return;
+        }
+        if (window.JSZipUtils !== undefined && window.JSZip !== undefined) {
+            JSZipUtils.getBinaryContent(url, function(err, data) {
+                if(err) {
+                    throw err;
                 }
-            }
-        };
-        xhr.responseType = 'arraybuffer';
-        xhr.send();
+                JSZip.loadAsync(data).then(function (zip) {
+                    actions.jszip_decodeAssets(zip, cb);
+                });
+            });
+        }
+        else {
+            let xhr = new XMLHttpRequest();
+            xhr.open('GET', url, true);
+            xhr.onreadystatechange = function () {
+                if (this.readyState == 4) {
+                    if (this.response != null) {
+                        actions.decodeAssets((Zip.inflate(new Uint8Array(this.response))).files, cb);
+                    }
+                }
+            };
+            xhr.responseType = 'arraybuffer';
+            xhr.send();
+        }
 	},
 
-	// TODO 转码资源文件
+	loadFile: (file, cb) => {
+        var reader = new FileReader();
+        reader.readAsArrayBuffer(file);
+        reader.onload = function (e) {
+            var arrayBuffer = new Uint8Array(reader.result);
+            actions.decodeAssets(Zip.inflate(arrayBuffer).files, cb);
+        }
+	},
+
 	decodeAssets: (files, cb) => {
 		const movie = files['movie.spec'].inflate();
 		largeuint8ArrToString(movie, (data) => {
@@ -78,7 +100,40 @@ const actions = {
 				images,
             })
 		})
-	}
+	},
+
+    jszip_decodeAssets: (zip, cb) => {
+        zip.file("movie.spec").async("string").then(function(spec) {
+            let movieData = JSON.parse(spec);
+            let images = {};
+            actions.jszip_loadImages(images, zip, movieData, function() {
+                cb({
+                    movie: movieData,
+                    images,
+                })
+            })
+        })
+    },
+
+    jszip_loadImages: function (images, zip, movieData, imagesLoadedBlock) {
+        var finished = true;
+        for (var key in movieData.images) {
+            if (movieData.images.hasOwnProperty(key)) {
+                var element = movieData.images[key];
+                if (images.hasOwnProperty(key)) {
+                    continue;
+                }
+                finished = false;
+                zip.file(element + ".png").async("base64").then(function (data) {
+                    images[key] = data;
+                    actions.jszip_loadImages(images, zip, movieData, imagesLoadedBlock);
+                }.bind(this))
+                break;
+            }
+        }
+        finished && imagesLoadedBlock.call(this)
+    },
+    
 }
 
 module.exports = (data, cb) => {
