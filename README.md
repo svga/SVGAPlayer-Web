@@ -120,6 +120,46 @@
 </html>
 ```
 
+### Android 4.x
+
+SVGAPlayer 是支持 Android 4.x 的，在引用 script 时，参照以下代码即可。区别在于，强制使用 JSZip 库。
+
+```html
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="description" content="">
+    <meta name="keywords" content="">
+    <meta name="format-detection" content="telephone=no,address=no,email=no">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <title>Example</title>
+</head>
+<body>
+
+    <div id="test">
+        <canvas id="canvas" width="750" height="750" style="background-color: #000000"></canvas>
+    </div>
+
+	<!--[if !IE]><!--><script src="http://assets.dwstatic.com/common/lib/??jszip/3.1.3/jszip.min.js,jszip/3.1.3/jszip-utils.min.js" charset="utf-8"></script><!--<![endif]-->
+    <!--[if IE]><script src="http://assets.dwstatic.com/common/lib/??jszip/3.1.3/jszip.min.js,jszip/3.1.3/jszip-utils.min.js,jszip/3.1.3/jszip-utils-ie.min.js" charset="utf-8"></script><![endif]-->
+	<script src="../build/svga.min.js" charset="utf-8"></script>
+
+	<script>
+        let player = new Svga.Player('#canvas');
+        let parser = new Svga.Parser(`../build/svga-worker.min.js`, Svga.DB); // 可以不传任何参数，达到不使用 Worker，不使用 DB 的目的。
+        parser.load('../example/EmptyState.svga', (videoItem) => {
+            player.setVideoItem(videoItem);
+            player.startAnimation();
+        });
+	</script>
+
+</body>
+</html>
+
+```
+
 ## 模块说明
 
 ### SVGAPlayer
