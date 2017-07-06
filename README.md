@@ -2,6 +2,9 @@
 
 ## 最近更新
 
+* NEXT
+    * SVGAPlayer 可以作为 CreateJS 上下文的一部分使用，也就是，SVGAPlayer 可以嵌入到 CreateJS 画布中。
+
 * 1.1.0
 	* 完全重构，模块划分为 SVGAParser / SVGAPlayer 以及 SVGAWorker / SVGADB
 	* 新增 stepToFrame / stepToPercentage 方法，新增 onFrame / onPercentage 回调
@@ -158,6 +161,71 @@ SVGAPlayer 是支持 Android 4.x 的，在引用 script 时，参照以下代码
 </body>
 </html>
 
+```
+
+### 嵌入画布
+
+在创建 Player 时，不传入任何参数，然后调用 Player.container(stage) 方法，获取一个 CreateJS 渲染对象。
+
+然后，将该对象使用 addChild 方法添加到舞台，即可。
+
+```html
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="description" content="">
+    <meta name="keywords" content="">
+    <meta name="format-detection" content="telephone=no,address=no,email=no">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <title>Example</title>
+</head>
+<body>
+
+    <div id="test" onload="init()">
+        <canvas id="canvas" width="750" height="750" style="background-color: #000000"></canvas>
+    </div>
+
+	<!--[if !IE]><!--><script src="http://assets.dwstatic.com/common/lib/??jszip/3.1.3/jszip.min.js,jszip/3.1.3/jszip-utils.min.js" charset="utf-8"></script><!--<![endif]-->
+    <!--[if IE]><script src="http://assets.dwstatic.com/common/lib/??jszip/3.1.3/jszip.min.js,jszip/3.1.3/jszip-utils.min.js,jszip/3.1.3/jszip-utils-ie.min.js" charset="utf-8"></script><![endif]-->
+	<script src="../build/svga.min.js" charset="utf-8"></script>
+
+	<script>
+
+        var stage;
+
+        function init() {
+            stage = new createjs.Stage("canvas");
+            var circle = new createjs.Shape();
+            circle.graphics.beginFill("gray").drawCircle(0, 0, 100);
+            circle.x = 250;
+            circle.y = 250;
+            stage.addChild(circle);
+            stage.update();
+            addAnimation();
+        }
+
+        function addAnimation() {
+            var player = new Svga.Player();
+            var parser = new Svga.Parser(`/assets/svga-worker.min.js`, SVGA.DB);
+            parser.load(`/assets/angel.svga`, function(videoItem) {
+                player.setVideoItem(videoItem);
+                var container = player.container(stage);
+                container.x = 150;
+                container.y = 150;
+                container.width = 200;
+                container.height = 200;
+                stage.addChild(container);
+                stage.update();
+                player.startAnimation();
+            });
+        }
+
+	</script>
+
+</body>
+</html>
 ```
 
 ## 模块说明

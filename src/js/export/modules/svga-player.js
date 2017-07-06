@@ -8,9 +8,21 @@ module.exports = class SVGAPlayer {
     loops = 0;
     clearsAfterStop = true;
 
-    constructor (canvas) {
+    constructor(canvas) {
         this._canvas = typeof canvas === "string" ? document.querySelector(canvas) : canvas;
-        this._stageLayer = new createjs.Stage(this._canvas);
+        if (this._canvas !== undefined) {
+            this._rootLayer = new createjs.Stage(this._canvas);
+            this._stage = this._rootLayer;
+        }
+        else {
+            this._rootLayer = new createjs.Container();
+        }
+
+    }
+
+    container(stage) {
+        this._stage = stage;
+        return this._rootLayer;
     }
 
     setVideoItem(videoItem) {
@@ -41,8 +53,8 @@ module.exports = class SVGAPlayer {
     }
 
     clear() {
-        this._stageLayer.removeAllChildren();
-        this._stageLayer.update();
+        this._rootLayer.removeAllChildren();
+        this._stage && this._stage.update();
     }
 
     stepToFrame(frame, andPlay) {
@@ -75,8 +87,8 @@ module.exports = class SVGAPlayer {
         let size = (typeof textORMap === "object" ? textORMap.size : "14px") || "14px";
         let family = (typeof textORMap === "object" ? textORMap.family : "") || "";
         let color = (typeof textORMap === "object" ? textORMap.color : "#000000") || "#000000";
-        let offset = (typeof textORMap === "object" ? textORMap.offset : {x: 0.0, y: 0.0}) || {x: 0.0, y: 0.0};
-        let textLayer = new createjs.Text(text, `${ size } family`, color);
+        let offset = (typeof textORMap === "object" ? textORMap.offset : { x: 0.0, y: 0.0 }) || { x: 0.0, y: 0.0 };
+        let textLayer = new createjs.Text(text, `${size} family`, color);
         textLayer.offset = offset;
         this._dynamicText[forKey] = textLayer;
     }
@@ -103,8 +115,9 @@ module.exports = class SVGAPlayer {
      */
 
     _canvas = ''
+    _stage = null;
     _videoItem = null;
-    _stageLayer = null;
+    _rootLayer = null;
     _drawLayer = null;
     _loopCount = 0;
     _currentFrame = 0;
@@ -114,7 +127,7 @@ module.exports = class SVGAPlayer {
     _onFinished = null;
     _onFrame = null;
     _onPercentage = null;
-     
+
     _nextTickTime = 0;
     _onTick() {
         if (typeof this._videoItem === "object") {
@@ -150,7 +163,7 @@ module.exports = class SVGAPlayer {
         let self = this;
         this._drawLayer = new createjs.Container();
         this._drawLayer.setBounds(0.0, 0.0, this._videoItem.videoSize.width, this._videoItem.videoSize.height)
-        this._videoItem.sprites.forEach(function(sprite) {
+        this._videoItem.sprites.forEach(function (sprite) {
             let bitmap;
             if (sprite.imageKey) {
                 bitmap = self._dynamicImage[sprite.imageKey] || self._videoItem.images[sprite.imageKey];
@@ -164,16 +177,22 @@ module.exports = class SVGAPlayer {
             }
             self._drawLayer.addChild(contentLayer);
         })
-        this._stageLayer.addChild(this._drawLayer);
+        this._rootLayer.addChild(this._drawLayer);
         this._currentFrame = 0;
         this._update();
     }
 
     _resize() {
-        this._canvas.width = this._canvas.offsetWidth;
-        this._canvas.height = this._canvas.offsetHeight;
-        let ratio = this._canvas.offsetWidth / this._videoItem.videoSize.width;
-        this._drawLayer.transformMatrix = new createjs.Matrix2D(ratio, 0.0, 0.0, ratio, 0.0, 0.0);
+        if (this._canvas !== undefined) {
+            this._canvas.width = this._canvas.offsetWidth;
+            this._canvas.height = this._canvas.offsetHeight;
+            let ratio = this._canvas.offsetWidth / this._videoItem.videoSize.width;
+            this._drawLayer.transformMatrix = new createjs.Matrix2D(ratio, 0.0, 0.0, ratio, 0.0, 0.0);
+        }
+        else {
+            let ratio = this._rootLayer.width / this._videoItem.videoSize.width;
+            this._drawLayer.transformMatrix = new createjs.Matrix2D(ratio, 0.0, 0.0, ratio, 0.0, 0.0);
+        }
     }
 
     _update() {
@@ -183,7 +202,7 @@ module.exports = class SVGAPlayer {
             }
         });
         this._resize();
-        this._stageLayer.update();
+        this._stage && this._stage.update();
     }
 
 }
