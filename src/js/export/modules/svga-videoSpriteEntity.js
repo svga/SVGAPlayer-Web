@@ -1,6 +1,5 @@
 
-require('./easeljs.min')
-
+import SVGAAdapter from './svga-adapter'
 import SVGAVideoSpriteFrameEntity from './svga-videoSpriteFrameEntity'
 import SVGABezierPath from './svga-bezierPath'
 import SVGARectPath from './svga-rectPath'
@@ -91,7 +90,7 @@ module.exports = class SVGAVideoSpriteEntity {
     }
 
     requestLayer(bitmap) {
-        let layer = new createjs.Container();
+        let layer = SVGAAdapter.Container();
         if (bitmap != null) {
             this._attachBitmapLayer(layer, bitmap);
         }
@@ -102,11 +101,11 @@ module.exports = class SVGAVideoSpriteEntity {
                 if (frameItem.alpha > 0.0) {
                     layer.visible = true;
                     layer.alpha = frameItem.alpha;
-                    layer.setBounds(frameItem.layout.x, frameItem.layout.y, frameItem.layout.width, frameItem.layout.height);
-                    layer.transformMatrix = new createjs.Matrix2D(frameItem.transform.a, frameItem.transform.b, frameItem.transform.c, frameItem.transform.d, frameItem.transform.tx, frameItem.transform.ty);
+                    SVGAAdapter.setBounds(layer, {x: frameItem.layout.x, y: frameItem.layout.y, width: frameItem.layout.width, height: frameItem.layout.height});
+                    layer.setTransformMatrix(SVGAAdapter.Matrix2D(frameItem.transform.a, frameItem.transform.b, frameItem.transform.c, frameItem.transform.d, frameItem.transform.tx, frameItem.transform.ty));
                     layer.mask = frameItem.maskShape;
                     if (layer.mask) {
-                        layer.mask.transformMatrix = layer.transformMatrix
+                        layer.mask.setTransformMatrix(layer.transformMatrix);
                     }
                     if (layer.bitmapLayer && typeof layer.bitmapLayer.stepToFrame === "function") {
                         layer.bitmapLayer.stepToFrame(frame);
@@ -129,21 +128,14 @@ module.exports = class SVGAVideoSpriteEntity {
     }
 
     _attachBitmapLayer(layer, bitmap) {
-        let imgTag = document.createElement('img');
-        if (bitmap.indexOf("iVBO") === 0 || bitmap.indexOf("/9j/2w") === 0) {
-            imgTag.src = 'data:image/png;base64,' + bitmap;
-        }
-        else {
-            imgTag.src = bitmap;
-        }
-        layer.bitmapLayer = new createjs.Bitmap(imgTag);
+        layer.bitmapLayer = SVGAAdapter.Bitmap(bitmap);
         layer.bitmapLayer.frames = this.frames;
         layer.bitmapLayer.stepToFrame = (frame) => {}
         layer.addChild(layer.bitmapLayer);
     }
 
     _attachVectorLayer(layer) {
-        layer.vectorLayer = new createjs.Container();
+        layer.vectorLayer = SVGAAdapter.Container();
         SVGAVectorLayerAssigner(layer.vectorLayer);
         layer.vectorLayer.init(this.frames)
         layer.addChild(layer.vectorLayer);

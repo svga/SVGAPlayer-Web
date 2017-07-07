@@ -1,6 +1,6 @@
 'use strict';
 
-require('./easeljs.min')
+import SVGAAdapter from './svga-adapter'
 import SVGAVideoEntity from './svga-videoEntity'
 
 module.exports = class SVGAPlayer {
@@ -11,11 +11,11 @@ module.exports = class SVGAPlayer {
     constructor(canvas) {
         this._canvas = typeof canvas === "string" ? document.querySelector(canvas) : canvas;
         if (this._canvas !== undefined) {
-            this._rootLayer = new createjs.Stage(this._canvas);
+            this._rootLayer = SVGAAdapter.Stage(this._canvas);
             this._stage = this._rootLayer;
         }
         else {
-            this._rootLayer = new createjs.Container();
+            this._rootLayer = SVGAAdapter.Container();
         }
 
     }
@@ -34,8 +34,7 @@ module.exports = class SVGAPlayer {
     startAnimation() {
         this.stopAnimation(false);
         this._loopCount = 0;
-        createjs.Ticker.framerate = 60;
-        this._tickListener = createjs.Ticker.addEventListener("tick", this._onTick.bind(this));
+        this._tickListener = SVGAAdapter.AddTimer(this, this._onTick);
     }
 
     pauseAnimation() {
@@ -46,7 +45,7 @@ module.exports = class SVGAPlayer {
         if (clear === undefined) {
             clear = this.clearsAfterStop;
         }
-        createjs.Ticker.removeEventListener("tick", this._tickListener);
+        SVGAAdapter.RemoveTimer(this, this._tickListener);
         if (clear) {
             this.clear();
         }
@@ -65,8 +64,7 @@ module.exports = class SVGAPlayer {
         this._currentFrame = frame;
         this._update();
         if (andPlay) {
-            createjs.Ticker.framerate = 60;
-            this._tickListener = createjs.Ticker.addEventListener("tick", this._onTick.bind(this));
+            this._tickListener = SVGAAdapter.AddTimer(this, this._onTick);
         }
     }
 
@@ -88,7 +86,7 @@ module.exports = class SVGAPlayer {
         let family = (typeof textORMap === "object" ? textORMap.family : "") || "";
         let color = (typeof textORMap === "object" ? textORMap.color : "#000000") || "#000000";
         let offset = (typeof textORMap === "object" ? textORMap.offset : { x: 0.0, y: 0.0 }) || { x: 0.0, y: 0.0 };
-        let textLayer = new createjs.Text(text, `${size} family`, color);
+        let textLayer = SVGAAdapter.Text(text, `${size} family`, color);
         textLayer.offset = offset;
         this._dynamicText[forKey] = textLayer;
     }
@@ -161,8 +159,8 @@ module.exports = class SVGAPlayer {
 
     _draw() {
         let self = this;
-        this._drawLayer = new createjs.Container();
-        this._drawLayer.setBounds(0.0, 0.0, this._videoItem.videoSize.width, this._videoItem.videoSize.height)
+        this._drawLayer = SVGAAdapter.Container();
+        SVGAAdapter.setBounds(this._drawLayer, { x: 0.0, y: 0.0, width: this._videoItem.videoSize.width, height: this._videoItem.videoSize.height })
         this._videoItem.sprites.forEach(function (sprite) {
             let bitmap;
             if (sprite.imageKey) {
@@ -187,20 +185,22 @@ module.exports = class SVGAPlayer {
             this._canvas.width = this._canvas.offsetWidth;
             this._canvas.height = this._canvas.offsetHeight;
             let ratio = this._canvas.offsetWidth / this._videoItem.videoSize.width;
-            this._drawLayer.transformMatrix = new createjs.Matrix2D(ratio, 0.0, 0.0, ratio, 0.0, 0.0);
+            this._drawLayer.setTransformMatrix(SVGAAdapter.Matrix2D(ratio, 0.0, 0.0, ratio, 0.0, 0.0));
         }
         else {
             let ratio = this._rootLayer.width / this._videoItem.videoSize.width;
-            this._drawLayer.transformMatrix = new createjs.Matrix2D(ratio, 0.0, 0.0, ratio, 0.0, 0.0);
+            this._drawLayer.setTransformMatrix(SVGAAdapter.Matrix2D(ratio, 0.0, 0.0, ratio, 0.0, 0.0));
         }
     }
 
     _update() {
-        this._drawLayer.children.forEach((child) => {
+        let children = this._drawLayer.children instanceof Array ? this._drawLayer.children : this._drawLayer.children();
+        for (let index = 0; index < children.length; index++) {
+            let child = children[index];
             if (typeof child.stepToFrame === "function") {
                 child.stepToFrame(this._currentFrame);
             }
-        });
+        }
         this._resize();
         this._stage && this._stage.update();
     }

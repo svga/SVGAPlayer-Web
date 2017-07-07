@@ -1,5 +1,5 @@
 
-require('./easeljs.min')
+import SVGAAdapter from './svga-adapter'
 
 let validMethods = {
     'M': 1,
@@ -27,7 +27,7 @@ module.exports = class SVGABezierPath {
     _shape;
 
     constructor(d, transform, styles) {
-        this._shape = new createjs.Shape();
+        this._shape = SVGAAdapter.Shape();
         if (d === undefined) {
             return;
         }
@@ -42,7 +42,8 @@ module.exports = class SVGABezierPath {
     }
 
     createShape(d, transform, outShape) {
-        let shape = outShape || new createjs.Shape();
+        return undefined;
+        let shape = outShape || SVGAAdapter.Shape();
         let g = shape.graphics;
         shape.x = 0;
         shape.y = 0;
@@ -200,7 +201,7 @@ module.exports = class SVGABezierPath {
             }
         }
         if (transform) {
-            shape.transformMatrix = new createjs.Matrix2D(transform.a, transform.b, transform.c, transform.d, transform.tx, transform.ty);
+            shape.setTransformMatrix(SVGAAdapter.Matrix2D(transform.a, transform.b, transform.c, transform.d, transform.tx, transform.ty));
         }
     }
 

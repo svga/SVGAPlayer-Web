@@ -26,7 +26,7 @@ module.exports = class SVGAVideoSpriteFrameEntity {
     ny = 0.0;
 
     /**
-     * CreateJS.Shape
+     * Shape
      */
     maskShape = null;
 
