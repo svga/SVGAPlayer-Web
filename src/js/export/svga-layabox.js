@@ -1,117 +1,13 @@
+'use strict';
 
-class SVGAAdapter {
+/**
+ * @file  : svga.layabox
+ * @author: cuiminghui
+ * @team  : UED中心
+ * @export: umd
+ */
 
-    static findAdapter() {
-        if (window.createjs !== undefined) {
-            return CreateJS;
-        }
-        else if (window.Laya !== undefined) {
-            return LayaBox;
-        }
-    }
-
-    static Stage(arg1, arg2, arg3) {
-        return undefined;
-    }
-
-    static Container() {
-        return undefined;
-    }
-
-    static AddTimer(callee, callback) {
-        return undefined;
-    }
-
-    static RemoveTimer(callee, handler) {
-        return undefined;
-    }
-
-    static Matrix2D(a, b, c, d, tx, ty) {
-        return undefined;
-    }
-
-    static Shape() {
-        return undefined;
-    }
-
-    static Bitmap(src) {
-        return undefined;
-    }
-
-    static Text(text, style, color) {
-        return undefined;
-    }
-
-    static setBounds(layer, bounds) {
-        return undefined;
-    }
-
-}
-
-class CreateJS {
-
-    static setState(layer, state) {
-        state['transformMatrix'] = state['transform'];
-        for (var key in state) {
-            layer[key] = state[key];
-        }
-    }
-
-    static Stage(arg1) {
-        return new window.createjs.Stage(arg1);
-    }
-
-    static Container() {
-        let layer = new window.createjs.Container();
-        layer.setState = (state) => { CreateJS.setState(layer, state); }
-        return layer;
-    }
-
-    static AddTimer(callee, callback) {
-        createjs.Ticker.framerate = 60;
-        return createjs.Ticker.addEventListener("tick", callback.bind(callee));
-    }
-
-    static RemoveTimer(callee, handler) {
-        createjs.Ticker.removeEventListener("tick", handler);
-    }
-
-    static Matrix2D(a, b, c, d, tx, ty) {
-        return new createjs.Matrix2D(a, b, c, d, tx, ty);
-    }
-
-    static Shape() {
-        let layer = new createjs.Shape();
-        layer.setState = (state) => { CreateJS.setState(layer, state); }
-        return layer;
-    }
-
-    static Bitmap(src) {
-        let imgTag = document.createElement('img');
-        if (src.indexOf("iVBO") === 0 || src.indexOf("/9j/2w") === 0) {
-            imgTag.src = 'data:image/png;base64,' + src;
-        }
-        else {
-            imgTag.src = src;
-        }
-        let layer = new createjs.Bitmap(imgTag);
-        layer.setState = (state) => { CreateJS.setState(layer, state); }
-        return layer;
-    }
-
-    static Text(text, style, color) {
-        let layer = new createjs.Text(text, style, color);
-        layer.setState = (state) => { CreateJS.setState(layer, state); }
-        return layer;
-    }
-
-    static setBounds(layer, bounds) {
-        layer.setBounds(bounds);
-    }
-
-}
-
-class LayaBox {
+class LayaBoxRender {
 
     static setState(layer, state) {
         for (var key in state) {
@@ -125,7 +21,7 @@ class LayaBox {
 
     static Container() {
         let layer = new Laya.Sprite();
-        layer.setState = (state) => { LayaBox.setState(layer, state); }
+        layer.setState = (state) => { LayaBoxRender.setState(layer, state); }
         layer.removeAllChildren = () => {
             layer.removeChildren(0, layer.numChildren - 1);
         }
@@ -154,7 +50,7 @@ class LayaBox {
     static Shape() {
         let layer = new Laya.Sprite();
         layer.customRenderEnable = true;
-        layer.setState = (state) => { LayaBox.setState(layer, state); }
+        layer.setState = (state) => { LayaBoxRender.setState(layer, state); }
         layer.removeAllChildren = () => {
             layer.removeChildren(0, layer.numChildren - 1);
         }
@@ -242,7 +138,7 @@ class LayaBox {
 
     static Bitmap(src) {
         var layer = new Laya.Sprite()
-        layer.setState = (state) => { LayaBox.setState(layer, state); }
+        layer.setState = (state) => { LayaBoxRender.setState(layer, state); }
         if (src.indexOf("iVBO") === 0 || src.indexOf("/9j/2w") === 0) {
             layer.loadImage('data:image/png;base64,' + src);
         }
@@ -262,4 +158,6 @@ class LayaBox {
 
 }
 
-export default Adapter = SVGAAdapter.findAdapter();
+module.exports = {
+    Render: LayaBoxRender,
+}

@@ -1,6 +1,3 @@
-
-import SVGAAdapter from './svga-adapter'
-
 let validMethods = {
     'M': 1,
     'm': 1,
@@ -24,25 +21,30 @@ let validMethods = {
 
 module.exports = class SVGABezierPath {
 
+    _d;
+    _transform;
+    _styles;
     _shape;
 
     constructor(d, transform, styles) {
-        this._shape = SVGAAdapter.Shape();
-        if (d === undefined) {
-            return;
-        }
-        if (styles) {
-            this.resetStyle(styles)
-        }
-        this.createShape(d, transform, this._shape)
+        this._d = d;
+        this._transform = transform;
+        this._styles = styles;
     }
 
-    getShape() {
+    getShape(render) {
+        if (this._shape === undefined && this._d !== undefined) {
+            this._shape = render.Shape();
+            if (this._styles) {
+                this.resetStyle(this._styles)
+            }
+            this.createShape(render, this._d, this._transform, this._shape)
+        }
         return this._shape
     }
 
-    createShape(d, transform, outShape) {
-        let shape = outShape || SVGAAdapter.Shape();
+    createShape(render, d, transform, outShape) {
+        let shape = outShape || render.Shape();
         let g = shape.graphics;
         shape.x = 0;
         shape.y = 0;
@@ -66,16 +68,16 @@ module.exports = class SVGABezierPath {
                 }
                 tempArg.push(firstLetter);
                 if (item.substr(1).trim().length > 0) {
-					tempArg.push(item.substr(1));
-				}
-            }else{
+                    tempArg.push(item.substr(1));
+                }
+            } else {
                 tempArg.push(item);
             }
         }
-		if (tempArg.length > 0) {
-			args.push(tempArg);
-			tempArg = [];
-		}
+        if (tempArg.length > 0) {
+            args.push(tempArg);
+            tempArg = [];
+        }
         g.st && g.st();
         for (let i = 0; i < args.length; i++) {
             let arg = args[i];
@@ -202,29 +204,29 @@ module.exports = class SVGABezierPath {
         }
         if (transform) {
             shape.setState({
-                transform: SVGAAdapter.Matrix2D(transform.a, transform.b, transform.c, transform.d, transform.tx, transform.ty)
+                transform: render.Matrix2D(transform.a, transform.b, transform.c, transform.d, transform.tx, transform.ty)
             })
         }
         g.fs && g.fs();
     }
 
-    resetStyle (styles) {
-		if(styles && styles.stroke){
-			this._shape.graphics.beginStroke(`rgba(${ parseInt(styles.stroke[0] * 255) }, ${ parseInt(styles.stroke[1] * 255) }, ${ parseInt(styles.stroke[2] * 255) }, ${ styles.stroke[3] })`);
-		}
-		if(styles){
-			const width = styles.strokeWidth || 0.0;
-			const caps = styles.lineCap || '';
-			const joints = styles.lineJoin || '';
-			const miterLimit = styles.miterLimit || '';
-			this._shape.graphics.setStrokeStyle(width, caps, joints, miterLimit, true);
-		}
-		if(styles && styles.fill){
-			this._shape.graphics.beginFill(`rgba(${ parseInt(styles.fill[0] * 255) }, ${ parseInt(styles.fill[1] * 255) }, ${ parseInt(styles.fill[2] * 255) }, ${ styles.fill[3] })`);
-		}
-		if(styles && styles.lineDash){
-			this._shape.graphics.setStrokeDash([styles.lineDash[0], styles.lineDash[1]], styles.lineDash[2]);
-		}
-	}
+    resetStyle(styles) {
+        if (styles && styles.stroke) {
+            this._shape.graphics.beginStroke(`rgba(${parseInt(styles.stroke[0] * 255)}, ${parseInt(styles.stroke[1] * 255)}, ${parseInt(styles.stroke[2] * 255)}, ${styles.stroke[3]})`);
+        }
+        if (styles) {
+            const width = styles.strokeWidth || 0.0;
+            const caps = styles.lineCap || '';
+            const joints = styles.lineJoin || '';
+            const miterLimit = styles.miterLimit || '';
+            this._shape.graphics.setStrokeStyle(width, caps, joints, miterLimit, true);
+        }
+        if (styles && styles.fill) {
+            this._shape.graphics.beginFill(`rgba(${parseInt(styles.fill[0] * 255)}, ${parseInt(styles.fill[1] * 255)}, ${parseInt(styles.fill[2] * 255)}, ${styles.fill[3]})`);
+        }
+        if (styles && styles.lineDash) {
+            this._shape.graphics.setStrokeDash([styles.lineDash[0], styles.lineDash[1]], styles.lineDash[2]);
+        }
+    }
 
 }

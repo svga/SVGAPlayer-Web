@@ -1,11 +1,10 @@
 
-import SVGAAdapter from './svga-adapter'
 import SVGAVideoSpriteFrameEntity from './svga-videoSpriteFrameEntity'
 import SVGABezierPath from './svga-bezierPath'
 import SVGARectPath from './svga-rectPath'
 import SVGAEllipsePath from './svga-ellipsePath'
 
-let SVGAVectorLayerAssigner = (obj) => {
+let SVGAVectorLayerAssigner = (obj, render) => {
     Object.assign(obj, {
         drawedFrame: 0,
         frames: [],
@@ -49,15 +48,15 @@ let SVGAVectorLayerAssigner = (obj) => {
                 frameItem.shapes.forEach((shape) => {
                     if (shape.type === "shape" && shape.args && shape.args.d) {
                         let bezierPath = new SVGABezierPath(shape.args.d, shape.transform, shape.styles);
-                        obj.addChild(bezierPath.getShape());
+                        obj.addChild(bezierPath.getShape(render));
                     }
                     if (shape.type === "ellipse" && shape.args) {
                         let bezierPath = new SVGAEllipsePath(parseFloat(shape.args.x) || 0.0, parseFloat(shape.args.y) || 0.0, parseFloat(shape.args.radiusX) || 0.0, parseFloat(shape.args.radiusY) || 0.0, shape.transform, shape.styles);
-                        obj.addChild(bezierPath.getShape());
+                        obj.addChild(bezierPath.getShape(render));
                     }
                     if (shape.type === "rect" && shape.args) {
                         let bezierPath = new SVGARectPath(parseFloat(shape.args.x) || 0.0, parseFloat(shape.args.y) || 0.0, parseFloat(shape.args.width) || 0.0, parseFloat(shape.args.height) || 0.0, parseFloat(shape.args.cornerRadius) || 0.0, shape.transform, shape.styles);
-                        obj.addChild(bezierPath.getShape());
+                        obj.addChild(bezierPath.getShape(render));
                     }
                 })
                 obj.drawedFrame = frame;
@@ -89,12 +88,12 @@ module.exports = class SVGAVideoSpriteEntity {
         }
     }
 
-    requestLayer(bitmap) {
-        let layer = SVGAAdapter.Container();
+    requestLayer(bitmap, render) {
+        let layer = render.Container();
         if (bitmap != null) {
-            this._attachBitmapLayer(layer, bitmap);
+            this._attachBitmapLayer(layer, bitmap, render);
         }
-        this._attachVectorLayer(layer);
+        this._attachVectorLayer(layer, render);
         layer.stepToFrame = (frame) => {
             if (frame < this.frames.length) {
                 let frameItem = this.frames[frame];
@@ -105,10 +104,10 @@ module.exports = class SVGAVideoSpriteEntity {
                     layer.setState({
                         visible: true,
                         alpha: frameItem.alpha,
-                        transform: SVGAAdapter.Matrix2D(frameItem.transform.a, frameItem.transform.b, frameItem.transform.c, frameItem.transform.d, frameItem.transform.tx, frameItem.transform.ty),
-                        mask: frameItem.maskShape,
+                        transform: render.Matrix2D(frameItem.transform.a, frameItem.transform.b, frameItem.transform.c, frameItem.transform.d, frameItem.transform.tx, frameItem.transform.ty),
+                        mask: frameItem.maskPath && frameItem.maskPath.getShape(render),
                     })
-                    SVGAAdapter.setBounds(layer, { x: frameItem.layout.x, y: frameItem.layout.y, width: frameItem.layout.width, height: frameItem.layout.height });
+                    render.setBounds(layer, { x: frameItem.layout.x, y: frameItem.layout.y, width: frameItem.layout.width, height: frameItem.layout.height });
                     if (layer.mask) {
                         layer.mask.setState({
                             transform: layer.transform,
@@ -136,16 +135,16 @@ module.exports = class SVGAVideoSpriteEntity {
         return layer;
     }
 
-    _attachBitmapLayer(layer, bitmap) {
-        layer.bitmapLayer = SVGAAdapter.Bitmap(bitmap);
+    _attachBitmapLayer(layer, bitmap, render) {
+        layer.bitmapLayer = render.Bitmap(bitmap);
         layer.bitmapLayer.frames = this.frames;
         layer.bitmapLayer.stepToFrame = (frame) => { }
         layer.addChild(layer.bitmapLayer);
     }
 
-    _attachVectorLayer(layer) {
-        layer.vectorLayer = SVGAAdapter.Container();
-        SVGAVectorLayerAssigner(layer.vectorLayer);
+    _attachVectorLayer(layer, render) {
+        layer.vectorLayer = render.Container();
+        SVGAVectorLayerAssigner(layer.vectorLayer, render);
         layer.vectorLayer.init(this.frames)
         layer.addChild(layer.vectorLayer);
     }
