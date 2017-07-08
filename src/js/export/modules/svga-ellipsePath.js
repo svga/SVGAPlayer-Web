@@ -17,7 +17,9 @@ module.exports = class SVGAEllipsePath extends SVGABezierPath {
         let g = shape.graphics;
         g.drawEllipse(x - radiusX, y - radiusY, radiusX * 2, radiusY * 2);
         if (transform) {
-            shape.setTransformMatrix(SVGAAdapter.Matrix2D(transform.a, transform.b, transform.c, transform.d, transform.tx, transform.ty));
+            shape.setState({
+                transform: SVGAAdapter.Matrix2D(transform.a, transform.b, transform.c, transform.d, transform.tx, transform.ty)
+            });
         }
         return shape;
     }

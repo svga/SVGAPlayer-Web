@@ -17,7 +17,9 @@ module.exports = class SVGARectPath extends SVGABezierPath {
         let g = shape.graphics;
         g.drawRoundRect(x, y, width, height, cornerRadius);
         if (transform) {
-            shape.setTransformMatrix(SVGAAdapter.Matrix2D(transform.a, transform.b, transform.c, transform.d, transform.tx, transform.ty));
+            shape.setState({
+                transform: SVGAAdapter.Matrix2D(transform.a, transform.b, transform.c, transform.d, transform.tx, transform.ty)
+            })
         }
         return shape;
     }

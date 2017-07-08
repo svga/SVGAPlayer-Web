@@ -15,8 +15,8 @@ function init() {
 
 function addAnimation() {
     let player = new SVGA.Player();
-    let parser = new SVGA.Parser(`/assets/svga-worker.min.js`, SVGA.DB)
-    parser.load(`/assets/angel.svga`, (videoItem) => {
+    let parser = new SVGA.Parser(undefined, SVGA.DB)
+    parser.load(`assets/angel.svga`, (videoItem) => {
         player.setVideoItem(videoItem);
         var container = player.container(stage);
         container.x = 150;

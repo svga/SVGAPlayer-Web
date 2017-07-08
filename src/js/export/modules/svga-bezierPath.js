@@ -42,7 +42,6 @@ module.exports = class SVGABezierPath {
     }
 
     createShape(d, transform, outShape) {
-        return undefined;
         let shape = outShape || SVGAAdapter.Shape();
         let g = shape.graphics;
         shape.x = 0;
@@ -77,6 +76,7 @@ module.exports = class SVGABezierPath {
 			args.push(tempArg);
 			tempArg = [];
 		}
+        g.st && g.st();
         for (let i = 0; i < args.length; i++) {
             let arg = args[i];
             if (!(arg[0] == 'C' || arg[0] == 'c')) {
@@ -201,8 +201,11 @@ module.exports = class SVGABezierPath {
             }
         }
         if (transform) {
-            shape.setTransformMatrix(SVGAAdapter.Matrix2D(transform.a, transform.b, transform.c, transform.d, transform.tx, transform.ty));
+            shape.setState({
+                transform: SVGAAdapter.Matrix2D(transform.a, transform.b, transform.c, transform.d, transform.tx, transform.ty)
+            })
         }
+        g.fs && g.fs();
     }
 
     resetStyle (styles) {

@@ -67,7 +67,7 @@ let SVGAVectorLayerAssigner = (obj) => {
 }
 
 module.exports = class SVGAVideoSpriteEntity {
-    
+
     /**
      * string
      */
@@ -99,13 +99,20 @@ module.exports = class SVGAVideoSpriteEntity {
             if (frame < this.frames.length) {
                 let frameItem = this.frames[frame];
                 if (frameItem.alpha > 0.0) {
-                    layer.visible = true;
-                    layer.alpha = frameItem.alpha;
-                    SVGAAdapter.setBounds(layer, {x: frameItem.layout.x, y: frameItem.layout.y, width: frameItem.layout.width, height: frameItem.layout.height});
-                    layer.setTransformMatrix(SVGAAdapter.Matrix2D(frameItem.transform.a, frameItem.transform.b, frameItem.transform.c, frameItem.transform.d, frameItem.transform.tx, frameItem.transform.ty));
-                    layer.mask = frameItem.maskShape;
+                    layer.setState({
+                        mask: undefined,
+                    })
+                    layer.setState({
+                        visible: true,
+                        alpha: frameItem.alpha,
+                        transform: SVGAAdapter.Matrix2D(frameItem.transform.a, frameItem.transform.b, frameItem.transform.c, frameItem.transform.d, frameItem.transform.tx, frameItem.transform.ty),
+                        mask: frameItem.maskShape,
+                    })
+                    SVGAAdapter.setBounds(layer, { x: frameItem.layout.x, y: frameItem.layout.y, width: frameItem.layout.width, height: frameItem.layout.height });
                     if (layer.mask) {
-                        layer.mask.setTransformMatrix(layer.transformMatrix);
+                        layer.mask.setState({
+                            transform: layer.transform,
+                        })
                     }
                     if (layer.bitmapLayer && typeof layer.bitmapLayer.stepToFrame === "function") {
                         layer.bitmapLayer.stepToFrame(frame);
@@ -120,7 +127,9 @@ module.exports = class SVGAVideoSpriteEntity {
                     }
                 }
                 else {
-                    layer.visible = false;
+                    layer.setState({
+                        visible: false,
+                    });
                 }
             }
         }
@@ -130,7 +139,7 @@ module.exports = class SVGAVideoSpriteEntity {
     _attachBitmapLayer(layer, bitmap) {
         layer.bitmapLayer = SVGAAdapter.Bitmap(bitmap);
         layer.bitmapLayer.frames = this.frames;
-        layer.bitmapLayer.stepToFrame = (frame) => {}
+        layer.bitmapLayer.stepToFrame = (frame) => { }
         layer.addChild(layer.bitmapLayer);
     }
 

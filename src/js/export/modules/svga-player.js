@@ -185,11 +185,15 @@ module.exports = class SVGAPlayer {
             this._canvas.width = this._canvas.offsetWidth;
             this._canvas.height = this._canvas.offsetHeight;
             let ratio = this._canvas.offsetWidth / this._videoItem.videoSize.width;
-            this._drawLayer.setTransformMatrix(SVGAAdapter.Matrix2D(ratio, 0.0, 0.0, ratio, 0.0, 0.0));
+            this._drawLayer.setState({
+                transform: SVGAAdapter.Matrix2D(ratio, 0.0, 0.0, ratio, 0.0, 0.0)
+            })
         }
         else {
             let ratio = this._rootLayer.width / this._videoItem.videoSize.width;
-            this._drawLayer.setTransformMatrix(SVGAAdapter.Matrix2D(ratio, 0.0, 0.0, ratio, 0.0, 0.0));
+            this._drawLayer.setState({
+                transform: SVGAAdapter.Matrix2D(ratio, 0.0, 0.0, ratio, 0.0, 0.0)
+            })
         }
     }
 

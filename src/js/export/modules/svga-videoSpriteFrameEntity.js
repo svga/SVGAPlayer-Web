@@ -53,7 +53,7 @@ module.exports = class SVGAVideoSpriteFrameEntity {
                 this.transform.ty = parseFloat(spec.transform.ty) || 0.0;
             }
             if (spec.clipPath && spec.clipPath.length > 0) {
-                let bezierPath = new SVGABezierPath(spec.clipPath);
+                let bezierPath = new SVGABezierPath(spec.clipPath, undefined, {fill: "#000000"});
                 this.maskShape = bezierPath.getShape();
             }
             if (spec.shapes) {
