@@ -1,16 +1,33 @@
 import SVGA from './export/svga.js';
 
-var stage;
+var events = [];
+let runloop = () => {
+    requestAnimationFrame(() => {
+        events.forEach(event => event());
+        runloop();
+    });
+}
 
 function init() {
-    stage = new createjs.Stage("canvas");
-    var circle = new createjs.Shape();
-    circle.graphics.beginFill("gray").drawCircle(0, 0, 100);
-    circle.x = 250;
-    circle.y = 250;
-    stage.addChild(circle);
-    stage.update();
+    runloop();
+    addClear();
+    addRect();
     addAnimation();
+}
+
+function addClear() {
+    events.push(() => {
+        let ctx = document.querySelector('#canvas').getContext('2d');
+        ctx.clearRect(0, 0, 500, 500);
+    })
+}
+
+function addRect() {
+    events.push(() => {
+        let ctx = document.querySelector('#canvas').getContext('2d');
+        ctx.fillStyle = "gray";
+        ctx.fillRect(150, 150, 200, 200);
+    });
 }
 
 function addAnimation() {
@@ -18,14 +35,10 @@ function addAnimation() {
     let parser = new SVGA.Parser(undefined, SVGA.DB)
     parser.load(`assets/angel.svga`, (videoItem) => {
         player.setVideoItem(videoItem);
-        var container = player.container(stage);
-        container.x = 150;
-        container.y = 150;
-        container.width = 200;
-        container.height = 200;
-        stage.addChild(container);
-        stage.update();
         player.startAnimation();
+        events.push(() => {
+            player.drawOnCanvas(document.querySelector('#canvas'), 125, 125, 250, 250);
+        })
     });
 }
 

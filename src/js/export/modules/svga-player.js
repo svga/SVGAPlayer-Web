@@ -1,5 +1,6 @@
 'use strict';
 
+import CanvasRender from './svga-render'
 import SVGAVideoEntity from './svga-videoEntity'
 
 module.exports = class SVGAPlayer {
@@ -25,6 +26,9 @@ module.exports = class SVGAPlayer {
             }
             else if (window.Laya !== undefined && window.SvgaLayabox !== undefined) {
                 render = window.SvgaLayabox.Render;
+            }
+            else {
+                render = CanvasRender;
             }
         }
         if (render === undefined) {
@@ -72,7 +76,7 @@ module.exports = class SVGAPlayer {
 
     clear() {
         this._rootLayer.removeAllChildren();
-        this._stage && this._stage.update();
+        this._stage && this._stage.update(this);
     }
 
     stepToFrame(frame, andPlay) {
@@ -225,7 +229,7 @@ module.exports = class SVGAPlayer {
             }
         }
         this._resize();
-        this._stage && this._stage.update();
+        this._stage && this._stage.update(this);
     }
 
 }
