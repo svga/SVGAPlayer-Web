@@ -3,7 +3,9 @@
 ## 最近更新
 
 * NEXT
-    * SVGAPlayer 可以作为 CreateJS 上下文的一部分使用，也就是，SVGAPlayer 可以嵌入到 CreateJS 画布中。
+    * SVGAPlayer 可以作为 CreateJS 上下文的一部分使用，也就是，SVGAPlayer 可以嵌入到 CreateJS 画布中；
+    * SVGAPlayer 核心运行时不再依赖 CreateJS 库，运行时大小减少70%；
+    * 新增 CreateJS LayaBox 运行时，可在相应的环境中播放 SVGA 动画。
 
 * 1.1.0
 	* 完全重构，模块划分为 SVGAParser / SVGAPlayer 以及 SVGAWorker / SVGADB
@@ -22,22 +24,11 @@
 
 ## 说明
 
-[SVGA](http://code.yy.com/ued/SVGA-Format) 格式 Web Canvas 实现方式
-
-## 实现
-
-* 修复 [原有player](http://code.yy.com/ued/SVGAPlayer-WebCanvas) 实际使用反馈的 bug
-* 轻量化，重构依赖模块，gzip 30K
-* 性能优化，运算开销较大 SVGA 源文件下载转码过程 迁移到 web worker，尽量避免影响主线程，造成页面卡顿
-* UMD 规范，全局引用，或使用模块加载
-
-## DEMO
-
-[前往测试地址](http://legox.yy.com/svga/svgaplayer/)
+[SVGA](https://github.com/yyued/SVGA-Format) 格式 Web 实现方式
 
 ## 注意
 
-因浏览器安全策略问题，以下文件需要同域，并不能跨域
+因浏览器安全策略问题，以下文件需要同域，并不能跨域（开启 cross-origin-domain 可以绕过限制）
 
 * svga-worker.min.js
 * svga.min.js
@@ -53,36 +44,22 @@
 可以通过创建 Player 和 Parser，手动加载 SVGA 动画。
 
 ```html
-<html lang="zh-cmn-Hans">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
-    <meta name="description" content="">
-    <meta name="keywords" content="">
-    <meta name="format-detection" content="telephone=no,address=no,email=no">
-    <meta http-equiv="Cache-Control" content="no-transform">
-    <meta http-equiv="Cache-Control" content="no-siteapp">
-    <title>Example</title>
-</head>
+...
 <body>
-
     <div id="test">
         <canvas id="canvas" width="750" height="750" style="background-color: #000000"></canvas>
     </div>
-
     <!--[if !IE]><!--><script src="http://assets.dwstatic.com/common/lib/yyzip/0.0.1/yyzip.min.js" charset="utf-8"></script><!--<![endif]-->
     <!--[if IE]><script src="http://assets.dwstatic.com/common/lib/??jszip/3.1.3/jszip.min.js,jszip/3.1.3/jszip-utils.min.js,jszip/3.1.3/jszip-utils-ie.min.js" charset="utf-8"></script><![endif]-->
 	<script src="../build/svga.min.js" charset="utf-8"></script>
-
 	<script>
         let player = new Svga.Player('#canvas');
-        let parser = new Svga.Parser(`../build/svga-worker.min.js`, Svga.DB); // 可以不传任何参数，达到不使用 Worker，不使用 DB 的目的。
-        parser.load('../example/EmptyState.svga', (videoItem) => {
+        let parser = new Svga.Parser(`svga-worker.min.js`, Svga.DB); // 可以不传任何参数，达到不使用 Worker，不使用 DB 的目的。
+        parser.load('EmptyState.svga', (videoItem) => {
             player.setVideoItem(videoItem);
             player.startAnimation();
         });
 	</script>
-
 </body>
 </html>
 ```
@@ -92,140 +69,86 @@
 可以为 canvas 标签设置 src 值，将 svga 源文件地址设为其值，然后执行 ```Svga.autoload()```。
 
 ```html
-<html lang="zh-cmn-Hans">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
-    <meta name="description" content="">
-    <meta name="keywords" content="">
-    <meta name="format-detection" content="telephone=no,address=no,email=no">
-    <meta http-equiv="Cache-Control" content="no-transform">
-    <meta http-equiv="Cache-Control" content="no-siteapp">
-    <title>Example</title>
-</head>
+...
 <body>
 
     <div id="test">
         <canvas id="TestCanvas" src="../example/EmptyState.svga" loops="0" clearsAfterStop="true" style="background-color: #000000; width: 500px; height: 500px;"></canvas>
     </div>
-
     <!--[if !IE]><!--><script src="http://assets.dwstatic.com/common/lib/yyzip/0.0.1/yyzip.min.js" charset="utf-8"></script><!--<![endif]-->
     <!--[if IE]><script src="http://assets.dwstatic.com/common/lib/??jszip/3.1.3/jszip.min.js,jszip/3.1.3/jszip-utils.min.js,jszip/3.1.3/jszip-utils-ie.min.js" charset="utf-8"></script><![endif]-->
 	<script src="../build/svga.min.js" charset="utf-8"></script>
-
 	<script>
         Svga.autoload(); // 第一个参数可以是DOM对象，或者 undefined。
         // Svga.autoload(undefined, new Svga.Parser(`../build/svga-worker.min.js`, Svga.DB)); // 可以自定义一个 Parser， 以启用 Worker 和 DB。
         var player = document.getElementById('TestCanvas').player; // 可以通过这种方式取得 SVGAPlayer 对象，直接操纵动画。
 	</script>
-
 </body>
 </html>
 ```
 
-### Android 4.x
+### 嵌入到 Canvas 上下文 
 
-SVGAPlayer 是支持 Android 4.x 的，在引用 script 时，参照以下代码即可。区别在于，强制使用 JSZip 库。
+如果希望将 SVGAPlayer 嵌入到 Canvas 上下文中，可以在创建 Player 时，不传递参数，然后使用 drawOnCanvas 方法将帧渲染至画布中。
 
-```html
-<html lang="zh-cmn-Hans">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
-    <meta name="description" content="">
-    <meta name="keywords" content="">
-    <meta name="format-detection" content="telephone=no,address=no,email=no">
-    <meta http-equiv="Cache-Control" content="no-transform">
-    <meta http-equiv="Cache-Control" content="no-siteapp">
-    <title>Example</title>
-</head>
-<body>
-
-    <div id="test">
-        <canvas id="canvas" width="750" height="750" style="background-color: #000000"></canvas>
-    </div>
-
-	<!--[if !IE]><!--><script src="http://assets.dwstatic.com/common/lib/??jszip/3.1.3/jszip.min.js,jszip/3.1.3/jszip-utils.min.js" charset="utf-8"></script><!--<![endif]-->
-    <!--[if IE]><script src="http://assets.dwstatic.com/common/lib/??jszip/3.1.3/jszip.min.js,jszip/3.1.3/jszip-utils.min.js,jszip/3.1.3/jszip-utils-ie.min.js" charset="utf-8"></script><![endif]-->
-	<script src="../build/svga.min.js" charset="utf-8"></script>
-
-	<script>
-        let player = new Svga.Player('#canvas');
-        let parser = new Svga.Parser(`../build/svga-worker.min.js`, Svga.DB); // 可以不传任何参数，达到不使用 Worker，不使用 DB 的目的。
-        parser.load('../example/EmptyState.svga', (videoItem) => {
-            player.setVideoItem(videoItem);
-            player.startAnimation();
-        });
-	</script>
-
-</body>
-</html>
-
+```js
+var player = new SVGA.Player();
+var parser = new SVGA.Parser();
+parser.load(`angel.svga`, (videoItem) => {
+    player.setVideoItem(videoItem);
+    player.startAnimation();
+    events.push(() => {
+        player.drawOnCanvas(document.querySelector('#canvas'), 125, 125, 250, 250); // (DOM, x, y, width, height);
+    })
+});
 ```
 
-### 嵌入画布
+### 使用 CreateJS 库播放
 
-在创建 Player 时，不传入任何参数，然后调用 Player.container(stage) 方法，获取一个 CreateJS 渲染对象。
-
-然后，将该对象使用 addChild 方法添加到舞台，即可。
+同时添加 CreateJS 依赖即可使用 CreateJS 库进行播放。
 
 ```html
-<html lang="zh-cmn-Hans">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
-    <meta name="description" content="">
-    <meta name="keywords" content="">
-    <meta name="format-detection" content="telephone=no,address=no,email=no">
-    <meta http-equiv="Cache-Control" content="no-transform">
-    <meta http-equiv="Cache-Control" content="no-siteapp">
-    <title>Example</title>
-</head>
-<body>
+<script src="https://code.createjs.com/createjs-2015.11.26.min.js"></script>
+<script src="svga-createjs.min.js" charset="utf-8"></script>
+```
 
-    <div id="test" onload="init()">
-        <canvas id="canvas" width="750" height="750" style="background-color: #000000"></canvas>
-    </div>
+#### 嵌入到 CreateJS 上下文
 
-	<!--[if !IE]><!--><script src="http://assets.dwstatic.com/common/lib/??jszip/3.1.3/jszip.min.js,jszip/3.1.3/jszip-utils.min.js" charset="utf-8"></script><!--<![endif]-->
-    <!--[if IE]><script src="http://assets.dwstatic.com/common/lib/??jszip/3.1.3/jszip.min.js,jszip/3.1.3/jszip-utils.min.js,jszip/3.1.3/jszip-utils-ie.min.js" charset="utf-8"></script><![endif]-->
-	<script src="../build/svga.min.js" charset="utf-8"></script>
+如果希望将 SVGAPlayer 嵌入到 Canvas 上下文中，可以在创建 Player 时，不传递参数，然后使用 ```Player.container(stage)``` 获取容器。
 
-	<script>
+```js
+var stage = new createjs.Stage('#canvas');
+var player = new SVGA.Player();
+var parser = new SVGA.Parser();
+parser.load(`angel.svga`, (videoItem) => {
+    player.setVideoItem(videoItem);
+    player.startAnimation();
+    var container = player.container(stage);
+    container.x = 100;      // 设定容器 x 位置
+    container.y = 100;      // 设定容器 y 位置
+    container.width = 100;  // 设定容器宽度
+    container.height = 100; // 设定容器高度
+    stage.addChild(container); // 自行添加至对应场景
+});
+```
 
-        var stage;
+### 在 LayaBox 游戏引擎中播放
 
-        function init() {
-            stage = new createjs.Stage("canvas");
-            var circle = new createjs.Shape();
-            circle.graphics.beginFill("gray").drawCircle(0, 0, 100);
-            circle.x = 250;
-            circle.y = 250;
-            stage.addChild(circle);
-            stage.update();
-            addAnimation();
-        }
+要在 LayaBox 中播放 SVGA 动画，你需要同时引用 ```svga.min.js``` ```svga-layabox.min.js```，然后，使用以下方法加载动画。
 
-        function addAnimation() {
-            var player = new Svga.Player();
-            var parser = new Svga.Parser(`/assets/svga-worker.min.js`, SVGA.DB);
-            parser.load(`/assets/angel.svga`, function(videoItem) {
-                player.setVideoItem(videoItem);
-                var container = player.container(stage);
-                container.x = 150;
-                container.y = 150;
-                container.width = 200;
-                container.height = 200;
-                stage.addChild(container);
-                stage.update();
-                player.startAnimation();
-            });
-        }
-
-	</script>
-
-</body>
-</html>
+```js
+var player = new SVGA.Player();
+var parser = new SVGA.Parser();
+parser.load(`angel.svga`, (videoItem) => {
+    player.setVideoItem(videoItem);
+    player.startAnimation();
+    var container = player.container();
+    container.x = 100;      // 设定容器 x 位置
+    container.y = 100;      // 设定容器 y 位置
+    container.width = 100;  // 设定容器宽度
+    container.height = 100; // 设定容器高度
+    Laya.stage.addChild(container); // 自行添加至对应场景
+});
 ```
 
 ## 模块说明
