@@ -103,6 +103,18 @@ parser.load(`angel.svga`, (videoItem) => {
 });
 ```
 
+### 在各运行时中播放动画
+
+SVGAPlayer 默认使用 Canvas API 播放动画，然而，你可能需要在不同的环境中播放动画，比如动画引擎、游戏引擎。
+
+SVGAPlayer 会自动选择最合适的 Render 进行渲染，当以下运行时存在时，会按顺序选择 Render。
+
+* CreateJS(SvgaCreateJS.Render)
+* Laya(SvgaLayabox.Render)
+* Canvas API
+
+当多个环境同时存在时，你可以通过 ```Player.setRender(Render)``` 强制 SVGAPlayer 使用某渲染器。
+
 ### 使用 CreateJS 库播放
 
 同时添加 CreateJS 依赖即可使用 CreateJS 库进行播放。
