@@ -203,4 +203,4 @@ SVGAParser 用于加载动画源文件， SVGAParser 可以配合 SVGAWorker 和
 
 ## 调试构建工具
 
-使用 [LegoFlow](http://legox.yy.com/md/book/LegoFlow/) 进行调试、构建
+使用 [LegoFlow](https://legoflow.com) 进行调试、构建

@@ -45,7 +45,7 @@ export default class CanvasRender {
                 ctx.save();
                 ctx.globalAlpha = frameItem.alpha;
                 ctx.transform(frameItem.transform.a, frameItem.transform.b, frameItem.transform.c, frameItem.transform.d, frameItem.transform.tx, frameItem.transform.ty)
-                let src = player._videoItem.bitmapCache[sprite.imageKey] || player._videoItem.images[sprite.imageKey];
+                let src = player._dynamicImage[sprite.imageKey] || player._videoItem.bitmapCache[sprite.imageKey] || player._videoItem.images[sprite.imageKey];
                 if (typeof src === "string") {
                     let imgTag = document.createElement('img');
                     if (src.indexOf("iVBO") === 0 || src.indexOf("/9j/2w") === 0) {
@@ -81,6 +81,16 @@ export default class CanvasRender {
                         rect.getShape(CanvasRender).draw(ctx);
                     }
                 })
+                let dynamicText = player._dynamicText[sprite.imageKey];
+                if (dynamicText !== undefined) {
+                    ctx.textBaseline="middle";
+                    ctx.font = dynamicText.style;
+                    let textWidth = ctx.measureText(dynamicText.text).width
+                    ctx.fillStyle = dynamicText.color;
+                    let offsetX = (dynamicText.offset !== undefined && dynamicText.offset.x !== undefined) ? isNaN(parseFloat(dynamicText.offset.x)) ? 0 : parseFloat(dynamicText.offset.x) : 0;
+                    let offsetY = (dynamicText.offset !== undefined && dynamicText.offset.y !== undefined) ? isNaN(parseFloat(dynamicText.offset.y)) ? 0 : parseFloat(dynamicText.offset.y) : 0;
+                    ctx.fillText(dynamicText.text, (frameItem.layout.width - textWidth) / 2 + offsetX, frameItem.layout.height / 2 + offsetY);
+                }
                 ctx.restore();
             });
             ctx.restore();
@@ -117,10 +127,6 @@ export default class CanvasRender {
 
     static Matrix2D(a, b, c, d, tx, ty) {
         return { a, b, c, d, tx, ty };
-    }
-
-    static DrawShapeWithPath(d, style) {
-
     }
 
     static Shape() {
@@ -256,7 +262,7 @@ export default class CanvasRender {
     }
 
     static Text(text, style, color) {
-        return undefined;
+        return { text, style, color };
     }
 
     static setBounds(layer, bounds) {

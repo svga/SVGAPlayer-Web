@@ -120,9 +120,13 @@ module.exports = class SVGAVideoSpriteEntity {
                         layer.vectorLayer.stepToFrame(frame);
                     }
                     if (layer.textLayer) {
-                        layer.textLayer.textBaseline = "middle"
-                        layer.textLayer.x = (frameItem.layout.width - layer.textLayer.getBounds().width) / 2.0 + layer.textLayer.offset.x;
-                        layer.textLayer.y = frameItem.layout.height / 2.0 + layer.textLayer.offset.y;
+                        let offsetX = (layer.textLayer.offset !== undefined && layer.textLayer.offset.x !== undefined) ? layer.textLayer.offset.x : 0;
+                        let offsetY = (layer.textLayer.offset !== undefined && layer.textLayer.offset.y !== undefined) ? layer.textLayer.offset.y : 0;
+                        layer.textLayer.setState({
+                            textBaseline: "middle",
+                            x: (frameItem.layout.width - layer.textLayer.getBounds().width) / 2.0 + offsetX,
+                            y: frameItem.layout.height / 2.0 + offsetY,
+                        });
                     }
                 }
                 else {

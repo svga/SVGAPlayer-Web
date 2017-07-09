@@ -110,7 +110,7 @@ module.exports = class SVGAPlayer {
         let color = (typeof textORMap === "object" ? textORMap.color : "#000000") || "#000000";
         let offset = (typeof textORMap === "object" ? textORMap.offset : { x: 0.0, y: 0.0 }) || { x: 0.0, y: 0.0 };
         let textLayer = this.render.Text(text, `${size} family`, color);
-        textLayer.offset = offset;
+        textLayer.setState({offset});
         this._dynamicText[forKey] = textLayer;
     }
 
