@@ -56,7 +56,13 @@ module.exports = class SVGAVideoSpriteFrameEntity {
                 this.maskPath = new SVGABezierPath(spec.clipPath, undefined, {fill: "#000000"});
             }
             if (spec.shapes) {
-                this.shapes = spec.shapes
+                if (spec.shapes[0] && spec.shapes[0].type === "keep") {
+                    this.shapes = SVGAVideoSpriteFrameEntity.lastShapes;
+                }
+                else {
+                    this.shapes = spec.shapes
+                    SVGAVideoSpriteFrameEntity.lastShapes = spec.shapes;
+                }
             }
             let llx = this.transform.a * this.layout.x + this.transform.c * this.layout.y + this.transform.tx;
             let lrx = this.transform.a * (this.layout.x + this.layout.width) + this.transform.c * this.layout.y + this.transform.tx;

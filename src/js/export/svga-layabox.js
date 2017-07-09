@@ -96,6 +96,12 @@ class LayaBoxRender {
         layer.graphics.cp = () => {
             layer.graphics.currentPath.push(["closePath"]);
         }
+        layer.graphics.drawEllipse = (left, top, dX, dY) => {
+            layer.graphics.currentPath.push(["ellipse", left, top, dX, dY]);
+        }
+        layer.graphics.drawRoundRect = (x, y, width, height, cornerRadius) => {
+            layer.graphics.currentPath.push(["rect", x, y, width, height, cornerRadius]);
+        }
         layer.customRender = (render, x, y) => {
             render.ctx.fillStyle = layer.graphics.fillStyle;
             render.ctx.strokeStyle = layer.graphics.strokeStyle;
@@ -128,6 +134,44 @@ class LayaBoxRender {
                     else if (item[0] === "closePath") {
                         render.ctx.closePath();
                     }
+                    else if (item[0] === "ellipse") {
+                            let x = item[1];
+                            let y = item[2];
+                            let w = item[3];
+                            let h = item[4];
+                            var kappa = .5522848,
+                                ox = (w / 2) * kappa,
+                                oy = (h / 2) * kappa,
+                                xe = x + w,
+                                ye = y + h,
+                                xm = x + w / 2,
+                                ym = y + h / 2;
+
+                            ctx.beginPath();
+                            ctx.moveTo(x, ym);
+                            ctx.bezierCurveTo(x, ym - oy, xm - ox, y, xm, y);
+                            ctx.bezierCurveTo(xm + ox, y, xe, ym - oy, xe, ym);
+                            ctx.bezierCurveTo(xe, ym + oy, xm + ox, ye, xm, ye);
+                            ctx.bezierCurveTo(xm - ox, ye, x, ym + oy, x, ym);
+                        }
+                        else if (item[0] === "rect") {
+                            let x = item[1];
+                            let y = item[2];
+                            let width = item[3];
+                            let height = item[4];
+                            let radius = item[5];
+                            ctx.beginPath();
+                            ctx.moveTo(x + radius, y);
+                            ctx.lineTo(x + width - radius, y);
+                            ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+                            ctx.lineTo(x + width, y + height - radius);
+                            ctx.quadraticCurveTo(x + width, y + height, x + width - radius.br, y + height);
+                            ctx.lineTo(x + radius, y + height);
+                            ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+                            ctx.lineTo(x, y + radius);
+                            ctx.quadraticCurveTo(x, y, x + radius, y);
+                            ctx.closePath();
+                        }
                 })
             }
             layer.graphics.fillStyle && render.ctx.fill();

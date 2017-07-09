@@ -1,3 +1,7 @@
+import SVGABezierPath from './svga-bezierPath'
+import SVGAEllipsePath from './svga-ellipsePath'
+import SVGARectPath from './svga-rectPath'
+
 export default class CanvasRender {
 
     static Stage(arg1, arg2, arg3) {
@@ -64,6 +68,19 @@ export default class CanvasRender {
                     }
                     ctx.drawImage(src, 0, 0);
                 }
+                frameItem.shapes && frameItem.shapes.forEach(shape => {
+                    if (shape.type === "shape" && shape.args && shape.args.d) {
+                        new SVGABezierPath(shape.args.d, shape.transform, shape.styles).getShape(CanvasRender).draw(ctx);
+                    }
+                    if (shape.type === "ellipse" && shape.args) {
+                        let ellipse = new SVGAEllipsePath(parseFloat(shape.args.x) || 0.0, parseFloat(shape.args.y) || 0.0, parseFloat(shape.args.radiusX) || 0.0, parseFloat(shape.args.radiusY) || 0.0, shape.transform, shape.styles);
+                        ellipse.getShape(CanvasRender).draw(ctx);
+                    }
+                    if (shape.type === "rect" && shape.args) {
+                        let rect = new SVGARectPath(parseFloat(shape.args.x) || 0.0, parseFloat(shape.args.y) || 0.0, parseFloat(shape.args.width) || 0.0, parseFloat(shape.args.height) || 0.0, parseFloat(shape.args.cornerRadius) || 0.0, shape.transform, shape.styles);
+                        rect.getShape(CanvasRender).draw(ctx);
+                    }
+                })
                 ctx.restore();
             });
             ctx.restore();
@@ -99,7 +116,7 @@ export default class CanvasRender {
     }
 
     static Matrix2D(a, b, c, d, tx, ty) {
-        return undefined;
+        return { a, b, c, d, tx, ty };
     }
 
     static DrawShapeWithPath(d, style) {
@@ -109,6 +126,10 @@ export default class CanvasRender {
     static Shape() {
         let layer = {
             draw: (ctx, noFill) => {
+                ctx.save();
+                if (layer.transform !== undefined && layer.transform !== null) {
+                    ctx.transform(layer.transform.a, layer.transform.b, layer.transform.c, layer.transform.d, layer.transform.tx, layer.transform.ty);
+                }
                 ctx.fillStyle = layer.graphics.fillStyle;
                 ctx.strokeStyle = layer.graphics.strokeStyle;
                 ctx.lineCap = layer.graphics.lineCap;
@@ -116,7 +137,7 @@ export default class CanvasRender {
                 ctx.lineWidth = layer.graphics.lineWidth;
                 ctx.miterLimit = layer.graphics.miterLimit;
                 if (layer.graphics.strokeDash !== undefined) {
-                    const { arr, arg } = strokeDash;
+                    const { arr, arg } = layer.graphics.strokeDash;
                     const newArr = [];
                     arr.forEach(item => newArr.push(item));
                     newArr.push(arg);
@@ -140,19 +161,58 @@ export default class CanvasRender {
                         else if (item[0] === "closePath") {
                             ctx.closePath();
                         }
+                        else if (item[0] === "ellipse") {
+                            let x = item[1];
+                            let y = item[2];
+                            let w = item[3];
+                            let h = item[4];
+                            var kappa = .5522848,
+                                ox = (w / 2) * kappa,
+                                oy = (h / 2) * kappa,
+                                xe = x + w,
+                                ye = y + h,
+                                xm = x + w / 2,
+                                ym = y + h / 2;
+
+                            ctx.beginPath();
+                            ctx.moveTo(x, ym);
+                            ctx.bezierCurveTo(x, ym - oy, xm - ox, y, xm, y);
+                            ctx.bezierCurveTo(xm + ox, y, xe, ym - oy, xe, ym);
+                            ctx.bezierCurveTo(xe, ym + oy, xm + ox, ye, xm, ye);
+                            ctx.bezierCurveTo(xm - ox, ye, x, ym + oy, x, ym);
+                        }
+                        else if (item[0] === "rect") {
+                            let x = item[1];
+                            let y = item[2];
+                            let width = item[3];
+                            let height = item[4];
+                            let radius = item[5];
+                            ctx.beginPath();
+                            ctx.moveTo(x + radius, y);
+                            ctx.lineTo(x + width - radius, y);
+                            ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+                            ctx.lineTo(x + width, y + height - radius);
+                            ctx.quadraticCurveTo(x + width, y + height, x + width - radius.br, y + height);
+                            ctx.lineTo(x + radius, y + height);
+                            ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+                            ctx.lineTo(x, y + radius);
+                            ctx.quadraticCurveTo(x, y, x + radius, y);
+                            ctx.closePath();
+                        }
                     })
                 }
                 layer.graphics.fillStyle && noFill !== true && ctx.fill();
                 layer.graphics.strokeStyle && ctx.stroke();
+                ctx.restore();
             },
         };
+        layer.setState = (state) => { layer.transform = state.transform; };
         layer.graphics = {};
+        layer.graphics.currentPath = [];
         layer.graphics.beginFill = (fillStyle) => {
             layer.graphics.fillStyle = fillStyle;
-            layer.graphics.strokeStyle = undefined;
         }
         layer.graphics.beginStroke = (stroke) => {
-            layer.graphics.fillStyle = undefined;
             layer.graphics.strokeStyle = stroke;
         }
         layer.graphics.setStrokeStyle = (width, caps, joints, miterLimit) => {
@@ -181,6 +241,12 @@ export default class CanvasRender {
         }
         layer.graphics.cp = () => {
             layer.graphics.currentPath.push(["closePath"]);
+        }
+        layer.graphics.drawEllipse = (left, top, dX, dY) => {
+            layer.graphics.currentPath.push(["ellipse", left, top, dX, dY]);
+        }
+        layer.graphics.drawRoundRect = (x, y, width, height, cornerRadius) => {
+            layer.graphics.currentPath.push(["rect", x, y, width, height, cornerRadius]);
         }
         return layer;
     }
