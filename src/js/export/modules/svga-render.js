@@ -110,6 +110,13 @@ export default class CanvasRender {
     }
 
     static AddTimer(callee, callback) {
+        let requestAnimationFrame;
+        if (window.requestAnimationFrame !== undefined) {
+            requestAnimationFrame = window.requestAnimationFrame;
+        }
+        else {
+            requestAnimationFrame = (callback) => { window.setTimeout(callback, 16) }
+        }
         callee._canvasAnimating = true;
         callee.drawOnCanvas = (canvas, x, y, width, height) => { CanvasRender.Draw(callee, canvas, { x, y, width, height }); }
         let cancelled = false;
