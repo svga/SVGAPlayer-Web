@@ -16,6 +16,9 @@ export default class CanvasRender {
     }
 
     static Draw(player, onCanvas, inRect) {
+        if (!player._canvasAnimating && player.clearsAfterStop) {
+            return;
+        }
         if (player._videoItem.bitmapCache === undefined) {
             player._videoItem.bitmapCache = {};
         }
@@ -83,7 +86,7 @@ export default class CanvasRender {
                 })
                 let dynamicText = player._dynamicText[sprite.imageKey];
                 if (dynamicText !== undefined) {
-                    ctx.textBaseline="middle";
+                    ctx.textBaseline = "middle";
                     ctx.font = dynamicText.style;
                     let textWidth = ctx.measureText(dynamicText.text).width
                     ctx.fillStyle = dynamicText.color;
@@ -107,6 +110,7 @@ export default class CanvasRender {
     }
 
     static AddTimer(callee, callback) {
+        callee._canvasAnimating = true;
         callee.drawOnCanvas = (canvas, x, y, width, height) => { CanvasRender.Draw(callee, canvas, { x, y, width, height }); }
         let cancelled = false;
         let doFrame = () => {
@@ -118,11 +122,11 @@ export default class CanvasRender {
             });
         }
         doFrame();
-        return cancelled;
+        return () => { callee._canvasAnimating = false; cancelled = true; };
     }
 
     static RemoveTimer(callee, handler) {
-        return handler = true;
+        return handler && handler();
     }
 
     static Matrix2D(a, b, c, d, tx, ty) {
