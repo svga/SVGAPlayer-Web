@@ -22,9 +22,18 @@
 	* 更新 动态对象功能
 	* 增加 getState 获取播放状态
 
-## 说明
+## Can I Use
 
-[SVGA](https://github.com/yyued/SVGA-Format) 格式 Web 实现方式
+SVGAPlayer 支持以下浏览器环境
+
+* IE9+
+* Safari / Chrome
+* iOS 6.0+ / Android 4.0+
+
+SVGAPlayer 支持以下动画、游戏引擎
+
+* CreateJS
+* LayaBox
 
 ## 注意
 
