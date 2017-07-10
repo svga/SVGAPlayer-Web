@@ -6,20 +6,13 @@ import SVGAMockWorker from './svga-mock-worker'
 module.exports = class SVGAParser {
 
     static worker;
+    static lastWorker;
     static database;
 
     constructor(worker, dbClass) {
         if (worker && window.Worker) {
             SVGAParser.worker = new Worker(worker);
-            SVGAParser.worker.onerror = ( err ) => {
-                console.log('[SVGA Web Canvas]: worker is error');
-            };
-        }
-        else if (typeof SVGAParser.worker !== 'undefined') {
-            SVGAParser.worker = new Worker(SVGAParser.worker);
-            SVGAParser.worker.onerror = ( err ) => {
-                console.log('[SVGA Web Canvas]: worker is error');
-            };
+            SVGAParser.lastWorker = worker;
         }
         if (dbClass && window.openDatabase) {
             SVGAParser.database = new dbClass();
@@ -30,7 +23,7 @@ module.exports = class SVGAParser {
      * url: 资源路径
      * callback(SVGAVideoEntity videoItem)
      */
-    load(url, callback) {
+    load(url, success, failure) {
         if (SVGAParser.database) {
             SVGAParser.database.find(url, ( images, movie, err ) => {
                 if (!err) {
@@ -38,20 +31,23 @@ module.exports = class SVGAParser {
                     callback(videoItem);
                 } 
                 else {
-                    this.loadViaWorker(url, callback);
+                    this.loadViaWorker(url, success, failure);
                 }
             });
         }
         else {
-            this.loadViaWorker(url, callback);
+            this.loadViaWorker(url, success, failure);
         }
     }
     
-    loadViaWorker(url, callback) {
+    loadViaWorker(url, success, failure) {
         if (SVGAParser.worker) {
-            console.log("using worker.");
-            SVGAParser.worker.postMessage(url);
-            SVGAParser.worker.onmessage = ({ data }) => {
+            const currentWorker = failure !== undefined ? new Worker(SVGAParser.lastWorker) : SVGAParser.worker;
+            currentWorker.postMessage(url);
+            currentWorker.onerror = ( err ) => {
+                failure(err);
+            };
+            currentWorker.onmessage = ({ data }) => {
                 let movie = data.movie;
                 let images = data.images;
                 if (SVGAParser.database) {
@@ -62,7 +58,7 @@ module.exports = class SVGAParser {
                     });
                 }
                 let videoItem = new SVGAVideoEntity(movie, images);
-                callback(videoItem);
+                success(videoItem);
             };
         }
         else {
@@ -77,8 +73,8 @@ module.exports = class SVGAParser {
                     });
                 }
                 let videoItem = new SVGAVideoEntity(movie, images);
-                callback(videoItem);
-            })
+                success(videoItem);
+            }, failure)
         }
     }
 

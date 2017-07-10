@@ -273,7 +273,13 @@ export default class CanvasRender {
     }
 
     static Text(text, style, color) {
-        return { text, style, color };
+        let layer = { text, style, color }
+        layer.setState = (state) => {
+            for (var key in state) {
+                layer[key] = state[key];
+            }
+        };
+        return layer;
     }
 
     static setBounds(layer, bounds) {

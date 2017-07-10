@@ -208,7 +208,7 @@ SVGAParser 用于加载动画源文件， SVGAParser 可以配合 SVGAWorker 和
 #### Methods
 
 * constructor(worker, dbClass); - 初始化方法，第一个参数传入 SVGAWorker 路径，第二个参数传入 SVGADB 的类名。
-* load(url, callback); - 加载一个动画，加载完成后 callback 回调，callback(videoItem: SVGAVideoItem)中。
+* load(url, success, failure); - 加载一个动画，加载完成后 success 回调，加载失败时 failure 回调，callback(videoItem: SVGAVideoItem)中。
 
 ## 调试构建工具
 
