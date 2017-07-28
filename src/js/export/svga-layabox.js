@@ -62,12 +62,14 @@ class LayaBoxRender {
             return children;
         }
         layer.graphics.beginFill = (fillStyle) => {
-            layer.graphics.fillStyle = fillStyle;
-            layer.graphics.strokeStyle = undefined;
+            if (typeof fillStyle === 'string') {
+                layer.graphics.fillStyle = fillStyle;
+            }
         }
         layer.graphics.beginStroke = (stroke) => {
-            layer.graphics.fillStyle = undefined;
-            layer.graphics.strokeStyle = stroke;
+            if (typeof stroke === 'string') {
+                layer.graphics.strokeStyle = stroke;
+            }
         }
         layer.graphics.setStrokeStyle = (width, caps, joints, miterLimit) => {
             layer.graphics.lineCap = caps;
@@ -103,8 +105,12 @@ class LayaBoxRender {
             layer.graphics.currentPath.push(["rect", x, y, width, height, cornerRadius]);
         }
         layer.customRender = (render, x, y) => {
-            render.ctx.fillStyle = layer.graphics.fillStyle;
-            render.ctx.strokeStyle = layer.graphics.strokeStyle;
+            if (typeof layer.graphics.fillStyle === 'string') {
+                render.ctx.fillStyle = layer.graphics.fillStyle;
+            }
+            if (typeof layer.graphics.strokeStyle === 'string') {
+                render.ctx.strokeStyle = layer.graphics.strokeStyle;
+            }
             render.ctx.lineCap = layer.graphics.lineCap;
             render.ctx.lineJoin = layer.graphics.lineJoin;
             render.ctx.lineWidth = layer.graphics.lineWidth;
