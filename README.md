@@ -172,7 +172,7 @@ parser.load(`angel.svga`, (videoItem) => {
 });
 ```
 
-* 使用 WebGL 引擎时，由于 Laya.WWEBGL 引擎存在 BUG 以及功能缺失，SVGA 已为其修复，在 patch/layabox/ 下，将 ```laya.webgl.js``` 替换工程 libs 目录下的文件即可。
+* 使用 WebGL 引擎时，由于 Laya.WEBGL 引擎存在 BUG 以及功能缺失，SVGA 已为其修复，在 patch/layabox/ 下，将 ```laya.webgl.js``` 替换工程 libs 目录下的文件即可。
 
 ## 模块说明
 
