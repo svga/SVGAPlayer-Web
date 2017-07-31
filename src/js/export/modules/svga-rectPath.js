@@ -23,7 +23,7 @@ module.exports = class SVGARectPath extends SVGABezierPath {
     }
 
     getShape(render) {
-        if (this._shape === undefined && this._d !== undefined) {
+        if (this._shape === undefined) {
             this._shape = render.Shape();
             if (this._styles) {
                 this.resetStyle(this._styles)
