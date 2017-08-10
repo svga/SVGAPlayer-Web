@@ -23,7 +23,7 @@ class LayaBoxRender {
         let layer = new Laya.Sprite();
         layer.setState = (state) => { LayaBoxRender.setState(layer, state); }
         layer.removeAllChildren = () => {
-            layer.removeChildren(0, layer.numChildren - 1);
+            layer.removeChildren(0, layer.numChildren);
         }
         layer.children = () => {
             let children = [];
