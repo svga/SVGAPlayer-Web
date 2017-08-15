@@ -2,7 +2,7 @@
 
 ## 最近更新
 
-* NEXT
+* 1.2.0
     * SVGAPlayer 可以作为 CreateJS 上下文的一部分使用，也就是，SVGAPlayer 可以嵌入到 CreateJS 画布中；
     * SVGAPlayer 核心运行时不再依赖 CreateJS 库，运行时大小减少70%；
     * 新增 CreateJS LayaBox 运行时，可在相应的环境中播放 SVGA 动画。
