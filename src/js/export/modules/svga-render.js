@@ -21,6 +21,14 @@ export default class CanvasRender {
         }
         if (player._videoItem.bitmapCache === undefined) {
             player._videoItem.bitmapCache = {};
+            for (var imageKey in player._videoItem.images) {
+                var src = player._videoItem.images[imageKey];
+                if (src.indexOf("iVBO") === 0 || src.indexOf("/9j/2w") === 0) {
+                    let imgTag = document.createElement('img');
+                    imgTag.src = 'data:image/png;base64,' + src;
+                    player._videoItem.bitmapCache[imageKey] = imgTag;
+                }
+            }
         }
         var canvas = onCanvas || player._canvas;
         if (canvas !== undefined) {
