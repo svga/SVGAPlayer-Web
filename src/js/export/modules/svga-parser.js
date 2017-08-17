@@ -19,14 +19,14 @@ module.exports = class SVGAParser {
 
     /**
      * url: 资源路径
-     * callback(SVGAVideoEntity videoItem)
+     * success(SVGAVideoEntity videoItem)
      */
     load(url, success, failure) {
         if (SVGAParser.database) {
             SVGAParser.database.find(url, ( images, movie, err ) => {
                 if (!err) {
                     let videoItem = new SVGAVideoEntity(movie, images);
-                    callback(videoItem);
+                    success(videoItem);
                 } 
                 else {
                     this.loadViaWorker(url, success, failure);
