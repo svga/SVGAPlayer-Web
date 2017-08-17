@@ -15,8 +15,20 @@ export default class CanvasRender {
         };
     }
 
+    static RedrawTimeout;
+
     static Draw(player, onCanvas, inRect) {
-        if (!player._canvasAnimating && player.clearsAfterStop) {
+        if (player.isPaused === true) {
+            // Dont return.
+        }
+        else if (!player._canvasAnimating && player.clearsAfterStop) {
+            var canvas = onCanvas || player._canvas;
+            if (canvas !== undefined) {
+                var ctx = canvas.getContext("2d");
+                if (onCanvas === undefined) {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height)
+                }
+            }
             return;
         }
         if (player._videoItem.bitmapCache === undefined) {
@@ -25,6 +37,10 @@ export default class CanvasRender {
                 var src = player._videoItem.images[imageKey];
                 if (src.indexOf("iVBO") === 0 || src.indexOf("/9j/2w") === 0) {
                     let imgTag = document.createElement('img');
+                    imgTag.onload = function () {
+                        clearTimeout(CanvasRender.RedrawTimeout);
+                        CanvasRender.RedrawTimeout = setTimeout(() => { CanvasRender.Draw(player, onCanvas, inRect); console.log("Redraw") });
+                    }
                     imgTag.src = 'data:image/png;base64,' + src;
                     player._videoItem.bitmapCache[imageKey] = imgTag;
                 }

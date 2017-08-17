@@ -8,6 +8,7 @@ module.exports = class SVGAPlayer {
     render = undefined;
     loops = 0;
     clearsAfterStop = true;
+    isPaused = false;
 
     constructor(canvas) {
         this._canvas = typeof canvas === "string" ? document.querySelector(canvas) : canvas;
@@ -55,12 +56,14 @@ module.exports = class SVGAPlayer {
     }
 
     startAnimation() {
+        this.isPaused = false;
         this.stopAnimation(false);
         this._loopCount = 0;
         this._tickListener = this.render.AddTimer(this, this._onTick);
     }
 
     pauseAnimation() {
+        this.isPaused = true;
         this.stopAnimation(false);
     }
 
@@ -75,6 +78,7 @@ module.exports = class SVGAPlayer {
     }
 
     clear() {
+        this.isPaused = false;
         this._rootLayer.removeAllChildren();
         this._stage && this._stage.update(this);
     }
@@ -87,6 +91,7 @@ module.exports = class SVGAPlayer {
         this._currentFrame = frame;
         this._update();
         if (andPlay) {
+            this.isPaused = false;
             this._tickListener = this.render.AddTimer(this, this._onTick);
         }
     }
