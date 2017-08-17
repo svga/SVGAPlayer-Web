@@ -49,7 +49,7 @@ const actions = {
 	loadAssets: (url) => {
 		let xhr = new XMLHttpRequest();
 		// worker 使用同步
-        xhr.open('GET', url, false);
+        xhr.open('GET', url, true);
         xhr.onreadystatechange = function () {
             if (this.readyState == 4) {
                 if (this.response != null) {
