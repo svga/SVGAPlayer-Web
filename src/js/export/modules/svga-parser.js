@@ -5,14 +5,12 @@ import SVGAMockWorker from './svga-mock-worker'
 
 module.exports = class SVGAParser {
 
-    static worker;
-    static lastWorker;
+    static workerPath;
     static database;
 
-    constructor(worker, dbClass) {
-        if (worker && window.Worker) {
-            SVGAParser.worker = new Worker(worker);
-            SVGAParser.lastWorker = worker;
+    constructor(workerPath, dbClass) {
+        if (workerPath && window.Worker) {
+            SVGAParser.workerPath = workerPath;
         }
         if (dbClass && window.openDatabase) {
             SVGAParser.database = new dbClass();
@@ -41,11 +39,14 @@ module.exports = class SVGAParser {
     }
     
     loadViaWorker(url, success, failure) {
-        if (SVGAParser.worker) {
-            const currentWorker = failure !== undefined ? new Worker(SVGAParser.lastWorker) : SVGAParser.worker;
+        if (SVGAParser.workerPath) {
+            const currentWorker = new Worker(SVGAParser.workerPath);
             currentWorker.postMessage(url);
             currentWorker.onerror = ( err ) => {
-                failure(err);
+                if (failure !== undefined) {
+                    failure(err);
+                    currentWorker.terminate();
+                }
             };
             currentWorker.onmessage = ({ data }) => {
                 let movie = data.movie;
@@ -59,6 +60,7 @@ module.exports = class SVGAParser {
                 }
                 let videoItem = new SVGAVideoEntity(movie, images);
                 success(videoItem);
+                currentWorker.terminate();
             };
         }
         else {
