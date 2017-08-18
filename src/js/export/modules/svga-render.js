@@ -37,9 +37,10 @@ export default class CanvasRender {
                 var src = player._videoItem.images[imageKey];
                 if (src.indexOf("iVBO") === 0 || src.indexOf("/9j/2w") === 0) {
                     let imgTag = document.createElement('img');
+                    const inRect = inRect === undefined ? undefined : {...inRect}
                     imgTag.onload = function () {
                         clearTimeout(CanvasRender.RedrawTimeout);
-                        CanvasRender.RedrawTimeout = setTimeout(() => { CanvasRender.Draw(player, onCanvas, inRect); console.log("Redraw") });
+                        CanvasRender.RedrawTimeout = setTimeout(() => { CanvasRender.Draw(player, onCanvas, inRect);  });
                     }
                     imgTag.src = 'data:image/png;base64,' + src;
                     player._videoItem.bitmapCache[imageKey] = imgTag;
