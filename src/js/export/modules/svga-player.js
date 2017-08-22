@@ -104,8 +104,11 @@ module.exports = class SVGAPlayer {
         this.stepToFrame(frame, andPlay);
     }
 
-    setImage(urlORbase64, forKey) {
+    setImage(urlORbase64, forKey, transform) {
         this._dynamicImage[forKey] = urlORbase64;
+        if (transform !== undefined && transform instanceof Array && transform.length == 6) {
+            this._dynamicImageTransform[forKey] = transform;
+        }
     }
 
     setText(textORMap, forKey) {
@@ -121,6 +124,7 @@ module.exports = class SVGAPlayer {
 
     clearDynamicObjects() {
         this._dynamicImage = {};
+        this._dynamicImageTransform = {};
         this._dynamicText = {};
     }
 
@@ -149,6 +153,7 @@ module.exports = class SVGAPlayer {
     _currentFrame = 0;
     _tickListener = null;
     _dynamicImage = {};
+    _dynamicImageTransform = {};
     _dynamicText = {};
     _onFinished = null;
     _onFrame = null;
@@ -194,7 +199,7 @@ module.exports = class SVGAPlayer {
             if (sprite.imageKey) {
                 bitmap = self._dynamicImage[sprite.imageKey] || self._videoItem.images[sprite.imageKey];
             }
-            let contentLayer = sprite.requestLayer(bitmap, self.render);
+            let contentLayer = sprite.requestLayer(bitmap, self._dynamicImageTransform[sprite.imageKey], self.render);
             if (sprite.imageKey) {
                 if (self._dynamicText[sprite.imageKey]) {
                     contentLayer.textLayer = self._dynamicText[sprite.imageKey];

@@ -88,10 +88,10 @@ module.exports = class SVGAVideoSpriteEntity {
         }
     }
 
-    requestLayer(bitmap, render) {
+    requestLayer(bitmap, bitmapTransform, render) {
         let layer = render.Container();
         if (bitmap != null) {
-            this._attachBitmapLayer(layer, bitmap, render);
+            this._attachBitmapLayer(layer, bitmap, bitmapTransform, render);
         }
         this._attachVectorLayer(layer, render);
         layer.stepToFrame = (frame) => {
@@ -139,8 +139,8 @@ module.exports = class SVGAVideoSpriteEntity {
         return layer;
     }
 
-    _attachBitmapLayer(layer, bitmap, render) {
-        layer.bitmapLayer = render.Bitmap(bitmap);
+    _attachBitmapLayer(layer, bitmap, bitmapTransform, render) {
+        layer.bitmapLayer = render.Bitmap(bitmap, bitmapTransform);
         layer.bitmapLayer.frames = this.frames;
         layer.bitmapLayer.stepToFrame = (frame) => { }
         layer.addChild(layer.bitmapLayer);

@@ -118,7 +118,7 @@ SVGAPlayer 默认使用 Canvas API 播放动画，然而，你可能需要在不
 
 SVGAPlayer 会自动选择最合适的 Render 进行渲染，当以下运行时存在时，会按顺序选择 Render。
 
-* CreateJS(SvgaCreateJS.Render)
+* CreateJS(SvgaCreatejs.Render)
 * Laya(SvgaLayabox.Render)
 * Canvas API
 
@@ -194,7 +194,7 @@ SVGAPlayer 是整个播放器的核心，其控制整个播放的进程、进度
 * clear(); - 清空当前画布
 * stepToFrame(frame: int, andPlay: Boolean); - 跳到第 N 帧 (frame 0 = 第 1 帧)，然后 andPlay == YES 时播放动画
 * stepToPercentage(percentage: float, andPlay: Boolean); - 跳到动画对应百分比的帧，然后 andPlay == YES 时播放动画
-* setImage(image: string, forKey: string); - 设置动态图像
+* setImage(image: string, forKey: string, transform: [a, b, c, d, tx, ty]); - 设置动态图像，其中 transform 是选填项，用于动态调整图像（目前只有 Canvas API 和 CreateJS 支持）
 * setText(text: string | object, forKey: string); - 设置动态文本, text: object = {text: string, font: string, size: string, color: string, offset: {x: float, y: float}}
 * clearDynamicObjects(); - 清空动态图像和文本
 

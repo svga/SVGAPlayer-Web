@@ -45,7 +45,7 @@ class CreateJSRender {
         return layer;
     }
 
-    static Bitmap(src) {
+    static Bitmap(src, bitmapTransform) {
         let imgTag = document.createElement('img');
         if (src.indexOf("iVBO") === 0 || src.indexOf("/9j/2w") === 0) {
             imgTag.src = 'data:image/png;base64,' + src;
@@ -54,6 +54,9 @@ class CreateJSRender {
             imgTag.src = src;
         }
         let layer = new window.createjs.Bitmap(imgTag);
+        if (bitmapTransform !== undefined) {
+            layer.transformMatrix = new window.createjs.Matrix2D(bitmapTransform[0], bitmapTransform[1], bitmapTransform[2], bitmapTransform[3], bitmapTransform[4], bitmapTransform[5]);
+        }
         layer.setState = (state) => { CreateJSRender.setState(layer, state); }
         return layer;
     }

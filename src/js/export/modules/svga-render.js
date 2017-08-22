@@ -37,10 +37,10 @@ export default class CanvasRender {
                 var src = player._videoItem.images[imageKey];
                 if (src.indexOf("iVBO") === 0 || src.indexOf("/9j/2w") === 0) {
                     let imgTag = document.createElement('img');
-                    const inRect = inRect === undefined ? undefined : {...inRect}
+                    const inRect = inRect === undefined ? undefined : { ...inRect }
                     imgTag.onload = function () {
                         clearTimeout(CanvasRender.RedrawTimeout);
-                        CanvasRender.RedrawTimeout = setTimeout(() => { CanvasRender.Draw(player, onCanvas, inRect);  });
+                        CanvasRender.RedrawTimeout = setTimeout(() => { CanvasRender.Draw(player, onCanvas, inRect); });
                     }
                     imgTag.src = 'data:image/png;base64,' + src;
                     player._videoItem.bitmapCache[imageKey] = imgTag;
@@ -87,14 +87,30 @@ export default class CanvasRender {
                         frameItem.maskPath.getShape(CanvasRender).draw(ctx, true);
                         ctx.clip();
                     }
+                    if (player._dynamicImageTransform[sprite.imageKey] !== undefined) {
+                        ctx.save();
+                        const concatTransform = player._dynamicImageTransform[sprite.imageKey];
+                        ctx.transform(concatTransform[0], concatTransform[1], concatTransform[2], concatTransform[3], concatTransform[4], concatTransform[5]);
+                    }
                     ctx.drawImage(imgTag, 0, 0);
+                    if (player._dynamicImageTransform[sprite.imageKey] !== undefined) {
+                        ctx.restore();
+                    }
                 }
                 else if (typeof src === "object") {
                     if (frameItem.maskPath !== undefined && frameItem.maskPath !== null) {
                         frameItem.maskPath.getShape(CanvasRender).draw(ctx, true);
                         ctx.clip();
                     }
+                    if (player._dynamicImageTransform[sprite.imageKey] !== undefined) {
+                        ctx.save();
+                        const concatTransform = player._dynamicImageTransform[sprite.imageKey];
+                        ctx.transform(concatTransform[0], concatTransform[1], concatTransform[2], concatTransform[3], concatTransform[4], concatTransform[5]);
+                    }
                     ctx.drawImage(src, 0, 0);
+                    if (player._dynamicImageTransform[sprite.imageKey] !== undefined) {
+                        ctx.restore();
+                    }
                 }
                 frameItem.shapes && frameItem.shapes.forEach(shape => {
                     if (shape.type === "shape" && shape.args && shape.args.d) {
