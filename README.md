@@ -215,3 +215,13 @@ SVGAParser 用于加载动画源文件， SVGAParser 可以配合 SVGAWorker 和
 ## 调试构建工具
 
 使用 [LegoFlow](https://legoflow.com) 进行调试、构建
+
+## 问题汇总
+
+### Android 4.x 无法加载
+
+在某些 Android 机器上，由于缺少 Blob 的支持（表面上 Blob 对象是有的，实际上是无效的），导致 Parser 无法工作，添加 Blob Polyfill 可以解决这个问题。
+
+```
+<script src="//cdn.bootcss.com/blob-polyfill/1.0.20150320/Blob.min.js"></script>
+```
