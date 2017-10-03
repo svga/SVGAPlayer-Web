@@ -20,11 +20,11 @@ module.exports = {
             }
         ]
     },
-    plugins: [
-        new webpack.optimize.UglifyJsPlugin({
-            include: /\.min\.js$/,
-            minimize: true,
-            output: { comments: false },
-        })
-    ],
+    // plugins: [
+    //     new webpack.optimize.UglifyJsPlugin({
+    //         include: /\.min\.js$/,
+    //         minimize: true,
+    //         output: { comments: false },
+    //     })
+    // ],
 }

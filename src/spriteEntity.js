@@ -2,6 +2,7 @@ import { FrameEntity } from './frameEntity'
 import { BezierPath } from './bezierPath'
 import { RectPath } from './rectPath'
 import { EllipsePath } from './ellipsePath'
+const Proto = require("./svga.pb")
 
 let VectorLayerAssigner = (obj, render) => {
     Object.assign(obj, {
@@ -33,7 +34,15 @@ let VectorLayerAssigner = (obj, render) => {
             return obj.keepFrameCache[frame]
         },
         isKeepFrame: (frameItem) => {
-            return frameItem.shapes && frameItem.shapes.length > 0 && frameItem.shapes[0].type === "keep";
+            if (frameItem.shapes && frameItem.shapes.length > 0) {
+                if (frameItem.shapes[0].getType && frameItem.shapes[0].getType() === Proto.ShapeEntity.ShapeType.KEEP) {
+                    return true
+                }
+                else if (frameItem.shapes[0].type === "keep") {
+                    return true
+                }
+            }
+            return false;
         },
         drawFrame: (frame) => {
             if (frame < obj.frames.length) {
@@ -77,7 +86,13 @@ export class SpriteEntity {
     frames = []
 
     constructor(spec) {
-        if (spec) {
+        if (spec instanceof Proto.SpriteEntity) {
+            this.imageKey = spec.getImagekey();
+            this.frames = spec.getFramesList().map(obj => {
+                return new FrameEntity(obj)
+            })
+        }
+        else if (spec) {
             this.imageKey = spec.imageKey;
             if (spec.frames) {
                 this.frames = spec.frames.map((obj) => {
