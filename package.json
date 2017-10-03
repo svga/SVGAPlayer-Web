@@ -11,7 +11,8 @@
   "dependencies": {
     "google-protobuf": "^3.4.0",
     "jszip": "^3.1.4",
-    "jszip-utils": "0.0.2"
+    "jszip-utils": "0.0.2",
+    "pako": "^1.0.6"
   },
   "devDependencies": {
     "babel-core": "^6.26.0",

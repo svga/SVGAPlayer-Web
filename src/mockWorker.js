@@ -1,6 +1,7 @@
 const Proto = require("./svga.pb")
 const JSZip = require("jszip")
 const JSZipUtils = require("jszip-utils")
+const pako = require("pako")
 
 const Uint8ToString = function (u8a) {
     var CHUNK_SZ = 0x8000;
@@ -17,6 +18,7 @@ const actions = {
         JSZipUtils.getBinaryContent(url, function (err, data) {
             if (err) {
                 failure && failure(err);
+                console.error(err);
                 throw err;
             }
             else {
@@ -26,6 +28,25 @@ const actions = {
                 }
                 JSZip.loadAsync(data).then(function (zip) {
                     actions.jszip_decodeAssets(zip, cb);
+                }).catch(function () {
+                    try {
+                        const inflatedData = pako.inflate(data);
+                        const movieData = Proto.MovieEntity.deserializeBinary(inflatedData);
+                        let images = {};
+                        actions.jszip_loadImages(images, undefined, movieData, function () {
+                            if (typeof window === "object") {
+                                window.SVGAPerformance.unzipEnd = performance.now()
+                            }
+                            cb({
+                                movie: movieData,
+                                images,
+                            })
+                        })
+                    } catch (err) {
+                        failure && failure(err);
+                        console.error(err);
+                        throw err;
+                    }
                 });
             }
         });
@@ -65,19 +86,30 @@ const actions = {
         if (movieData instanceof Proto.MovieEntity) {
             var finished = true;
             const movieDataImages = movieData.getImagesMap()
-            for (const key in movieDataImages.map_) {
-                if (movieDataImages.map_.hasOwnProperty(key)) {
-                    const element = movieDataImages.map_[key].value;
-                    const value = Uint8ToString(element);
-                    if (images.hasOwnProperty(key)) {
-                        continue;
+            if (!zip) {
+                for (const key in movieDataImages.map_) {
+                    if (movieDataImages.map_.hasOwnProperty(key)) {
+                        const element = movieDataImages.map_[key].value;
+                        const value = Uint8ToString(element);
+                        images[key] = btoa(value)
                     }
-                    finished = false;
-                    zip.file(value + ".png").async("base64").then(function (data) {
-                        images[key] = data;
-                        actions.jszip_loadImages(images, zip, movieData, imagesLoadedBlock);
-                    }.bind(this))
-                    break;
+                }
+            }
+            else {
+                for (const key in movieDataImages.map_) {
+                    if (movieDataImages.map_.hasOwnProperty(key)) {
+                        const element = movieDataImages.map_[key].value;
+                        const value = Uint8ToString(element);
+                        if (images.hasOwnProperty(key)) {
+                            continue;
+                        }
+                        finished = false;
+                        zip.file(value + ".png").async("base64").then(function (data) {
+                            images[key] = data;
+                            actions.jszip_loadImages(images, zip, movieData, imagesLoadedBlock);
+                        }.bind(this))
+                        break;
+                    }
                 }
             }
             finished && imagesLoadedBlock.call(this)

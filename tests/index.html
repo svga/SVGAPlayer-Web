@@ -10,7 +10,7 @@
     <script>
         var parser = new SVGA.Parser()
         var player = new SVGA.Player('#testCanvas')
-        parser.load("./samples/rose_1.5.0.svga", function (videoItem) {
+        parser.load("./samples/rose_2.0.0.svga", function (videoItem) {
             console.log(videoItem);
             document.getElementById('svgaPerformance').innerHTML = "Performance >>> " + JSON.stringify(window.SVGAPerformance);
             player.setVideoItem(videoItem);
