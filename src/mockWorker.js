@@ -1,6 +1,4 @@
 const Proto = require("./svga.pb")
-const JSZip = require("jszip")
-const JSZipUtils = require("jszip-utils")
 const pako = require("pako")
 
 const Uint8ToString = function (u8a) {
@@ -15,48 +13,67 @@ const Uint8ToString = function (u8a) {
 const actions = {
 
     loadAssets: (url, cb, failure) => {
-        JSZipUtils.getBinaryContent(url, function (err, data) {
-            if (err) {
-                failure && failure(err);
-                console.error(err);
-                throw err;
-            }
-            else {
+        if (typeof JSZipUtils === "object" && typeof JSZip === "object") {
+            JSZipUtils.getBinaryContent(url, function (err, data) {
+                if (err) {
+                    failure && failure(err);
+                    console.error(err);
+                    throw err;
+                }
+                else {
+                    if (typeof window === "object") {
+                        window.SVGAPerformance.networkEnd = performance.now()
+                        window.SVGAPerformance.unzipStart = performance.now()
+                    }
+                    JSZip.loadAsync(data).then(function (zip) {
+                        actions._decodeAssets(zip, cb);
+                    }).catch(function () {
+                        actions.load_viaProto(data, cb, failure);
+                    });
+                }
+            });
+        }
+        else {
+            const req = new XMLHttpRequest()
+            req.open("GET", url, true);
+            req.responseType = "arraybuffer"
+            req.onloadend = () => {
                 if (typeof window === "object") {
                     window.SVGAPerformance.networkEnd = performance.now()
                     window.SVGAPerformance.unzipStart = performance.now()
                 }
-                JSZip.loadAsync(data).then(function (zip) {
-                    actions.jszip_decodeAssets(zip, cb);
-                }).catch(function () {
-                    try {
-                        const inflatedData = pako.inflate(data);
-                        const movieData = Proto.MovieEntity.deserializeBinary(inflatedData);
-                        let images = {};
-                        actions.jszip_loadImages(images, undefined, movieData, function () {
-                            if (typeof window === "object") {
-                                window.SVGAPerformance.unzipEnd = performance.now()
-                            }
-                            cb({
-                                movie: movieData,
-                                images,
-                            })
-                        })
-                    } catch (err) {
-                        failure && failure(err);
-                        console.error(err);
-                        throw err;
-                    }
-                });
+                actions.load_viaProto(req.response, cb, failure);
             }
-        });
+            req.send()
+        }
     },
 
-    jszip_decodeAssets: (zip, cb) => {
+    load_viaProto: (arraybuffer, cb, failure) => {
+        try {
+            const inflatedData = pako.inflate(arraybuffer);
+            const movieData = Proto.MovieEntity.deserializeBinary(inflatedData);
+            let images = {};
+            actions._loadImages(images, undefined, movieData, function () {
+                if (typeof window === "object") {
+                    window.SVGAPerformance.unzipEnd = performance.now()
+                }
+                cb({
+                    movie: movieData,
+                    images,
+                })
+            })
+        } catch (err) {
+            failure && failure(err);
+            console.error(err);
+            throw err;
+        }
+    },
+
+    _decodeAssets: (zip, cb) => {
         zip.file("movie.binary").async("arraybuffer").then(function (spec) {
             const movieData = Proto.MovieEntity.deserializeBinary(spec);
             let images = {};
-            actions.jszip_loadImages(images, zip, movieData, function () {
+            actions._loadImages(images, zip, movieData, function () {
                 if (typeof window === "object") {
                     window.SVGAPerformance.unzipEnd = performance.now()
                 }
@@ -69,7 +86,7 @@ const actions = {
             zip.file("movie.spec").async("string").then(function (spec) {
                 let movieData = JSON.parse(spec);
                 let images = {};
-                actions.jszip_loadImages(images, zip, movieData, function () {
+                actions._loadImages(images, zip, movieData, function () {
                     if (typeof window === "object") {
                         window.SVGAPerformance.unzipEnd = performance.now()
                     }
@@ -82,7 +99,7 @@ const actions = {
         })
     },
 
-    jszip_loadImages: function (images, zip, movieData, imagesLoadedBlock) {
+    _loadImages: function (images, zip, movieData, imagesLoadedBlock) {
         if (movieData instanceof Proto.MovieEntity) {
             var finished = true;
             const movieDataImages = movieData.getImagesMap()
@@ -106,7 +123,7 @@ const actions = {
                         finished = false;
                         zip.file(value + ".png").async("base64").then(function (data) {
                             images[key] = data;
-                            actions.jszip_loadImages(images, zip, movieData, imagesLoadedBlock);
+                            actions._loadImages(images, zip, movieData, imagesLoadedBlock);
                         }.bind(this))
                         break;
                     }
@@ -125,7 +142,7 @@ const actions = {
                     finished = false;
                     zip.file(element + ".png").async("base64").then(function (data) {
                         images[key] = data;
-                        actions.jszip_loadImages(images, zip, movieData, imagesLoadedBlock);
+                        actions._loadImages(images, zip, movieData, imagesLoadedBlock);
                     }.bind(this))
                     break;
                 }

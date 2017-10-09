@@ -1,17 +1,15 @@
 {
-  "name": "svga-web-canvas",
-  "version": "1.5.0",
+  "name": "svgaplayer",
+  "version": "2.0.0",
   "main": "src/index.js",
   "scripts": {
     "start": "http-server ./ & webpack -w & open http://127.0.0.1:8080/tests/",
     "build": "webpack"
   },
-  "author": "UED.lijialiang",
+  "author": "YYUED",
   "license": "Apache License 2.0",
   "dependencies": {
     "google-protobuf": "^3.4.0",
-    "jszip": "^3.1.4",
-    "jszip-utils": "0.0.2",
     "pako": "^1.0.6"
   },
   "devDependencies": {

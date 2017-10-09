@@ -18,13 +18,19 @@ module.exports = {
                     presets: ['es2015', "stage-0"]
                 }
             }
-        ]
+        ],
     },
-    // plugins: [
-    //     new webpack.optimize.UglifyJsPlugin({
-    //         include: /\.min\.js$/,
-    //         minimize: true,
-    //         output: { comments: false },
-    //     })
-    // ],
+    externals: {
+        "jszip": "JSZip",
+        "jszip-utils": "JSZipUtils",
+        // "pako": "pako",
+        // "google-protobuf": "google-protobuf",
+    },
+    plugins: [
+        new webpack.optimize.UglifyJsPlugin({
+            include: /\.min\.js$/,
+            minimize: true,
+            output: { comments: false },
+        })
+    ],
 }
