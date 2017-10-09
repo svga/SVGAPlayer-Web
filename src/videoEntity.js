@@ -1,5 +1,5 @@
 import { SpriteEntity } from './spriteEntity'
-const Proto = require("./svga.pb")
+const { ProtoMovieEntity } = require("./proto")
 
 export class VideoEntity {
 
@@ -32,12 +32,12 @@ export class VideoEntity {
     sprites = []
 
     constructor(spec, images) {
-        if (spec instanceof Proto.MovieEntity) {
-            if (spec.hasParams()) {
-                this.videoSize.width = spec.getParams().getViewboxwidth() || 0.0;
-                this.videoSize.height = spec.getParams().getViewboxheight() || 0.0;
-                this.FPS = spec.getParams().getFps() || 20;
-                this.frames = spec.getParams().getFrames() || 0;
+        if (typeof spec === "object" && spec.$type == ProtoMovieEntity) {
+            if (typeof spec.params === "object") {
+                this.videoSize.width = spec.params.viewBoxWidth || 0.0;
+                this.videoSize.height = spec.params.viewBoxHeight || 0.0;
+                this.FPS = spec.params.fps || 20;
+                this.frames = spec.params.frames || 0;
             }
             this.resetSprites(spec)
         }
@@ -58,17 +58,10 @@ export class VideoEntity {
     }
 
     resetSprites(spec) {
-        if (spec instanceof Proto.MovieEntity) {
-            this.sprites = spec.getSpritesList().map((obj) => {
+        if (spec.sprites instanceof Array) {
+            this.sprites = spec.sprites.map((obj) => {
                 return new SpriteEntity(obj)
             })
-        }
-        else if (spec) {
-            if (spec.sprites) {
-                this.sprites = spec.sprites.map((obj) => {
-                    return new SpriteEntity(obj)
-                })
-            }
         }
     }
 

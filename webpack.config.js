@@ -17,14 +17,12 @@ module.exports = {
                 query: {
                     presets: ['es2015', "stage-0"]
                 }
+            },
+            {
+                test: /\.json$/,
+                loader: 'json-loader'
             }
         ],
-    },
-    externals: {
-        "jszip": "JSZip",
-        "jszip-utils": "JSZipUtils",
-        // "pako": "pako",
-        // "google-protobuf": "google-protobuf",
     },
     plugins: [
         new webpack.optimize.UglifyJsPlugin({

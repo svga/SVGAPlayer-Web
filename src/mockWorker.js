@@ -1,4 +1,4 @@
-const Proto = require("./svga.pb")
+const { ProtoMovieEntity } = require("./proto")
 const assignUtils = require('pako/lib/utils/common').assign;
 const inflate = require("pako/lib/inflate")
 const pako = {}
@@ -16,7 +16,7 @@ const Uint8ToString = function (u8a) {
 const actions = {
 
     loadAssets: (url, cb, failure) => {
-        if (typeof JSZipUtils === "object" && typeof JSZip === "object") {
+        if (typeof JSZipUtils === "object" && typeof JSZip === "function") {
             JSZipUtils.getBinaryContent(url, function (err, data) {
                 if (err) {
                     failure && failure(err);
@@ -54,7 +54,7 @@ const actions = {
     load_viaProto: (arraybuffer, cb, failure) => {
         try {
             const inflatedData = pako.inflate(arraybuffer);
-            const movieData = Proto.MovieEntity.deserializeBinary(inflatedData);
+            const movieData = ProtoMovieEntity.decode(inflatedData);
             let images = {};
             actions._loadImages(images, undefined, movieData, function () {
                 if (typeof window === "object") {
@@ -103,22 +103,21 @@ const actions = {
     },
 
     _loadImages: function (images, zip, movieData, imagesLoadedBlock) {
-        if (movieData instanceof Proto.MovieEntity) {
+        if (typeof movieData === "object" && movieData.$type == ProtoMovieEntity) {
             var finished = true;
-            const movieDataImages = movieData.getImagesMap()
             if (!zip) {
-                for (const key in movieDataImages.map_) {
-                    if (movieDataImages.map_.hasOwnProperty(key)) {
-                        const element = movieDataImages.map_[key].value;
+                for (const key in movieData.images) {
+                    if (movieData.images.hasOwnProperty(key)) {
+                        const element = movieData.images[key];
                         const value = Uint8ToString(element);
                         images[key] = btoa(value)
                     }
                 }
             }
             else {
-                for (const key in movieDataImages.map_) {
-                    if (movieDataImages.map_.hasOwnProperty(key)) {
-                        const element = movieDataImages.map_[key].value;
+                for (const key in movieData.images) {
+                    if (movieData.images.hasOwnProperty(key)) {
+                        const element = movieData.images[key];
                         const value = Uint8ToString(element);
                         if (images.hasOwnProperty(key)) {
                             continue;
@@ -131,7 +130,7 @@ const actions = {
                         break;
                     }
                 }
-            }
+            } 
             finished && imagesLoadedBlock.call(this)
         }
         else {
