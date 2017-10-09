@@ -1,23 +1,4 @@
-let validMethods = {
-    'M': 1,
-    'm': 1,
-    'L': 1,
-    'l': 1,
-    'H': 1,
-    'h': 1,
-    'V': 1,
-    'v': 1,
-    'C': 1,
-    'c': 1,
-    'S': 1,
-    's': 1,
-    'Q': 1,
-    'q': 1,
-    'R': 1,
-    'r': 1,
-    'Z': 1,
-    'z': 1,
-};
+const validMethods = 'MLHVCSQRZ'
 
 export class BezierPath {
 
@@ -61,7 +42,7 @@ export class BezierPath {
                 continue;
             }
             let firstLetter = item.substr(0, 1);
-            if (validMethods[firstLetter] === 1) {
+            if (validMethods.indexOf(firstLetter) >= 0) {
                 if (tempArg.length > 0) {
                     args.push(tempArg);
                     tempArg = [];

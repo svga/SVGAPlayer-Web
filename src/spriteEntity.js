@@ -33,15 +33,7 @@ let VectorLayerAssigner = (obj, render) => {
             return obj.keepFrameCache[frame]
         },
         isKeepFrame: (frameItem) => {
-            if (frameItem.shapes && frameItem.shapes.length > 0) {
-                if (frameItem.shapes[0].getType && frameItem.shapes[0].getType() === Proto.ShapeEntity.ShapeType.KEEP) {
-                    return true
-                }
-                else if (frameItem.shapes[0].type === "keep") {
-                    return true
-                }
-            }
-            return false;
+            return frameItem.shapes && frameItem.shapes.length > 0 && frameItem.shapes[0].type === "keep";
         },
         drawFrame: (frame) => {
             if (frame < obj.frames.length) {
@@ -53,24 +45,12 @@ let VectorLayerAssigner = (obj, render) => {
                 }
                 obj.removeAllChildren();
                 frameItem.shapes.forEach((shape) => {
-                    if (shape.getType && shape.getType() === Proto.ShapeEntity.ShapeType.SHAPE) {
-                        let bezierPath = new BezierPath(shape.getShape().getD(), shape.getTransform(), shape.getStyles());
-                        obj.addChild(bezierPath.getShape(render));
-                    }
-                    else if (shape.type === "shape" && shape.args && shape.args.d) {
+                    if (shape.type === "shape" && shape.args && shape.args.d) {
                         let bezierPath = new BezierPath(shape.args.d, shape.transform, shape.styles);
-                        obj.addChild(bezierPath.getShape(render));
-                    }
-                    if (shape.getType && shape.getType() === Proto.ShapeEntity.ShapeType.ELLIPSE) {
-                        let bezierPath = new EllipsePath(shape.getEllipse().getX(), shape.getEllipse().getY(), shape.getEllipse().getRadiusx(), shape.getEllipse().getRadiusy(), shape.getTransform(), shape.getStyles());
                         obj.addChild(bezierPath.getShape(render));
                     }
                     else if (shape.type === "ellipse" && shape.args) {
                         let bezierPath = new EllipsePath(parseFloat(shape.args.x) || 0.0, parseFloat(shape.args.y) || 0.0, parseFloat(shape.args.radiusX) || 0.0, parseFloat(shape.args.radiusY) || 0.0, shape.transform, shape.styles);
-                        obj.addChild(bezierPath.getShape(render));
-                    }
-                    if (shape.getType && shape.getType() === Proto.ShapeEntity.ShapeType.RECT) {
-                        let bezierPath = new RectPath(shape.getRect().getX(), shape.getRect().getY(), shape.getRect().getWidth(), shape.getRect().getHeight(), shape.getRect().getCornerradius(), shape.getTransform(), shape.getStyles());
                         obj.addChild(bezierPath.getShape(render));
                     }
                     else if (shape.type === "rect" && shape.args) {
