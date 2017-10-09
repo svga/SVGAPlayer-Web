@@ -1,5 +1,8 @@
 const Proto = require("./svga.pb")
-const pako = require("pako")
+const assignUtils = require('pako/lib/utils/common').assign;
+const inflate = require("pako/lib/inflate")
+const pako = {}
+assignUtils(pako, inflate);
 
 const Uint8ToString = function (u8a) {
     var CHUNK_SZ = 0x8000;
