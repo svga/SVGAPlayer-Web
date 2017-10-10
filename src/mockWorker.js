@@ -28,11 +28,15 @@ const actions = {
                         window.SVGAPerformance.networkEnd = performance.now()
                         window.SVGAPerformance.unzipStart = performance.now()
                     }
-                    JSZip.loadAsync(data).then(function (zip) {
-                        actions._decodeAssets(zip, cb);
-                    }).catch(function () {
+                    const dataHeader = new Uint8Array(data, 0, 4)
+                    if (dataHeader[0] == 80 && dataHeader[1] == 75 && dataHeader[2] == 3 && dataHeader[3] == 4) {
+                        JSZip.loadAsync(data).then(function (zip) {
+                            actions._decodeAssets(zip, cb);
+                        });
+                    }
+                    else {
                         actions.load_viaProto(data, cb, failure);
-                    });
+                    }
                 }
             });
         }
@@ -73,8 +77,8 @@ const actions = {
     },
 
     _decodeAssets: (zip, cb) => {
-        zip.file("movie.binary").async("arraybuffer").then(function (spec) {
-            const movieData = Proto.MovieEntity.deserializeBinary(spec);
+        zip.file("movie.spec").async("string").then(function (spec) {
+            let movieData = JSON.parse(spec);
             let images = {};
             actions._loadImages(images, zip, movieData, function () {
                 if (typeof window === "object") {
@@ -83,20 +87,6 @@ const actions = {
                 cb({
                     movie: movieData,
                     images,
-                })
-            })
-        }, function (error) {
-            zip.file("movie.spec").async("string").then(function (spec) {
-                let movieData = JSON.parse(spec);
-                let images = {};
-                actions._loadImages(images, zip, movieData, function () {
-                    if (typeof window === "object") {
-                        window.SVGAPerformance.unzipEnd = performance.now()
-                    }
-                    cb({
-                        movie: movieData,
-                        images,
-                    })
                 })
             })
         })
@@ -130,7 +120,7 @@ const actions = {
                         break;
                     }
                 }
-            } 
+            }
             finished && imagesLoadedBlock.call(this)
         }
         else {
