@@ -1,6 +1,9 @@
-import { Parser } from './parser'
-import { Player } from './player'
+import { Parser as MParser } from './parser'
+import { Player as MPlayer } from './player'
 import { AutoLoader } from './autoLoader'
+
+export class Parser extends MParser { }
+export class Player extends MPlayer { }
 
 ((global) => {
     global.Svga = global.SVGA = {
@@ -13,8 +16,3 @@ import { AutoLoader } from './autoLoader'
     (typeof this === "object" && this) ||
     (typeof window === "object" && window) ||
     {});
-
-module.exports = {
-    Parser,
-    Player,
-}
