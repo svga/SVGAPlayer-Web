@@ -1527,4 +1527,4 @@ System.register("index", ["parser", "player", "autoLoader"], function (exports_1
         }
     };
 });
-//# sourceMappingURL=index.js.map
+//# sourceMappingURL=exports.js.map

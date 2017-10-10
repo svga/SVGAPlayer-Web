@@ -2,7 +2,7 @@
     "compilerOptions": {
         "module": "system",
         "allowJs": true,
-        "outFile": "index.js",
+        "outFile": "./src/exports.js",
         "sourceMap": true
     },
     "include": [
