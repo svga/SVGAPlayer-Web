@@ -1,4 +1,4 @@
-export module svgaplayerweb {
+declare module 'svgaplayerweb' {
 
     class VideoEntity {
         videoSize: { width: number, height: number }
