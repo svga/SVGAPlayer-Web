@@ -12,4 +12,9 @@ import { AutoLoader } from './autoLoader'
 })(
     (typeof this === "object" && this) ||
     (typeof window === "object" && window) ||
-    {})
+    {});
+
+module.exports = {
+    Parser,
+    Player,
+}

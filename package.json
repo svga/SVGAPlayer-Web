@@ -1,7 +1,12 @@
 {
   "name": "svgaplayer",
   "version": "2.0.0",
-  "main": "src/index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yyued/SVGAPlayer-Web.git"
+  },
+  "main": "index.js",
+  "types": "index.d.ts",
   "scripts": {
     "start": "http-server ./ & webpack -w & open http://127.0.0.1:8080/tests/",
     "build": "webpack"
