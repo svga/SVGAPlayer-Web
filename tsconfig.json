@@ -1,6 +1,6 @@
 {
     "compilerOptions": {
-        "module": "system",
+        "module": "amd",
         "allowJs": true,
         "outFile": "./src/exports.js",
         "sourceMap": true
@@ -9,6 +9,8 @@
         "src/**/*"
     ],
     "exclude": [
+        "src/exports.js",
+        "src/exports.js.map",
         "node_modules"
     ]
 }
