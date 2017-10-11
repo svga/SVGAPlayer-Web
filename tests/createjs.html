@@ -1,23 +1,37 @@
 <html>
-    
-    <body style="text-align: center">
-        <div id="test">
-            <canvas id="testCanvas" width="750" height="750" style="background-color: #000000"></canvas>
-            <p id="svgaPerformance"></p>
-        </div>
-        <script src="https://cdn.bootcss.com/EaselJS/0.8.0/easeljs.min.js"></script>
-        <script src="http://assets.dwstatic.com/common/lib/??jszip/3.1.3/jszip.min.js,jszip/3.1.3/jszip-utils.min.js" charset="utf-8"></script>
-        <script src="../build/svga.createjs.min.js"></script>
-        <script>
-            var parser = new SVGA.Parser()
-            var player = new SVGA.Player('#testCanvas')
-            parser.load("./samples/rose_2.0.0.svga", function (videoItem) {
-                console.log(videoItem);
-                document.getElementById('svgaPerformance').innerHTML = "Performance >>> " + JSON.stringify(window.SVGAPerformance);
-                player.setVideoItem(videoItem);
-                player.startAnimation()
-            })
-        </script>
-    </body>
-    
-    </html>
+
+<body style="text-align: center">
+    <div id="test">
+        <canvas id="testCanvas" width="750" height="750" style="background-color: #000000"></canvas>
+        <p id="svgaPerformance"></p>
+    </div>
+    <script src="https://cdn.bootcss.com/EaselJS/0.8.0/easeljs.min.js"></script>
+    <script src="http://assets.dwstatic.com/common/lib/??jszip/3.1.3/jszip.min.js,jszip/3.1.3/jszip-utils.min.js" charset="utf-8"></script>
+    <script src="../build/svga.createjs.min.js"></script>
+    <script>
+
+        // as root
+        // var parser = new SVGA.Parser()
+        // var player = new SVGA.Player('#testCanvas')
+        // parser.load("./samples/rose_2.0.0.svga", function (videoItem) {
+        //     console.log(videoItem);
+        //     document.getElementById('svgaPerformance').innerHTML = "Performance >>> " + JSON.stringify(window.SVGAPerformance);
+        //     player.setVideoItem(videoItem);
+        //     player.startAnimation()
+        // })
+
+        // as container
+        var stage = new createjs.Stage('testCanvas');
+        SVGA.Player.requestContainer(stage, "./samples/rose_2.0.0.svga", function (container, player) {
+            stage.addChild(container);
+            container.x = 100;      // 设定容器 x 位置
+            container.y = 100;      // 设定容器 y 位置
+            container.width = 300;  // 设定容器宽度
+            container.height = 300; // 设定容器高度
+            player.startAnimation();
+        });
+
+    </script>
+</body>
+
+</html>

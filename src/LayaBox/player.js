@@ -1,6 +1,6 @@
 'use strict';
 
-import { CreateJSRender } from './render'
+import { LayaBoxRender } from './render'
 import { Parser } from '../parser'
 
 export class Player {
@@ -10,22 +10,22 @@ export class Player {
     clearsAfterStop = true;
     isPaused = false;
 
-    static requestContainer(stage, url, success, failure) {
+    static requestContainer(url, success, failure) {
         (new Parser()).load(url, (videoItem) => {
-            const player = new Player();
+            const player = new Player(undefined);
             player.setVideoItem(videoItem);
-            success(player.container(stage), player);
+            success(player.container(), player);
         }, failure);
     }
 
     constructor(canvas) {
         this._canvas = typeof canvas === "string" ? document.querySelector(canvas) : canvas;
-        this.render = CreateJSRender;
+        this.render = LayaBoxRender;
         this.resetRootStage();
     }
 
-    container(stage) {
-        this._stage = stage;
+    container() {
+        this._stage = Laya.stage;
         return this._rootLayer;
     }
 

@@ -5,6 +5,7 @@ module.exports = {
     entry: {
         "svga.min": "./src/Canvas/index.js",
         "svga.createjs.min": "./src/CreateJS/index.js",
+        "svga.layabox.min": "./src/LayaBox/index.js",
     },
     output: {
         path: __dirname,
