@@ -16,29 +16,53 @@ const Uint8ToString = function (u8a) {
 const actions = {
 
     loadAssets: (url, cb, failure) => {
+
         if (typeof JSZipUtils === "object" && typeof JSZip === "function") {
-            JSZipUtils.getBinaryContent(url, function (err, data) {
-                if (err) {
-                    failure && failure(err);
-                    console.error(err);
-                    throw err;
-                }
-                else {
-                    if (typeof window === "object") {
-                        window.SVGAPerformance.networkEnd = performance.now()
-                        window.SVGAPerformance.unzipStart = performance.now()
-                    }
-                    const dataHeader = new Uint8Array(data, 0, 4)
+            if (url.toString() == "[object File]"){
+                actions._readBlobAsArrayBuffer(url, function (arrayBufferSVGA) {
+                    const dataHeader = new Uint8Array(arrayBufferSVGA, 0, 4)
                     if (dataHeader[0] == 80 && dataHeader[1] == 75 && dataHeader[2] == 3 && dataHeader[3] == 4) {
-                        JSZip.loadAsync(data).then(function (zip) {
+                        JSZip.loadAsync(arrayBufferSVGA).then(function (zip) {
                             actions._decodeAssets(zip, cb);
                         });
                     }
                     else {
-                        actions.load_viaProto(data, cb, failure);
+                        actions.load_viaProto(arrayBufferSVGA, cb, failure);
                     }
-                }
-            });
+                });
+
+            } else if(url.indexOf("data:svga/1.0;base64,") >= 0) {
+                var arrayBufferSVGA = actions._base64ToArrayBuffer(url.substring(21));
+                JSZip.loadAsync(arrayBufferSVGA).then(function (zip) {
+                    actions._decodeAssets(zip, cb);
+                });
+            }else if(url.indexOf("data:svga/2.0;base64,") >= 0){
+                var arrayBufferSVGA = actions._base64ToArrayBuffer(url.substring(21));
+                actions.load_viaProto(arrayBufferSVGA, cb, failure);
+            }else{
+                JSZipUtils.getBinaryContent(url, function (err, data) {
+                    if (err) {
+                        failure && failure(err);
+                        console.error(err);
+                        throw err;
+                    }
+                    else {
+                        if (typeof window === "object") {
+                            window.SVGAPerformance.networkEnd = performance.now()
+                            window.SVGAPerformance.unzipStart = performance.now()
+                        }
+                        const dataHeader = new Uint8Array(data, 0, 4)
+                        if (dataHeader[0] == 80 && dataHeader[1] == 75 && dataHeader[2] == 3 && dataHeader[3] == 4) {
+                            JSZip.loadAsync(data).then(function (zip) {
+                                actions._decodeAssets(zip, cb);
+                            });
+                        }
+                        else {
+                            actions.load_viaProto(data, cb, failure);
+                        }
+                    }
+                });
+            }
         }
         else {
             const req = new XMLHttpRequest()
@@ -142,6 +166,22 @@ const actions = {
             finished && imagesLoadedBlock.call(this)
         }
     },
+
+    _base64ToArrayBuffer: (base64) => {
+        var binary_string =  window.atob(base64);
+        var len = binary_string.length;
+        var bytes = new Uint8Array( len );
+        for (var i = 0; i < len; i++)        {
+            bytes[i] = binary_string.charCodeAt(i);
+        }
+        return bytes.buffer;
+    },
+
+    _readBlobAsArrayBuffer: (blob, callback) => {
+        var reader = new FileReader();
+        reader.onload = function(e) {callback(e.target.result);};
+        reader.readAsArrayBuffer(blob);
+    }
 
 }
 
