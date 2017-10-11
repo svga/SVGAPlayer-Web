@@ -3,7 +3,8 @@ var webpack = require('webpack')
 
 module.exports = {
     entry: {
-        "svga.min": "./src/index.js",
+        "svga.min": "./src/Canvas/index.js",
+        "svga.createjs.min": "./src/CreateJS/index.js",
     },
     output: {
         path: __dirname,

@@ -1,4 +1,4 @@
-import { Parser } from './parser'
+import { Parser } from '../parser'
 import { Player } from './player'
 
 export class AutoLoader {

@@ -1,5 +1,3 @@
-'use strict';
-
 import { VideoEntity } from './videoEntity'
 import MockWorker from './mockWorker'
 
