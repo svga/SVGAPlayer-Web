@@ -7,11 +7,11 @@ export class VideoEntity {
 }
 
 export class Parser {
-    load(url: string, success: (videoItem: VideoEntity) => void, failure: (err: Error) => void): void
+    load(url: string, success: (videoItem: VideoEntity) => void, failure?: (err: Error) => void): void
 }
 
 export class Player {
-    static requestContainer(stage: any, url: string, success: (container: any, player: Player) => void, failure: (err: Error) => void): void
+    static requestContainer(stage: any, url: string, success: (container: any, player: Player) => void, failure?: (err: Error) => void): void
     constructor(canvas: string | HTMLCanvasElement)
     setVideoItem(videoItem: VideoEntity): void
     startAnimation(): void

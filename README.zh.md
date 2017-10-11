@@ -62,7 +62,7 @@ parser.load('rose_2.0.0.svga', function(videoItem) {
 
 动画会在页面加载完成后播放
 
-## 动态图像
+### 动态图像
 
 你可以动态替换动画中的指定元素，询问你的动画设计师以获取 ImageKey。
 
@@ -73,7 +73,7 @@ parser.load('rose_2.0.0.svga', function(videoItem) {
 player.setImage('http://yourserver.com/xxx.png', 'ImageKey');
 ```
 
-## 动态文本
+### 动态文本
 
 你可以在指定元素上添加文本，询问你的动画设计师以获取 ImageKey。
 
@@ -125,7 +125,7 @@ SVGA.Player 用于控制动画的播放和停止
 
 SVGA.Parser 用于加载远端或 Base64 动画，并转换成 VideoItem。
 
-跨域的 SVGA 资源需要使用 CROS 协议才能加载成功。
+跨域的 SVGA 资源需要使用 CORS 协议才能加载成功。
 
 如果你需要加载 Base64 资源，或者 File 资源，这样传递就可以了 ```load(File)``` 或 ```load('data:svga/2.0;base64,xxxxxx')```。
 

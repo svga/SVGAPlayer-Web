@@ -7,7 +7,7 @@ export class VideoEntity {
 }
 
 export class Parser {
-    load(url: string, success: (videoItem: VideoEntity) => void, failure: (err: Error) => void): void
+    load(url: string, success: (videoItem: VideoEntity) => void, failure?: (err: Error) => void): void
 }
 
 export class Player {

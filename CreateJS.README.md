@@ -1,35 +1,20 @@
 # SVGAPlayer-Web
 
-Language: [中文](README.zh.md)
-
-## News
-
-* 2.0.0
-    * Add SVGA-Format 2.0.0 support.
-    * Add npm support, use ```npm install svgaplayerweb --save```.
-
-## Can I Use
-
-SVGAPlayer 2.0.0 only supports below browsers.
-
-* Edge
-* Safari / Chrome
-* iOS 6.0+ / Android 4.0+
-
-SVGAPlayer 2.0.0 also supports below Game Engines.
-
-* CreateJS [Usage](CreateJS.README.md)
-* LayaBox [Usage](LayaBox.README.md)
-
 ## Install
 
+### Add CreateJS library
+
+```html
+<script src="https://code.createjs.com/easeljs-0.8.2.min.js"></script>
+```
+
 ### Prebuild JS
-1. Goto [https://github.com/yyued/SVGAPlayer-Web/tree/master/build](https://github.com/yyued/SVGAPlayer-Web/tree/master/build) Download svga.min.js
-2. Add ```<script src="svga.min.js"></script>``` to xxx.html
+1. Goto [https://github.com/yyued/SVGAPlayer-Web/tree/master/build](https://github.com/yyued/SVGAPlayer-Web/tree/master/build) Download svga.createjs.min.js
+2. Add ```<script src="svga.createjs.min.js"></script>``` to xxx.html
 
 ### NPM
 1. ```npm install svgaplayerweb --save```
-2. Add ``` require('svgaplayerweb') ``` to ```xxx.js```
+2. Add ``` require('svgaplayerweb/build/svga.createjs.min') ``` to ```xxx.js```
 
 ### SVGA-Format 1.x support
 
@@ -63,6 +48,22 @@ Assign canvas element properties as below.
 ```
 
 Animation will play after Web-Page onload.
+
+### As Child
+
+You could request a child from SVGA.Player instance, and add it to stage by yourself.
+
+```html
+var stage = new createjs.Stage('testCanvas');
+SVGA.Player.requestContainer(stage, "rose_2.0.0.svga", function (container, player) {
+    stage.addChild(container);
+    container.x = 100;      
+    container.y = 100;      
+    container.width = 300;  
+    container.height = 300; 
+    player.startAnimation();
+});
+```
 
 ### Replace Animation Images Dynamically
 

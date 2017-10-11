@@ -1,39 +1,19 @@
 # SVGAPlayer-Web
 
-Language: [中文](README.zh.md)
-
-## News
-
-* 2.0.0
-    * Add SVGA-Format 2.0.0 support.
-    * Add npm support, use ```npm install svgaplayerweb --save```.
-
-## Can I Use
-
-SVGAPlayer 2.0.0 only supports below browsers.
-
-* Edge
-* Safari / Chrome
-* iOS 6.0+ / Android 4.0+
-
-SVGAPlayer 2.0.0 also supports below Game Engines.
-
-* CreateJS [Usage](CreateJS.README.md)
-* LayaBox [Usage](LayaBox.README.md)
-
 ## Install
 
-### Prebuild JS
-1. Goto [https://github.com/yyued/SVGAPlayer-Web/tree/master/build](https://github.com/yyued/SVGAPlayer-Web/tree/master/build) Download svga.min.js
-2. Add ```<script src="svga.min.js"></script>``` to xxx.html
+### Patch laya.webgl.js library
 
-### NPM
-1. ```npm install svgaplayerweb --save```
-2. Add ``` require('svgaplayerweb') ``` to ```xxx.js```
+1. Goto [https://github.com/yyued/SVGAPlayer-Web/tree/master/patch/layabox](https://github.com/yyued/SVGAPlayer-Web/tree/master/patch/layabox) Download laya.webgl.js
+2. Replace to {LayaProjectDir}/bin/libs/laya.webgl.js
+
+### Prebuild JS
+1. Goto [https://github.com/yyued/SVGAPlayer-Web/tree/master/build](https://github.com/yyued/SVGAPlayer-Web/tree/master/build) Download svga.layabox.min.js
+2. Add ```<script src="svga.layabox.min.js"></script>``` to index.html
 
 ### SVGA-Format 1.x support
 
-Both Prebuild & NPM, if you need to support SVGA-Format 1.x, add JSZip script to html.
+If you need to support SVGA-Format 1.x, add JSZip script to html.
 
 ```html
 <script src="http://assets.dwstatic.com/common/lib/??jszip/3.1.3/jszip.min.js,jszip/3.1.3/jszip-utils.min.js" charset="utf-8"></script>
@@ -41,28 +21,18 @@ Both Prebuild & NPM, if you need to support SVGA-Format 1.x, add JSZip script to
 
 ## Usage
 
-### Load Animation Mannally
-
-You may create Player and Parser by yourself.
+### Load Animation As Child
 
 ```js
-var player = new SVGA.Player('#canvas'); // replace #canvas as <canvas id="!!!HERE!!!"></canvas>
-var parser = new SVGA.Parser();
-parser.load('rose_2.0.0.svga', function(videoItem) {
-    player.setVideoItem(videoItem);
-    player.startAnimation();
-})
+SVGA.Player.requestContainer('rose_2.0.0.svga', (container, player) => {
+	Laya.stage.addChild(container);
+	container.x = 100;
+	container.y = 100;
+	container.width = 300;
+	container.height = 300;
+	player.startAnimation();
+}, (err: Error) => { })
 ```
-
-### Load Animation Automatically
-
-Assign canvas element properties as below.
-
-```html
-<canvas src="rose_2.0.0.svga" loops="0" clearsAfterStop="true"></canvas>
-```
-
-Animation will play after Web-Page onload.
 
 ### Replace Animation Images Dynamically
 
