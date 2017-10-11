@@ -18,8 +18,8 @@ SVGAPlayer 2.0.0 only supports below browsers.
 
 SVGAPlayer 2.0.0 also supports below Game Engines.
 
-* CreateJS
-* LayaBox
+* CreateJS [Usage](CreateJS.README.md)
+* LayaBox [Usage](LayaBox.README.md)
 
 ## Install
 
@@ -40,11 +40,6 @@ Both Prebuild & NPM, if you need to support SVGA-Format 1.x, add JSZip script to
 ```
 
 ## Usage
-
-Here's Canvas usage
-
-* [GOTO CreateJS Usage]()
-* [GOTO LayaBox Usage]()
 
 ### Load Animation Mannally
 
@@ -119,7 +114,7 @@ You use SVGA.Player controls animation play and stop.
 * clear(); - force clear contents.
 * stepToFrame(frame: int, andPlay: Boolean); - stop to specific frame, play animation while andPlay === true
 * stepToPercentage(percentage: float, andPlay: Boolean); - stop to specific percentage, play animation while andPlay === true
-* setImage(image: string, forKey: string, transform: [a, b, c, d, tx, ty]); - Replace Animation Images Dynamically, transform is optional, transform cloud adjust replacing image.
+* setImage(image: string, forKey: string, transform: [a, b, c, d, tx, ty]); - Replace Animation Images Dynamically, transform is optional, transform could adjust replacing image.
 * setText(text: string | {text: string, font: string, size: string, color: string, offset: {x: float, y: float}}, forKey: string); - Add Text on Animation Image Dynamically
 * clearDynamicObjects(); - clear all dynamic objects.
 
