@@ -1,226 +1,151 @@
 # SVGA-Web-Canvas
 
-## 最近更新
+Language: (中文)[README.zh.md]
 
-* 1.2.0
-    * SVGAPlayer 可以作为 CreateJS 上下文的一部分使用，也就是，SVGAPlayer 可以嵌入到 CreateJS 画布中；
-    * SVGAPlayer 核心运行时不再依赖 CreateJS 库，运行时大小减少70%；
-    * 新增 CreateJS LayaBox 运行时，可在相应的环境中播放 SVGA 动画。
+## News
 
-* 1.1.0
-	* 完全重构，模块划分为 SVGAParser / SVGAPlayer 以及 SVGAWorker / SVGADB
-	* 新增 stepToFrame / stepToPercentage 方法，新增 onFrame / onPercentage 回调
-	* 新增矢量对象渲染支持，匹配 SVGA-Format_v1.1，向下兼容 SVGA-Format_v1.0
-    * 新增 IE9+ 支持
-
-* 1.0.1
-	* 增加 添加播放回调函数，获取当前动画播放进度
-* 1.0.0
-	* 增加 无使用 worker 版本 build/svga-not-worker.min.js ( gzip 50K )
-	* 增加插件 SVGA-DB，使用可持久化常用 SVGA 源文件
-	* 优化 worker 转码
-	* 更新 动态对象功能
-	* 增加 getState 获取播放状态
+* 2.0.0
+    * Add SVGA-Format 2.0.0 support.
+    * Add npm support, use ```npm install svgaplayerweb --save```.
 
 ## Can I Use
 
-SVGAPlayer 支持以下浏览器环境
+SVGAPlayer 2.0.0 only supports below browsers.
 
-* IE9+
+* Edge
 * Safari / Chrome
 * iOS 6.0+ / Android 4.0+
 
-SVGAPlayer 支持以下动画、游戏引擎
+SVGAPlayer 2.0.0 also supports below Game Engines.
 
 * CreateJS
 * LayaBox
 
-## 注意
+## Install
 
-因浏览器安全策略问题，以下文件需要同域，并不能跨域（开启 cross-origin-domain 可以绕过限制）
+### Prebuild JS
+1. Goto (https://github.com/yyued/SVGAPlayer-Web/tree/master/build)[https://github.com/yyued/SVGAPlayer-Web/tree/master/build] Download svga.min.js
+2. Add <script src="svga.min.js"></script> to xxx.html
 
-* svga-worker.min.js
-* svga.min.js
-* svga 源文件
+### NPM
+1. ```npm install svgaplayerweb --save```
+2. Add ``` require('svgaplayerweb') ``` to ```xxx.js```
 
-## 使用
+### SVGA-Format 1.x support
 
-* 下载 build/svga.min.js & build/svga-worker.min.js
-* HTML 直接外链使用 或 JS 模块 require 使用
-
-### 手动加载动画
-
-可以通过创建 Player 和 Parser，手动加载 SVGA 动画。
+Both Prebuild & NPM, if you need to support SVGA-Format 1.x, add JSZip script to html.
 
 ```html
-...
-<body>
-    <div id="test">
-        <canvas id="canvas" width="750" height="750" style="background-color: #000000"></canvas>
-    </div>
-    <!--[if !IE]><!--><script src="http://assets.dwstatic.com/common/lib/yyzip/0.0.1/yyzip.min.js" charset="utf-8"></script><!--<![endif]-->
-    <!--[if IE]><script src="http://assets.dwstatic.com/common/lib/??jszip/3.1.3/jszip.min.js,jszip/3.1.3/jszip-utils.min.js,jszip/3.1.3/jszip-utils-ie.min.js" charset="utf-8"></script><![endif]-->
-	<script src="../build/svga.min.js" charset="utf-8"></script>
-	<script>
-        let player = new Svga.Player('#canvas');
-        let parser = new Svga.Parser(`svga-worker.min.js`, Svga.DB); // 可以不传任何参数，达到不使用 Worker，不使用 DB 的目的。
-        parser.load('EmptyState.svga', (videoItem) => {
-            player.setVideoItem(videoItem);
-            player.startAnimation();
-        });
-	</script>
-</body>
-</html>
+<script src="http://assets.dwstatic.com/common/lib/??jszip/3.1.3/jszip.min.js,jszip/3.1.3/jszip-utils.min.js" charset="utf-8"></script>
 ```
 
-### 自动加载动画
+## Usage
 
-可以为 canvas 标签设置 src 值，将 svga 源文件地址设为其值，然后执行 ```Svga.autoload()```。
+Here's Canvas usage
+
+* [GOTO CreateJS Usage]()
+* [GOTO LayaBox Usage]()
+
+### Load Animation Mannally
+
+You may create Player and Parser by yourself.
+
+```js
+var player = new SVGA.Player('#canvas'); // replace #canvas as <canvas id="!!!HERE!!!"></canvas>
+var parser = new SVGA.Parser();
+parser.load('rose_2.0.0.svga', function(videoItem) {
+    player.setVideoItem(videoItem);
+    player.startAnimation();
+})
+```
+
+### Load Animation Automatically
+
+Assign canvas element properties as below.
 
 ```html
-...
-<body>
-
-    <div id="test">
-        <canvas id="TestCanvas" src="../example/EmptyState.svga" loops="0" clearsAfterStop="true" style="background-color: #000000; width: 500px; height: 500px;"></canvas>
-    </div>
-    <!--[if !IE]><!--><script src="http://assets.dwstatic.com/common/lib/yyzip/0.0.1/yyzip.min.js" charset="utf-8"></script><!--<![endif]-->
-    <!--[if IE]><script src="http://assets.dwstatic.com/common/lib/??jszip/3.1.3/jszip.min.js,jszip/3.1.3/jszip-utils.min.js,jszip/3.1.3/jszip-utils-ie.min.js" charset="utf-8"></script><![endif]-->
-	<script src="../build/svga.min.js" charset="utf-8"></script>
-	<script>
-        Svga.autoload(); // 第一个参数可以是DOM对象，或者 undefined。
-        // Svga.autoload(undefined, new Svga.Parser(`../build/svga-worker.min.js`, Svga.DB)); // 可以自定义一个 Parser， 以启用 Worker 和 DB。
-        var player = document.getElementById('TestCanvas').player; // 可以通过这种方式取得 SVGAPlayer 对象，直接操纵动画。
-	</script>
-</body>
-</html>
+<canvas src="rose_2.0.0.svga" loops="0" clearsAfterStop="true"></canvas>
 ```
 
-### 嵌入到 Canvas 上下文 
+Animation will play after Web-Page onload.
 
-如果希望将 SVGAPlayer 嵌入到 Canvas 上下文中，可以在创建 Player 时，不传递参数，然后使用 drawOnCanvas 方法将帧渲染至画布中。
+## Replace Animation Images Dynamically
 
-```js
-var player = new SVGA.Player();
-var parser = new SVGA.Parser();
-parser.load(`angel.svga`, (videoItem) => {
-    player.setVideoItem(videoItem);
-    player.startAnimation();
-    events.push(() => {
-        player.drawOnCanvas(document.querySelector('#canvas'), 125, 125, 250, 250); // (DOM, x, y, width, height);
-    })
-});
+You can replace specific image by yourself, ask your designer tell you the ImageKey.
+
+* The Replacing Image MUST have same WIDTH and HEIGHT as Original.
+* setImage operation MUST set BEFORE startAnimation.
+
+```
+player.setImage('http://yourserver.com/xxx.png', 'ImageKey');
 ```
 
-### 在各运行时中播放动画
+## Add Text on Animation Image Dynamically
 
-SVGAPlayer 默认使用 Canvas API 播放动画，然而，你可能需要在不同的环境中播放动画，比如动画引擎、游戏引擎。
+You can add text on specific image, ask your designer tell you the ImageKey.
 
-SVGAPlayer 会自动选择最合适的 Render 进行渲染，当以下运行时存在时，会按顺序选择 Render。
+* setText operation MUST set BEFORE startAnimation.
 
-* CreateJS(SvgaCreatejs.Render)
-* Laya(SvgaLayabox.Render)
-* Canvas API
-
-当多个环境同时存在时，你可以通过 ```Player.setRender(Render)``` 强制 SVGAPlayer 使用某渲染器。
-
-### 使用 CreateJS 库播放
-
-同时添加 CreateJS 依赖即可使用 CreateJS 库进行播放。
-
-```html
-<script src="https://code.createjs.com/createjs-2015.11.26.min.js"></script>
-<script src="svga-createjs.min.js" charset="utf-8"></script>
+```
+player.setText('Hello, World!', 'ImageKey');
 ```
 
-#### 嵌入到 CreateJS 上下文
-
-如果希望将 SVGAPlayer 嵌入到 Canvas 上下文中，可以在创建 Player 时，不传递参数，然后使用 ```Player.container(stage)``` 获取容器。
-
-```js
-var stage = new createjs.Stage('#canvas');
-var player = new SVGA.Player();
-var parser = new SVGA.Parser();
-parser.load(`angel.svga`, (videoItem) => {
-    player.setVideoItem(videoItem);
-    player.startAnimation();
-    var container = player.container(stage);
-    container.x = 100;      // 设定容器 x 位置
-    container.y = 100;      // 设定容器 y 位置
-    container.width = 100;  // 设定容器宽度
-    container.height = 100; // 设定容器高度
-    stage.addChild(container); // 自行添加至对应场景
-});
+```
+player.setText({ 
+    text: 'Hello, World!, 
+    size: "24px", 
+    color: "#ffe0a4",
+    offset: {x: 0.0, y: 0.0}
+}, 'ImageKey'); // customize text styles.
 ```
 
-### 在 LayaBox 游戏引擎中播放
+## Classes
 
-要在 LayaBox 中播放 SVGA 动画，你需要同时引用 ```svga.min.js``` ```svga-layabox.min.js```，然后，使用以下方法加载动画。
+### SVGA.Player
 
-```js
-var player = new SVGA.Player();
-var parser = new SVGA.Parser();
-parser.load(`angel.svga`, (videoItem) => {
-    player.setVideoItem(videoItem);
-    player.startAnimation();
-    var container = player.container();
-    container.x = 100;      // 设定容器 x 位置
-    container.y = 100;      // 设定容器 y 位置
-    container.width = 100;  // 设定容器宽度
-    container.height = 100; // 设定容器高度
-    Laya.stage.addChild(container); // 自行添加至对应场景
-});
-```
-
-* 使用 WebGL 引擎时，由于 Laya.WEBGL 引擎存在 BUG 以及功能缺失，SVGA 已为其修复，在 patch/layabox/ 下，将 ```laya.webgl.js``` 替换工程 libs 目录下的文件即可。
-
-## 模块说明
-
-### SVGAPlayer
-
-SVGAPlayer 是整个播放器的核心，其控制整个播放的进程、进度。
+You use SVGA.Player controls animation play and stop.
 
 #### Properties
 
-* int loops; - 循环次数，0 = 无限循环
-* BOOL clearsAfterStop; - 是否在结束播放时清空画布。
+* int loops; - Animation loop count, defaults to 0 means infinity loop.
+* BOOL clearsAfterStop; - defaults to true, means player will clear all contents after stop.
 
 #### Methods
 
-* constructor (canvas); - 初始化方法，canvas 可以是 string(#selector) 也可以是 DOM 对象。
-* startAnimation(); - 从 0 帧开始播放动画
-* pauseAnimation(); - 在当前帧暂停动画
-* stopAnimation(); - 停止播放动画，如果 clearsAfterStop == YES，则同时清空画布
-* clear(); - 清空当前画布
-* stepToFrame(frame: int, andPlay: Boolean); - 跳到第 N 帧 (frame 0 = 第 1 帧)，然后 andPlay == YES 时播放动画
-* stepToPercentage(percentage: float, andPlay: Boolean); - 跳到动画对应百分比的帧，然后 andPlay == YES 时播放动画
-* setImage(image: string, forKey: string, transform: [a, b, c, d, tx, ty]); - 设置动态图像，其中 transform 是选填项，用于动态调整图像（目前只有 Canvas API 和 CreateJS 支持）
-* setText(text: string | object, forKey: string); - 设置动态文本, text: object = {text: string, font: string, size: string, color: string, offset: {x: float, y: float}}
-* clearDynamicObjects(); - 清空动态图像和文本
+* constructor (canvas); - first params could be '#id' or CanvasHTMLElement
+* startAnimation(); - start animation from zero frame.
+* pauseAnimation(); - pause animation on current frame.
+* stopAnimation(); - stop animation, clear contents while clearsAfterStop === true
+* clear(); - force clear contents.
+* stepToFrame(frame: int, andPlay: Boolean); - stop to specific frame, play animation while andPlay === true
+* stepToPercentage(percentage: float, andPlay: Boolean); - stop to specific percentage, play animation while andPlay === true
+* setImage(image: string, forKey: string, transform: [a, b, c, d, tx, ty]); - Replace Animation Images Dynamically, transform is optional, transform cloud adjust replacing image.
+* setText(text: string | {text: string, font: string, size: string, color: string, offset: {x: float, y: float}}, forKey: string); - Add Text on Animation Image Dynamically
+* clearDynamicObjects(); - clear all dynamic objects.
 
 #### Callback Method
-* onFinished(callback: function); - 动画播放结束时回调
-* onFrame(callback: function); - 动画播放到某一帧时回调，callback(frame: int)
-* onPercentage(callback: function); - 动画播放到某一进度时回调，callback(percentage: float)
+* onFinished(callback: () => void): void; - call after animation stop.
+* onFrame(callback: (frame: number): void): void; - call after animation specific frame rendered.
+* onPercentage(callback: (percentage: number): void): void; - call after animation specific percentage rendered.
 
-### SVGAParser
+### SVGA.Parser
 
-SVGAParser 用于加载动画源文件， SVGAParser 可以配合 SVGAWorker 和 SVGADB 使用。使用 SVGAWorker 时，动画解码过程在 Worker 线程中执行。 使用 SVGADB 时，动画会缓存在 Local Database 中。
+You use SVGA.Parser load VideoItem from remote or Base64 string.
+
+Only Cross-Domain allow files could be loaded.
+
+If you eager to load resources from Base64 or File, deliver as ```load(File)``` or ```load('data:svga/2.0;base64,xxxxxx')```.
 
 #### Methods
 
-* constructor(worker, dbClass); - 初始化方法，第一个参数传入 SVGAWorker 路径，第二个参数传入 SVGADB 的类名。
-* load(url, success, failure); - 加载一个动画，加载完成后执行 success(videoItem: SVGAVideoItem) 回调，加载失败时执行 failure(error: String | Error) 回调。
+* constructor();
+* load(url: string, success: (videoItem: VideoEntity) => void, failure: (error: Error) => void): void;
 
-## 调试构建工具
+## Issues
 
-使用 [LegoFlow](https://legoflow.com) 进行调试、构建
+### Android 4.x Breaks
 
-## 问题汇总
-
-### Android 4.x 无法加载
-
-在某些 Android 机器上，由于缺少 Blob 的支持（表面上 Blob 对象是有的，实际上是无效的），导致 Parser 无法工作，添加 Blob Polyfill 可以解决这个问题。
+As known, some Android OS leaks Blob support, add Blob Polyfill by yourself.
 
 ```
 <script src="//cdn.bootcss.com/blob-polyfill/1.0.20150320/Blob.min.js"></script>
