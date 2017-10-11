@@ -1,6 +1,6 @@
-import { BezierPath } from './bezierPath'
-import { EllipsePath } from './ellipsePath'
-import { RectPath } from './rectPath'
+import { BezierPath } from '../bezierPath'
+import { EllipsePath } from '../ellipsePath'
+import { RectPath } from '../rectPath'
 
 export class CanvasRender {
 

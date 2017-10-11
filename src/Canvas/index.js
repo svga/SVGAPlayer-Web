@@ -1,4 +1,4 @@
-import { Parser as MParser } from './parser'
+import { Parser as MParser } from '../parser'
 import { Player as MPlayer } from './player'
 import { AutoLoader } from './autoLoader'
 

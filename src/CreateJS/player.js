@@ -1,6 +1,6 @@
 'use strict';
 
-import { CanvasRender } from './canvasRender'
+import { CreateJSRender } from './render'
 
 export class Player {
 
@@ -11,31 +11,13 @@ export class Player {
 
     constructor(canvas) {
         this._canvas = typeof canvas === "string" ? document.querySelector(canvas) : canvas;
-        this.setRender(undefined);
+        this.render = CreateJSRender;
+        this.resetRootStage();
     }
 
     container(stage) {
         this._stage = stage;
         return this._rootLayer;
-    }
-
-    setRender(render) {
-        if (render === undefined) {
-            if (window.createjs !== undefined && window.SvgaCreatejs !== undefined) {
-                render = window.SvgaCreatejs.Render;
-            }
-            else if (window.Laya !== undefined && window.SvgaLayabox !== undefined) {
-                render = window.SvgaLayabox.Render;
-            }
-            else {
-                render = CanvasRender;
-            }
-        }
-        if (render === undefined) {
-            throw "RENDER REQUIRED.";
-        }
-        this.render = render;
-        this.resetRootStage();
     }
 
     resetRootStage() {
