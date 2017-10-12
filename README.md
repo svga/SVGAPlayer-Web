@@ -56,7 +56,10 @@ SVGAPlayer 支持以下动画、游戏引擎
 ...
 <body>
     <div id="test">
+        <!-- 非抗锯齿 -->
         <canvas id="canvas" width="750" height="750" style="background-color: #000000"></canvas>
+        <!-- 当 Canvas 尺寸与原图不一致时，会有明显锯齿，使用以下标签可以抗锯齿 -->
+        <!-- <div id="canvas" style="width: 150px; height: 150px; background-color: #000000;"></div> -->
     </div>
     <!--[if !IE]><!--><script src="http://assets.dwstatic.com/common/lib/yyzip/0.0.1/yyzip.min.js" charset="utf-8"></script><!--<![endif]-->
     <!--[if IE]><script src="http://assets.dwstatic.com/common/lib/??jszip/3.1.3/jszip.min.js,jszip/3.1.3/jszip-utils.min.js,jszip/3.1.3/jszip-utils-ie.min.js" charset="utf-8"></script><![endif]-->
