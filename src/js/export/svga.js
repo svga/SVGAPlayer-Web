@@ -5,6 +5,8 @@
  * @author: lijialiang
  * @team  : UED中心
  * @export: umd
+ * @export file: svga
+ * @export name: Svga
  */
 
 import SVGAParser from './modules/svga-parser'
