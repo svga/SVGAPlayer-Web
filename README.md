@@ -45,8 +45,16 @@ Both Prebuild & NPM, if you need to support SVGA-Format 1.x, add JSZip script to
 
 You may create Player and Parser by yourself.
 
+1. Add Div Tag.
+
+```html
+<div id="demoCanvas" style="styles..."></div>
+```
+
+2. Load Animation
+
 ```js
-var player = new SVGA.Player('#canvas'); // replace #canvas as <canvas id="!!!HERE!!!"></canvas>
+var player = new SVGA.Player('#demoCanvas');
 var parser = new SVGA.Parser();
 parser.load('rose_2.0.0.svga', function(videoItem) {
     player.setVideoItem(videoItem);
@@ -59,7 +67,7 @@ parser.load('rose_2.0.0.svga', function(videoItem) {
 Assign canvas element properties as below.
 
 ```html
-<canvas src="rose_2.0.0.svga" loops="0" clearsAfterStop="true"></canvas>
+<div src="rose_2.0.0.svga" loops="0" clearsAfterStop="true" style="styles..."></div>
 ```
 
 Animation will play after Web-Page onload.

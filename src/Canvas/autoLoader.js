@@ -11,7 +11,7 @@ export class AutoLoader {
         }
         let parser = customParser || AutoLoader.sharedParser;
         if (element) {
-            if (element.tagName === "CANVAS" && element.attributes.src && element.attributes.src.value.indexOf(".svga") === element.attributes.src.value.length - 5) {
+            if ((element.tagName === "CANVAS" || element.tagName === "DIV") && element.attributes.src && element.attributes.src.value.indexOf(".svga") === element.attributes.src.value.length - 5) {
                 let src = element.attributes.src.value;
                 let player = new Player(element);
                 parser.load(src, (videoItem) => {
@@ -30,7 +30,7 @@ export class AutoLoader {
             }
         }
         else {
-            var elements = document.getElementsByTagName("canvas");
+            var elements = document.querySelectorAll('[src$=".svga"]');
             for (var index = 0; index < elements.length; index++) {
                 var element = elements[index];
                 AutoLoader.autoload(element);

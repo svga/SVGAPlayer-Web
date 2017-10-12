@@ -30,7 +30,7 @@ export class AutoLoader {
             }
         }
         else {
-            var elements = document.getElementsByTagName("canvas");
+            var elements = document.querySelectorAll('[src$=".svga"]');
             for (var index = 0; index < elements.length; index++) {
                 var element = elements[index];
                 AutoLoader.autoload(element);

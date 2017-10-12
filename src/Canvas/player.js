@@ -8,14 +8,13 @@ export class Player {
     loops = 0;
     clearsAfterStop = true;
     isPaused = false;
-    drawingCanvas = undefined;
 
     constructor(canvas) {
         this._canvas = typeof canvas === "string" ? document.querySelector(canvas) : canvas;
         if (this._canvas instanceof HTMLDivElement) {
-            this.drawingCanvas = document.createElement('canvas');
-            this.drawingCanvas.style.backgroundColor = "transparent"
-            this._canvas.appendChild(this.drawingCanvas);
+            this._drawingCanvas = document.createElement('canvas');
+            this._drawingCanvas.style.backgroundColor = "transparent"
+            this._canvas.appendChild(this._drawingCanvas);
         }
         this.render = CanvasRender;
         this.resetRootStage();
@@ -38,16 +37,9 @@ export class Player {
 
     setVideoItem(videoItem) {
         this._videoItem = videoItem;
-        if (this.drawingCanvas) {
-            this.drawingCanvas.width = this._videoItem.videoSize.width;
-            this.drawingCanvas.height = this._videoItem.videoSize.height;
-            if (this.drawingCanvas.parentNode) {
-                const scaleX = this.drawingCanvas.parentNode.clientWidth / this.drawingCanvas.width;
-                const scaleY = this.drawingCanvas.parentNode.clientHeight / this.drawingCanvas.height;
-                const translateX = (this.drawingCanvas.width * scaleX - this.drawingCanvas.width) / 2.0
-                const translateY = (this.drawingCanvas.height * scaleY - this.drawingCanvas.height) / 2.0
-                this.drawingCanvas.style.transform = "matrix(" + scaleX + ", 0.0, 0.0, " + scaleY + ", " + translateX + ", " + translateY + ")"
-            }
+        if (this._drawingCanvas) {
+            this._drawingCanvas.width = this._videoItem.videoSize.width;
+            this._drawingCanvas.height = this._videoItem.videoSize.height;
         }
         this.clear();
         this._draw();
@@ -143,6 +135,7 @@ export class Player {
      */
 
     _canvas = ''
+    _drawingCanvas = undefined;
     _stage = null;
     _videoItem = null;
     _rootLayer = null;
@@ -225,6 +218,13 @@ export class Player {
             this._drawLayer.setState({
                 transform: this.render.Matrix2D(ratio, 0.0, 0.0, ratio, 0.0, 0.0)
             })
+        }
+        if (this._drawingCanvas.parentNode) {
+            const scaleX = this._drawingCanvas.parentNode.clientWidth / this._drawingCanvas.width;
+            const scaleY = this._drawingCanvas.parentNode.clientHeight / this._drawingCanvas.height;
+            const translateX = (this._drawingCanvas.width * scaleX - this._drawingCanvas.width) / 2.0
+            const translateY = (this._drawingCanvas.height * scaleY - this._drawingCanvas.height) / 2.0
+            this._drawingCanvas.style.transform = "matrix(" + scaleX + ", 0.0, 0.0, " + scaleY + ", " + translateX + ", " + translateY + ")"
         }
     }
 
