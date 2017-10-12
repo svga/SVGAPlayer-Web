@@ -22,7 +22,7 @@ export class CanvasRender {
             // Dont return.
         }
         else if (!player._canvasAnimating && player.clearsAfterStop) {
-            var canvas = onCanvas || player._canvas;
+            var canvas = onCanvas || player.drawingCanvas || player._canvas;
             if (canvas !== undefined) {
                 var ctx = canvas.getContext("2d");
                 if (onCanvas === undefined) {
@@ -47,7 +47,7 @@ export class CanvasRender {
                 }
             }
         }
-        var canvas = onCanvas || player._canvas;
+        var canvas = onCanvas || player.drawingCanvas || player._canvas;
         if (canvas !== undefined) {
             var ctx = canvas.getContext("2d");
             if (inRect === undefined) {

@@ -8,9 +8,15 @@ export class Player {
     loops = 0;
     clearsAfterStop = true;
     isPaused = false;
+    drawingCanvas = undefined;
 
     constructor(canvas) {
         this._canvas = typeof canvas === "string" ? document.querySelector(canvas) : canvas;
+        if (this._canvas instanceof HTMLDivElement) {
+            this.drawingCanvas = document.createElement('canvas');
+            this.drawingCanvas.style.backgroundColor = "transparent"
+            this._canvas.appendChild(this.drawingCanvas);
+        }
         this.render = CanvasRender;
         this.resetRootStage();
     }
@@ -32,6 +38,17 @@ export class Player {
 
     setVideoItem(videoItem) {
         this._videoItem = videoItem;
+        if (this.drawingCanvas) {
+            this.drawingCanvas.width = this._videoItem.videoSize.width;
+            this.drawingCanvas.height = this._videoItem.videoSize.height;
+            if (this.drawingCanvas.parentNode) {
+                const scaleX = this.drawingCanvas.parentNode.clientWidth / this.drawingCanvas.width;
+                const scaleY = this.drawingCanvas.parentNode.clientHeight / this.drawingCanvas.height;
+                const translateX = (this.drawingCanvas.width * scaleX - this.drawingCanvas.width) / 2.0
+                const translateY = (this.drawingCanvas.height * scaleY - this.drawingCanvas.height) / 2.0
+                this.drawingCanvas.style.transform = "matrix(" + scaleX + ", 0.0, 0.0, " + scaleY + ", " + translateX + ", " + translateY + ")"
+            }
+        }
         this.clear();
         this._draw();
     }
