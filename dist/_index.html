@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-cmn-Hans">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
@@ -9,18 +10,23 @@
     <meta http-equiv="Cache-Control" content="no-transform">
     <meta http-equiv="Cache-Control" content="no-siteapp">
     <title> index </title>
-    <link rel="stylesheet" href="./css/index.css" charset="utf-8">
 </head>
-<body>
+
+<body style="text-align: center">
 
     <div id="test">
-        <canvas id="canvas" src="assets/angel.svga" loops="0" clearsAfterStop="true" width="500" height="500" style="background-color: #000000;"></canvas>
-        <!--<canvas id="canvas" width="500" height="500" style="background-color: #000000;"></canvas>-->
+        <!-- 非抗锯齿 -->
+        <!-- <canvas id="canvas" src="assets/angel.svga" loops="0" clearsAfterStop="true" width="500" height="500" style="background-color: #000000;"></canvas> -->
+        <!-- 抗锯齿 -->
+        <div id="canvas" src="assets/angel.svga" loops="0" clearsAfterStop="true" style="width: 150px; height: 150px; margin: auto; background-color: #000000;"></div>
     </div>
 
-    <!--[if !IE]><!--><script src="http://assets.dwstatic.com/common/lib/yyzip/0.0.1/yyzip.min.js" charset="utf-8"></script><!--<![endif]-->
-    <!--[if IE]><script src="http://assets.dwstatic.com/common/lib/??jszip/3.1.3/jszip.min.js,jszip/3.1.3/jszip-utils.min.js,jszip/3.1.3/jszip-utils-ie.min.js" charset="utf-8"></script><![endif]-->    
-    <script src="./js/index.js" charset="utf-8"></script> 
+    <!--[if !IE]><!-->
+    <script src="http://assets.dwstatic.com/common/lib/yyzip/0.0.1/yyzip.min.js" charset="utf-8"></script>
+    <!--<![endif]-->
+    <!--[if IE]><script src="http://assets.dwstatic.com/common/lib/??jszip/3.1.3/jszip.min.js,jszip/3.1.3/jszip-utils.min.js,jszip/3.1.3/jszip-utils-ie.min.js" charset="utf-8"></script><![endif]-->
+    <script src="./js/index.js" charset="utf-8"></script>
 
 </body>
+
 </html>

@@ -22,7 +22,7 @@ export default class CanvasRender {
             // Dont return.
         }
         else if (!player._canvasAnimating && player.clearsAfterStop) {
-            var canvas = onCanvas || player._canvas;
+            var canvas = onCanvas || player._drawingCanvas || player._canvas;
             if (canvas !== undefined) {
                 var ctx = canvas.getContext("2d");
                 if (onCanvas === undefined) {
@@ -37,7 +37,7 @@ export default class CanvasRender {
                 var src = player._videoItem.images[imageKey];
                 if (src.indexOf("iVBO") === 0 || src.indexOf("/9j/2w") === 0) {
                     let imgTag = document.createElement('img');
-                    const inRect = inRect === undefined ? undefined : { ...inRect }
+                    const inRect = inRect === undefined ? undefined : Object.assign({}, inRect)
                     imgTag.onload = function () {
                         clearTimeout(CanvasRender.RedrawTimeout);
                         CanvasRender.RedrawTimeout = setTimeout(() => { CanvasRender.Draw(player, onCanvas, inRect); });
@@ -47,7 +47,7 @@ export default class CanvasRender {
                 }
             }
         }
-        var canvas = onCanvas || player._canvas;
+        var canvas = onCanvas || player._drawingCanvas || player._canvas;
         if (canvas !== undefined) {
             var ctx = canvas.getContext("2d");
             if (inRect === undefined) {

@@ -12,6 +12,11 @@ module.exports = class SVGAPlayer {
 
     constructor(canvas) {
         this._canvas = typeof canvas === "string" ? document.querySelector(canvas) : canvas;
+        if (this._canvas instanceof HTMLDivElement) {
+            this._drawingCanvas = document.createElement('canvas');
+            this._drawingCanvas.style.backgroundColor = "transparent"
+            this._canvas.appendChild(this._drawingCanvas);
+        }
         this.setRender(undefined);
     }
 
@@ -51,6 +56,17 @@ module.exports = class SVGAPlayer {
 
     setVideoItem(videoItem) {
         this._videoItem = videoItem;
+        if (this._drawingCanvas) {
+            this._drawingCanvas.width = this._videoItem.videoSize.width;
+            this._drawingCanvas.height = this._videoItem.videoSize.height;
+            if (this._drawingCanvas.parentNode) {
+                const scaleX = this._drawingCanvas.parentNode.clientWidth / this._drawingCanvas.width;
+                const scaleY = this._drawingCanvas.parentNode.clientHeight / this._drawingCanvas.height;
+                const translateX = (this._drawingCanvas.width * scaleX - this._drawingCanvas.width) / 2.0
+                const translateY = (this._drawingCanvas.height * scaleY - this._drawingCanvas.height) / 2.0
+                this._drawingCanvas.style.transform = "matrix(" + scaleX + ", 0.0, 0.0, " + scaleY + ", " + translateX + ", " + translateY + ")"
+            }
+        }
         this.clear();
         this._draw();
     }
@@ -118,7 +134,7 @@ module.exports = class SVGAPlayer {
         let color = (typeof textORMap === "object" ? textORMap.color : "#000000") || "#000000";
         let offset = (typeof textORMap === "object" ? textORMap.offset : { x: 0.0, y: 0.0 }) || { x: 0.0, y: 0.0 };
         let textLayer = this.render.Text(text, `${size} family`, color);
-        textLayer.setState({offset});
+        textLayer.setState({ offset });
         this._dynamicText[forKey] = textLayer;
     }
 
@@ -145,6 +161,7 @@ module.exports = class SVGAPlayer {
      */
 
     _canvas = ''
+    _drawingCanvas = undefined;
     _stage = null;
     _videoItem = null;
     _rootLayer = null;
