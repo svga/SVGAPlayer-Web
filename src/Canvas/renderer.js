@@ -4,7 +4,7 @@ import { RectPath } from '../rectPath'
 
 const validMethods = 'MLHVCSQRZ'
 
-export class Render {
+export class Renderer {
 
     _owner = undefined;
     _prepared = false;
@@ -42,6 +42,17 @@ export class Render {
         }
     }
 
+    clear() {
+        const ctx = (this._owner._drawingCanvas || this._owner._container).getContext('2d')
+        const areaFrame = {
+            x: 0.0,
+            y: 0.0,
+            width: (this._owner._drawingCanvas || this._owner._container).width,
+            height: (this._owner._drawingCanvas || this._owner._container).height,
+        }
+        ctx.clearRect(areaFrame.x, areaFrame.y, areaFrame.width, areaFrame.height)
+    }
+
     drawFrame(frame) {
         if (this._prepared) {
             const ctx = (this._owner._drawingCanvas || this._owner._container).getContext('2d')
@@ -51,15 +62,16 @@ export class Render {
                 width: (this._owner._drawingCanvas || this._owner._container).width,
                 height: (this._owner._drawingCanvas || this._owner._container).height,
             }
-            if (!this._owner._asChild) {
-                ctx.clearRect(areaFrame.x, areaFrame.y, areaFrame.width, areaFrame.height)
-            }
+            ctx.clearRect(areaFrame.x, areaFrame.y, areaFrame.width, areaFrame.height)
             this._owner._videoItem.sprites.forEach(sprite => {
                 let frameItem = sprite.frames[this._owner._currentFrame];
                 if (frameItem.alpha < 0.05) {
                     return;
                 }
                 ctx.save();
+                if (this._owner._globalTransform) {
+                    ctx.transform(this._owner._globalTransform.a, this._owner._globalTransform.b, this._owner._globalTransform.c, this._owner._globalTransform.d, this._owner._globalTransform.tx, this._owner._globalTransform.ty)
+                }
                 ctx.globalAlpha = frameItem.alpha;
                 ctx.transform(frameItem.transform.a, frameItem.transform.b, frameItem.transform.c, frameItem.transform.d, frameItem.transform.tx, frameItem.transform.ty)
                 let src = this._owner._dynamicImage[sprite.imageKey] || this._owner._videoItem.bitmapCache[sprite.imageKey] || this._owner._videoItem.images[sprite.imageKey];

@@ -8,17 +8,10 @@
     </div>
     <script src="http://assets.dwstatic.com/common/lib/??jszip/3.1.3/jszip.min.js,jszip/3.1.3/jszip-utils.min.js" charset="utf-8"></script>
     <script src="../build/svga.min.js"></script>
-    <script src="./Bsae64SVGARecource.js"></script>
     <script>
         var parser = new SVGA.Parser()
         var player = new SVGA.Player('#testCanvas')
-        // player.setContentMode("AspectFill")
-
-        // parser.load(base64SVGAv1_0, function (videoItem) {
-        // parser.load(base64SVGAv2_0, function (videoItem) {
         parser.load("./samples/rose_2.0.0.svga", function (videoItem) {
-            console.log(videoItem);
-            // document.getElementById('svgaPerformance').innerHTML = "Performance >>> " + JSON.stringify(window.SVGAPerformance);
             player.setVideoItem(videoItem);
             player.startAnimation()
         })

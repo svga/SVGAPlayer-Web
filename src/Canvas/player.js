@@ -1,33 +1,32 @@
 'use strict';
 
-import { Render } from './render'
+import { Renderer } from './renderer'
 import { Ticker } from './ticker'
 
 export class Player {
 
     loops = 0;
     clearsAfterStop = true;
-    isPaused = false;
 
-    constructor(container, asChild) {
+    constructor(container) {
         this._container = typeof container === "string" ? document.querySelector(container) : container;
-        this._asChild = asChild === true
-        this.init();
+        this._asChild = container === undefined
+        this._init();
     }
 
-    init() {
-        if (this._container instanceof HTMLDivElement) {
+    _init() {
+        if (this._container instanceof HTMLDivElement || this._asChild) {
             this._drawingCanvas = document.createElement('canvas');
             this._drawingCanvas.style.backgroundColor = "transparent"
-            this._container.appendChild(this._drawingCanvas);
+            this._container && this._container.appendChild(this._drawingCanvas);
         }
-        this._render = new Render(this);
+        this._renderer = new Renderer(this);
         this._ticker = new Ticker(this);
     }
 
     setVideoItem(videoItem) {
         this._videoItem = videoItem;
-        this._render.prepare();
+        this._renderer.prepare();
         if (this._drawingCanvas) {
             this._drawingCanvas.width = this._videoItem.videoSize.width;
             this._drawingCanvas.height = this._videoItem.videoSize.height;
@@ -48,14 +47,12 @@ export class Player {
     }
 
     startAnimation() {
-        this.isPaused = false;
         this.stopAnimation(false);
         this._loopCount = 0;
         this._ticker.start();
     }
 
     pauseAnimation() {
-        this.isPaused = true;
         this.stopAnimation(false);
     }
 
@@ -70,7 +67,7 @@ export class Player {
     }
 
     clear() {
-        this.isPaused = false;
+        this._renderer.clear();
     }
 
     stepToFrame(frame, andPlay) {
@@ -81,7 +78,6 @@ export class Player {
         this._currentFrame = frame;
         this._update();
         if (andPlay) {
-            this.isPaused = false;
             this._ticker.start();
         }
     }
@@ -107,7 +103,7 @@ export class Player {
         let family = (typeof textORMap === "object" ? textORMap.family : "") || "";
         let color = (typeof textORMap === "object" ? textORMap.color : "#000000") || "#000000";
         let offset = (typeof textORMap === "object" ? textORMap.offset : { x: 0.0, y: 0.0 }) || { x: 0.0, y: 0.0 };
-        let textLayer = this._render.Text(text, `${size} family`, color);
+        let textLayer = this._renderer.Text(text, `${size} family`, color);
         textLayer.setState({ offset });
         this._dynamicText[forKey] = textLayer;
     }
@@ -130,13 +126,19 @@ export class Player {
         this._onPercentage = callback;
     }
 
+    drawOnContext(ctx, x, y, width, height) {
+        if (this._drawingCanvas && this._videoItem) {
+            ctx.drawImage(this._drawingCanvas, x, y, width || this._videoItem.videoSize.width, height || this._videoItem.videoSize.height);
+        }
+    }
+
     /**
      * Private methods & properties
      */
 
     _asChild = false;
     _container = undefined;
-    _render = undefined;
+    _renderer = undefined;
     _ticker = undefined;
     _drawingCanvas = undefined;
     _contentMode = "AspectFit"
@@ -171,6 +173,7 @@ export class Player {
                 if (typeof this._onFinished === "function") {
                     this._onFinished();
                 }
+                return;
             }
         }
         this._update();
@@ -183,9 +186,15 @@ export class Player {
     }
 
     _resize() {
-        if (this._drawingCanvas && this._drawingCanvas.parentNode) {
+        if (this._drawingCanvas) {
             let scaleX = 1.0; let scaleY = 1.0; let translateX = 0.0; let translateY = 0.0;
-            let targetSize = { width: this._drawingCanvas.parentNode.clientWidth, height: this._drawingCanvas.parentNode.clientHeight };
+            let targetSize;
+            if (this._drawingCanvas.parentNode) {
+                targetSize = { width: this._drawingCanvas.parentNode.clientWidth, height: this._drawingCanvas.parentNode.clientHeight };
+            }
+            else {
+                targetSize = this._videoItem.videoSize;
+            }
             let imageSize = this._videoItem.videoSize;
             if (this._contentMode === "Fill") {
                 const scaleX = targetSize.width / imageSize.width;
@@ -210,6 +219,7 @@ export class Player {
                     this._drawingCanvas.style.transform = "matrix(" + scale + ", 0.0, 0.0, " + scale + ", " + translateX + ", " + translateY + ")"
                 }
             }
+            this._globalTransform = undefined;
         }
         else {
             let scaleX = 1.0; let scaleY = 1.0; let translateX = 0.0; let translateY = 0.0;
@@ -231,15 +241,13 @@ export class Player {
                     translateX = (targetSize.width - imageSize.width * scaleX) / 2.0
                 }
             }
-            // this._drawLayer.setState({
-            //     transform: this._render.Matrix2D(scaleX, 0.0, 0.0, scaleY, translateX, translateY)
-            // })
+            this._globalTransform = { a: scaleX, b: 0.0, c: 0.0, d: scaleY, tx: translateX, ty: translateY };
         }
     }
 
     _update() {
         this._resize();
-        this._render.drawFrame(this._currentFrame);
+        this._renderer.drawFrame(this._currentFrame);
     }
 
 }

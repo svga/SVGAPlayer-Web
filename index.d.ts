@@ -11,8 +11,14 @@ export class Parser {
 }
 
 export class Player {
-    constructor(canvas: string | HTMLCanvasElement)
+
+    loops: number;
+    clearsAfterStop: boolean;
+
+    constructor(canvas: string | HTMLCanvasElement | HTMLDivElement)
     setVideoItem(videoItem: VideoEntity): void
+    setContentMode(contentMode: "Fill" | "AspectFill" | "AspectFit"): void
+    setClipsToBounds(clipsToBounds: boolean): void
     startAnimation(): void
     pauseAnimation(): void
     stopAnimation(clear?: boolean): void
@@ -31,4 +37,5 @@ export class Player {
     onFinished(callback: () => void): void
     onFrame(callback: () => void): void
     onPercentage(callback: () => void): void
+    drawOnContext(ctx: CanvasRenderingContext2D, x: number, y: number, width?: number, height?: number): void
 }
