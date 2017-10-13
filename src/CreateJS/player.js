@@ -15,6 +15,8 @@ export class Player extends createjs.Container {
             if (autoplay !== false) {
                 this.startAnimation();
             }
+        }, (error) => {
+            this._onError && this._onError(error);
         })
         this._renderer = new Renderer(this);
     }
@@ -31,7 +33,7 @@ export class Player extends createjs.Container {
     }
 
     setClipsToBounds(clipsToBounds) {
-        
+
     }
 
     startAnimation() {
@@ -108,6 +110,10 @@ export class Player extends createjs.Container {
         this._dynamicText = {};
     }
 
+    onError(callback) {
+        this._onError = callback;
+    }
+
     onFinished(callback) {
         this._onFinished = callback;
     }
@@ -169,7 +175,7 @@ export class Player extends createjs.Container {
     }
 
     _addLayers() {
-        this._videoItem.sprites.forEach((sprite) =>  {
+        this._videoItem.sprites.forEach((sprite) => {
             this.addChild(this._renderer.requestContentLayer(sprite));
         })
         this._currentFrame = 0;

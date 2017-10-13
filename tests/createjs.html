@@ -10,7 +10,10 @@
     <script src="../build/svga.createjs.min.js"></script>
     <script>
 
-        var sprite = new SVGA.Player('https://github.com/yyued/SVGA-Samples/blob/master/posche.svga?raw=true');
+        var sprite = new SVGA.Player('./samples/rose_2.0.0.svga');
+        sprite.onError((err) => {
+            console.error(err)
+        })
         var stage = new createjs.Stage('demoCanvas');
         sprite.x = 0;
         sprite.y = 0;
