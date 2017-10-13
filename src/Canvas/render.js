@@ -2,78 +2,67 @@ import { BezierPath } from '../bezierPath'
 import { EllipsePath } from '../ellipsePath'
 import { RectPath } from '../rectPath'
 
-export class CanvasRender {
+const validMethods = 'MLHVCSQRZ'
 
-    static Stage(arg1, arg2, arg3) {
-        return {
-            setState: () => { },
-            removeAllChildren: () => { },
-            addChild: () => { },
-            update: (player) => {
-                CanvasRender.Draw(player);
-            },
-        };
+export class Render {
+
+    _owner = undefined;
+    _prepared = false;
+    _undrawFrame = undefined;
+
+    constructor(owner) {
+        this._owner = owner;
     }
 
-    static RedrawTimeout;
-
-    static Draw(player, onCanvas, inRect) {
-        if (player.isPaused === true) {
-            // Dont return.
-        }
-        else if (!player._canvasAnimating && player.clearsAfterStop) {
-            var canvas = onCanvas || player._drawingCanvas || player._canvas;
-            if (canvas !== undefined) {
-                var ctx = canvas.getContext("2d");
-                if (onCanvas === undefined) {
-                    ctx.clearRect(0, 0, canvas.width, canvas.height)
-                }
-            }
-            return;
-        }
-        if (player._videoItem.bitmapCache === undefined) {
-            player._videoItem.bitmapCache = {};
-            for (var imageKey in player._videoItem.images) {
-                var src = player._videoItem.images[imageKey];
+    prepare() {
+        this._prepared = false;
+        if (this._owner._videoItem.bitmapCache === undefined) {
+            this._owner._videoItem.bitmapCache = {};
+            let totalCount = 0
+            let loadedCount = 0
+            for (var imageKey in this._owner._videoItem.images) {
+                let src = this._owner._videoItem.images[imageKey];
                 if (src.indexOf("iVBO") === 0 || src.indexOf("/9j/2w") === 0) {
+                    totalCount++;
                     let imgTag = document.createElement('img');
-                    const inRect = inRect === undefined ? undefined : { ...inRect }
                     imgTag.onload = function () {
-                        clearTimeout(CanvasRender.RedrawTimeout);
-                        CanvasRender.RedrawTimeout = setTimeout(() => { CanvasRender.Draw(player, onCanvas, inRect); });
-                    }
+                        loadedCount++;
+                        if (loadedCount == totalCount) {
+                            this._prepared = true;
+                            if (typeof this._undrawFrame === "number") {
+                                this.drawFrame(this._undrawFrame);
+                                this._undrawFrame = undefined;
+                            }
+                        }
+                    }.bind(this);
                     imgTag.src = 'data:image/png;base64,' + src;
-                    player._videoItem.bitmapCache[imageKey] = imgTag;
+                    this._owner._videoItem.bitmapCache[imageKey] = imgTag;
                 }
             }
         }
-        var canvas = onCanvas || player._drawingCanvas || player._canvas;
-        if (canvas !== undefined) {
-            var ctx = canvas.getContext("2d");
-            if (inRect === undefined) {
-                inRect = { x: 0, y: 0, width: canvas.width, height: canvas.height }
+    }
+
+    drawFrame(frame) {
+        if (this._prepared) {
+            const ctx = (this._owner._drawingCanvas || this._owner._container).getContext('2d')
+            const areaFrame = {
+                x: 0.0,
+                y: 0.0,
+                width: (this._owner._drawingCanvas || this._owner._container).width,
+                height: (this._owner._drawingCanvas || this._owner._container).height,
             }
-            if (onCanvas === undefined) {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            if (!this._owner._asChild) {
+                ctx.clearRect(areaFrame.x, areaFrame.y, areaFrame.width, areaFrame.height)
             }
-            ctx.save();
-            ctx.setTransform(
-                inRect.width / player._videoItem.videoSize.width,
-                0.0,
-                0.0,
-                inRect.width / player._videoItem.videoSize.width,
-                inRect.x,
-                (inRect.height - inRect.width / player._videoItem.videoSize.width * player._videoItem.videoSize.height) / 2.0 + inRect.y,
-            );
-            player._videoItem.sprites.forEach(sprite => {
-                let frameItem = sprite.frames[player._currentFrame];
+            this._owner._videoItem.sprites.forEach(sprite => {
+                let frameItem = sprite.frames[this._owner._currentFrame];
                 if (frameItem.alpha < 0.05) {
                     return;
                 }
                 ctx.save();
                 ctx.globalAlpha = frameItem.alpha;
                 ctx.transform(frameItem.transform.a, frameItem.transform.b, frameItem.transform.c, frameItem.transform.d, frameItem.transform.tx, frameItem.transform.ty)
-                let src = player._dynamicImage[sprite.imageKey] || player._videoItem.bitmapCache[sprite.imageKey] || player._videoItem.images[sprite.imageKey];
+                let src = this._owner._dynamicImage[sprite.imageKey] || this._owner._videoItem.bitmapCache[sprite.imageKey] || this._owner._videoItem.images[sprite.imageKey];
                 if (typeof src === "string") {
                     let imgTag = document.createElement('img');
                     if (src.indexOf("iVBO") === 0 || src.indexOf("/9j/2w") === 0) {
@@ -82,50 +71,48 @@ export class CanvasRender {
                     else {
                         imgTag.src = src;
                     }
-                    player._videoItem.bitmapCache[sprite.imageKey] = imgTag;
+                    this._owner._videoItem.bitmapCache[sprite.imageKey] = imgTag;
                     if (frameItem.maskPath !== undefined && frameItem.maskPath !== null) {
-                        frameItem.maskPath.getShape(CanvasRender).draw(ctx, true);
+                        this.drawBezier(ctx, frameItem.maskPath);
                         ctx.clip();
                     }
-                    if (player._dynamicImageTransform[sprite.imageKey] !== undefined) {
+                    if (this._owner._dynamicImageTransform[sprite.imageKey] !== undefined) {
                         ctx.save();
-                        const concatTransform = player._dynamicImageTransform[sprite.imageKey];
+                        const concatTransform = this._owner._dynamicImageTransform[sprite.imageKey];
                         ctx.transform(concatTransform[0], concatTransform[1], concatTransform[2], concatTransform[3], concatTransform[4], concatTransform[5]);
                     }
                     ctx.drawImage(imgTag, 0, 0);
-                    if (player._dynamicImageTransform[sprite.imageKey] !== undefined) {
+                    if (this._owner._dynamicImageTransform[sprite.imageKey] !== undefined) {
                         ctx.restore();
                     }
                 }
                 else if (typeof src === "object") {
                     if (frameItem.maskPath !== undefined && frameItem.maskPath !== null) {
-                        frameItem.maskPath.getShape(CanvasRender).draw(ctx, true);
+                        this.drawBezier(ctx, frameItem.maskPath);
                         ctx.clip();
                     }
-                    if (player._dynamicImageTransform[sprite.imageKey] !== undefined) {
+                    if (this._owner._dynamicImageTransform[sprite.imageKey] !== undefined) {
                         ctx.save();
-                        const concatTransform = player._dynamicImageTransform[sprite.imageKey];
+                        const concatTransform = this._owner._dynamicImageTransform[sprite.imageKey];
                         ctx.transform(concatTransform[0], concatTransform[1], concatTransform[2], concatTransform[3], concatTransform[4], concatTransform[5]);
                     }
                     ctx.drawImage(src, 0, 0);
-                    if (player._dynamicImageTransform[sprite.imageKey] !== undefined) {
+                    if (this._owner._dynamicImageTransform[sprite.imageKey] !== undefined) {
                         ctx.restore();
                     }
                 }
                 frameItem.shapes && frameItem.shapes.forEach(shape => {
                     if (shape.type === "shape" && shape.args && shape.args.d) {
-                        new BezierPath(shape.args.d, shape.transform, shape.styles).getShape(CanvasRender).draw(ctx);
+                        this.drawBezier(ctx, new BezierPath(shape.args.d, shape.transform, shape.styles))
                     }
                     if (shape.type === "ellipse" && shape.args) {
-                        let ellipse = new EllipsePath(parseFloat(shape.args.x) || 0.0, parseFloat(shape.args.y) || 0.0, parseFloat(shape.args.radiusX) || 0.0, parseFloat(shape.args.radiusY) || 0.0, shape.transform, shape.styles);
-                        ellipse.getShape(CanvasRender).draw(ctx);
+                        this.drawEllipse(ctx, new EllipsePath(parseFloat(shape.args.x) || 0.0, parseFloat(shape.args.y) || 0.0, parseFloat(shape.args.radiusX) || 0.0, parseFloat(shape.args.radiusY) || 0.0, shape.transform, shape.styles))
                     }
                     if (shape.type === "rect" && shape.args) {
-                        let rect = new RectPath(parseFloat(shape.args.x) || 0.0, parseFloat(shape.args.y) || 0.0, parseFloat(shape.args.width) || 0.0, parseFloat(shape.args.height) || 0.0, parseFloat(shape.args.cornerRadius) || 0.0, shape.transform, shape.styles);
-                        rect.getShape(CanvasRender).draw(ctx);
+                        this.drawRect(ctx, new RectPath(parseFloat(shape.args.x) || 0.0, parseFloat(shape.args.y) || 0.0, parseFloat(shape.args.width) || 0.0, parseFloat(shape.args.height) || 0.0, parseFloat(shape.args.cornerRadius) || 0.0, shape.transform, shape.styles))
                     }
                 })
-                let dynamicText = player._dynamicText[sprite.imageKey];
+                let dynamicText = this._owner._dynamicText[sprite.imageKey];
                 if (dynamicText !== undefined) {
                     ctx.textBaseline = "middle";
                     ctx.font = dynamicText.style;
@@ -137,194 +124,251 @@ export class CanvasRender {
                 }
                 ctx.restore();
             });
-            ctx.restore();
-        }
-    }
-
-    static Container() {
-        return {
-            setState: () => { },
-            removeAllChildren: () => { },
-            addChild: () => { },
-            children: () => [],
-        };
-    }
-
-    static AddTimer(callee, callback) {
-        let requestAnimationFrame;
-        if (window.requestAnimationFrame !== undefined) {
-            requestAnimationFrame = window.requestAnimationFrame;
         }
         else {
-            requestAnimationFrame = (callback) => { window.setTimeout(callback, 16) }
+            this._undrawFrame = frame;
         }
-        callee._canvasAnimating = true;
-        callee.drawOnCanvas = (canvas, x, y, width, height) => { CanvasRender.Draw(callee, canvas, { x, y, width, height }); }
-        let cancelled = false;
-        let doFrame = () => {
-            requestAnimationFrame(() => {
-                if (cancelled === false) {
-                    callback && callback.call(callee);
-                    doFrame();
-                }
-            });
+    }
+
+    resetShapeStyles(ctx, obj) {
+        const styles = obj._styles;
+        if (styles === undefined) { return; }
+        if (styles && styles.stroke) {
+            ctx.strokeStyle = `rgba(${parseInt(styles.stroke[0] * 255)}, ${parseInt(styles.stroke[1] * 255)}, ${parseInt(styles.stroke[2] * 255)}, ${styles.stroke[3]})`;
         }
-        doFrame();
-        return () => { callee._canvasAnimating = false; cancelled = true; };
+        else {
+            ctx.strokeStyle = "transparent"
+        }
+        if (styles) {
+            ctx.lineWidth = styles.strokeWidth || undefined;
+            ctx.lineCap = styles.lineCap || undefined;
+            ctx.lineJoin = styles.lineJoin || undefined;
+            ctx.miterLimit = styles.miterLimit || undefined;
+        }
+        if (styles && styles.fill) {
+            ctx.fillStyle = `rgba(${parseInt(styles.fill[0] * 255)}, ${parseInt(styles.fill[1] * 255)}, ${parseInt(styles.fill[2] * 255)}, ${styles.fill[3]})`
+        }
+        else {
+            ctx.fillStyle = "transparent"
+        }
+        if (styles && styles.lineDash) {
+            ctx.setLineDash(styles.lineDash);
+        }
     }
 
-    static RemoveTimer(callee, handler) {
-        return handler && handler();
-    }
-
-    static Matrix2D(a, b, c, d, tx, ty) {
-        return { a, b, c, d, tx, ty };
-    }
-
-    static Shape() {
-        let layer = {
-            draw: (ctx, noFill) => {
-                ctx.save();
-                if (layer.transform !== undefined && layer.transform !== null) {
-                    ctx.transform(layer.transform.a, layer.transform.b, layer.transform.c, layer.transform.d, layer.transform.tx, layer.transform.ty);
-                }
-                ctx.fillStyle = layer.graphics.fillStyle;
-                ctx.strokeStyle = layer.graphics.strokeStyle;
-                ctx.lineCap = layer.graphics.lineCap;
-                ctx.lineJoin = layer.graphics.lineJoin;
-                ctx.lineWidth = layer.graphics.lineWidth;
-                ctx.miterLimit = layer.graphics.miterLimit;
-                if (layer.graphics.strokeDash !== undefined) {
-                    const { arr, arg } = layer.graphics.strokeDash;
-                    const newArr = [];
-                    arr.forEach(item => newArr.push(item));
-                    newArr.push(arg);
-                    ctx.setLineDash(newArr);
-                }
-                if (layer.graphics.currentPath instanceof Array) {
-                    ctx.beginPath();
-                    layer.graphics.currentPath.forEach((item) => {
-                        if (item[0] === "moveTo") {
-                            ctx.moveTo(item[1], item[2]);
-                        }
-                        else if (item[0] === "lineTo") {
-                            ctx.lineTo(item[1], item[2]);
-                        }
-                        else if (item[0] === "bezierCurveTo") {
-                            ctx.bezierCurveTo(item[1], item[2], item[3], item[4], item[5], item[6]);
-                        }
-                        else if (item[0] === "quadraticCurveTo") {
-                            ctx.quadraticCurveTo(item[1], item[2], item[3], item[4]);
-                        }
-                        else if (item[0] === "closePath") {
-                            ctx.closePath();
-                        }
-                        else if (item[0] === "ellipse") {
-                            let x = item[1];
-                            let y = item[2];
-                            let w = item[3];
-                            let h = item[4];
-                            var kappa = .5522848,
-                                ox = (w / 2) * kappa,
-                                oy = (h / 2) * kappa,
-                                xe = x + w,
-                                ye = y + h,
-                                xm = x + w / 2,
-                                ym = y + h / 2;
-
-                            ctx.beginPath();
-                            ctx.moveTo(x, ym);
-                            ctx.bezierCurveTo(x, ym - oy, xm - ox, y, xm, y);
-                            ctx.bezierCurveTo(xm + ox, y, xe, ym - oy, xe, ym);
-                            ctx.bezierCurveTo(xe, ym + oy, xm + ox, ye, xm, ye);
-                            ctx.bezierCurveTo(xm - ox, ye, x, ym + oy, x, ym);
-                        }
-                        else if (item[0] === "rect") {
-                            let x = item[1];
-                            let y = item[2];
-                            let width = item[3];
-                            let height = item[4];
-                            let radius = item[5];
-                            ctx.beginPath();
-                            ctx.moveTo(x + radius, y);
-                            ctx.lineTo(x + width - radius, y);
-                            ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
-                            ctx.lineTo(x + width, y + height - radius);
-                            ctx.quadraticCurveTo(x + width, y + height, x + width - radius.br, y + height);
-                            ctx.lineTo(x + radius, y + height);
-                            ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
-                            ctx.lineTo(x, y + radius);
-                            ctx.quadraticCurveTo(x, y, x + radius, y);
-                            ctx.closePath();
-                        }
-                    })
-                }
-                layer.graphics.fillStyle && noFill !== true && ctx.fill();
-                layer.graphics.strokeStyle && ctx.stroke();
-                ctx.restore();
-            },
+    drawBezier(ctx, obj) {
+        ctx.save();
+        this.resetShapeStyles(ctx, obj);
+        if (obj._transform !== undefined && obj._transform !== null) {
+            ctx.transform(obj._transform.a, obj._transform.b, obj._transform.c, obj._transform.d, obj._transform.tx, obj._transform.ty);
+        }
+        let args = [];
+        let tempArg = [];
+        let items = obj._d.replace(/,/g, ' ').split(' ');
+        let point = {
+            x: 0,
+            y: 0,
         };
-        layer.setState = (state) => { layer.transform = state.transform; };
-        layer.graphics = {};
-        layer.graphics.currentPath = [];
-        layer.graphics.beginFill = (fillStyle) => {
-            layer.graphics.fillStyle = fillStyle;
-        }
-        layer.graphics.beginStroke = (stroke) => {
-            layer.graphics.strokeStyle = stroke;
-        }
-        layer.graphics.setStrokeStyle = (width, caps, joints, miterLimit) => {
-            layer.graphics.lineCap = caps;
-            layer.graphics.lineJoin = joints;
-            layer.graphics.lineWidth = width;
-            layer.graphics.miterLimit = miterLimit;
-        }
-        layer.graphics.setStrokeDash = (arr, arg) => {
-            layer.graphics.strokeDash = { arr, arg }
-        }
-        layer.graphics.st = (x, y) => {
-            layer.graphics.currentPath = [];
-        }
-        layer.graphics.mt = (x, y) => {
-            layer.graphics.currentPath.push(["moveTo", x, y]);
-        }
-        layer.graphics.lt = (x, y) => {
-            layer.graphics.currentPath.push(["lineTo", x, y]);
-        }
-        layer.graphics.bt = (x1, y1, x2, y2, x, y) => {
-            layer.graphics.currentPath.push(["bezierCurveTo", x1, y1, x2, y2, x, y]);
-        }
-        layer.graphics.qt = (x1, y1, x, y) => {
-            layer.graphics.currentPath.push(["quadraticCurveTo", x1, y1, x, y]);
-        }
-        layer.graphics.cp = () => {
-            layer.graphics.currentPath.push(["closePath"]);
-        }
-        layer.graphics.drawEllipse = (left, top, dX, dY) => {
-            layer.graphics.currentPath.push(["ellipse", left, top, dX, dY]);
-        }
-        layer.graphics.drawRoundRect = (x, y, width, height, cornerRadius) => {
-            layer.graphics.currentPath.push(["rect", x, y, width, height, cornerRadius]);
-        }
-        return layer;
-    }
-
-    static Bitmap(src) {
-        return {};
-    }
-
-    static Text(text, style, color) {
-        let layer = { text, style, color }
-        layer.setState = (state) => {
-            for (var key in state) {
-                layer[key] = state[key];
+        for (let i = 0; i < items.length; i++) {
+            let item = items[i];
+            if (item.length < 1) {
+                continue;
             }
-        };
-        return layer;
+            let firstLetter = item.substr(0, 1);
+            if (validMethods.indexOf(firstLetter) >= 0) {
+                if (tempArg.length > 0) {
+                    args.push(tempArg);
+                    tempArg = [];
+                }
+                tempArg.push(firstLetter);
+                if (item.substr(1).trim().length > 0) {
+                    tempArg.push(item.substr(1));
+                }
+            } else {
+                tempArg.push(item);
+            }
+        }
+        if (tempArg.length > 0) {
+            args.push(tempArg);
+            tempArg = [];
+        }
+        ctx.beginPath();
+        for (let i = 0; i < args.length; i++) {
+            let arg = args[i];
+            if (!(arg[0] == 'C' || arg[0] == 'c')) {
+                delete (point.x1);
+                delete (point.y1);
+                delete (point.x2);
+                delete (point.y2);
+            }
+            switch (arg[0]) {
+                case 'M':
+                    point.x = Number(arg[1]);
+                    point.y = Number(arg[2]);
+                    ctx.moveTo(point.x, point.y);
+                    break;
+                case 'm':
+                    point.x += Number(arg[1]);
+                    point.y += Number(arg[2]);
+                    ctx.moveTo(point.x, point.y);
+                    break;
+                case 'L':
+                    point.x = Number(arg[1]);
+                    point.y = Number(arg[2]);
+                    ctx.lineTo(point.x, point.y);
+                    break;
+                case 'l':
+                    point.x += Number(arg[1]);
+                    point.y += Number(arg[2]);
+                    ctx.lineTo(point.x, point.y);
+                    break;
+                case 'H':
+                    point.x = Number(arg[1]);
+                    ctx.lineTo(point.x, point.y);
+                    break;
+                case 'h':
+                    point.x += Number(arg[1]);
+                    ctx.lineTo(point.x, point.y);
+                    break;
+                case 'V':
+                    point.y = Number(arg[1]);
+                    ctx.lineTo(point.x, point.y);
+                    break;
+                case 'v':
+                    point.y += Number(arg[1]);
+                    ctx.lineTo(point.x, point.y);
+                    break;
+                case 'C':
+                    point.x1 = Number(arg[1]);
+                    point.y1 = Number(arg[2]);
+                    point.x2 = Number(arg[3]);
+                    point.y2 = Number(arg[4]);
+                    point.x = Number(arg[5]);
+                    point.y = Number(arg[6]);
+                    ctx.bezierCurveTo(point.x1, point.y1, point.x2, point.y2, point.x, point.y);
+                    break;
+                case 'c':
+                    point.x1 = point.x + Number(arg[1]);
+                    point.y1 = point.y + Number(arg[2]);
+                    point.x2 = point.x + Number(arg[3]);
+                    point.y2 = point.y + Number(arg[4]);
+                    point.x += Number(arg[5]);
+                    point.y += Number(arg[6]);
+                    ctx.bezierCurveTo(point.x1, point.y1, point.x2, point.y2, point.x, point.y);
+                    break;
+                case 'S':
+                    if (point.x1 && point.y1 && point.x2 && point.y2) {
+                        point.x1 = point.x - point.x2 + point.x;
+                        point.y1 = point.y - point.y2 + point.y;
+                        point.x2 = Number(arg[1]);
+                        point.y2 = Number(arg[2]);
+                        point.x = Number(arg[3]);
+                        point.y = Number(arg[4]);
+                        ctx.bezierCurveTo(point.x1, point.y1, point.x2, point.y2, point.x, point.y);
+                    } else {
+                        point.x1 = Number(arg[1]);
+                        point.y1 = Number(arg[2]);
+                        point.x = Number(arg[3]);
+                        point.y = Number(arg[4]);
+                        ctx.quadraticCurveTo(point.x1, point.y1, point.x, point.y);
+                    }
+                    break;
+                case 's':
+                    if (point.x1 && point.y1 && point.x2 && point.y2) {
+                        point.x1 = point.x - point.x2 + point.x;
+                        point.y1 = point.y - point.y2 + point.y;
+                        point.x2 = point.x + Number(arg[1]);
+                        point.y2 = point.y + Number(arg[2]);
+                        point.x += Number(arg[3]);
+                        point.y += Number(arg[4]);
+                        ctx.bezierCurveTo(point.x1, point.y1, point.x2, point.y2, point.x, point.y);
+                    } else {
+                        point.x1 = point.x + Number(arg[1]);
+                        point.y1 = point.y + Number(arg[2]);
+                        point.x += Number(arg[3]);
+                        point.y += Number(arg[4]);
+                        ctx.quadraticCurveTo(point.x1, point.y1, point.x, point.y);
+                    }
+                    break;
+                case 'Q':
+                    point.x1 = Number(arg[1]);
+                    point.y1 = Number(arg[2]);
+                    point.x = Number(arg[3]);
+                    point.y = Number(arg[4]);
+                    ctx.quadraticCurveTo(point.x1, point.y1, point.x, point.y);
+                    break;
+                case 'q':
+                    point.x1 = point.x + Number(arg[1]);
+                    point.y1 = point.y + Number(arg[2]);
+                    point.x += Number(arg[3]);
+                    point.y += Number(arg[4]);
+                    ctx.quadraticCurveTo(point.x1, point.y1, point.x, point.y);
+                    break;
+                case 'A':
+                    break;
+                case 'a':
+                    break;
+                case 'Z':
+                case 'z':
+                    ctx.closePath();
+                    break;
+                default:
+                    break;
+            }
+        }
+        ctx.restore();
     }
 
-    static setBounds(layer, bounds) {
-        return undefined;
+    drawEllipse(ctx, obj) {
+        ctx.save();
+        this.resetShapeStyles(ctx, obj);
+        if (obj._transform !== undefined && obj._transform !== null) {
+            ctx.transform(obj._transform.a, obj._transform.b, obj._transform.c, obj._transform.d, obj._transform.tx, obj._transform.ty);
+        }
+        let x = obj._x - obj._radiusX;
+        let y = obj._y - obj._radiusY;
+        let w = obj._radiusX * 2;
+        let h = obj._radiusY * 2;
+        var kappa = .5522848,
+            ox = (w / 2) * kappa,
+            oy = (h / 2) * kappa,
+            xe = x + w,
+            ye = y + h,
+            xm = x + w / 2,
+            ym = y + h / 2;
+
+        ctx.beginPath();
+        ctx.moveTo(x, ym);
+        ctx.bezierCurveTo(x, ym - oy, xm - ox, y, xm, y);
+        ctx.bezierCurveTo(xm + ox, y, xe, ym - oy, xe, ym);
+        ctx.bezierCurveTo(xe, ym + oy, xm + ox, ye, xm, ye);
+        ctx.bezierCurveTo(xm - ox, ye, x, ym + oy, x, ym);
+        ctx.restore();
+    }
+
+    drawRect(ctx, obj) {
+        ctx.save();
+        this.resetShapeStyles(ctx, obj);
+        if (obj._transform !== undefined && obj._transform !== null) {
+            ctx.transform(obj._transform.a, obj._transform.b, obj._transform.c, obj._transform.d, obj._transform.tx, obj._transform.ty);
+        }
+        let x = obj._x;
+        let y = obj._y;
+        let width = obj._width;
+        let height = obj._height;
+        let radius = obj._cornerRadius;
+        ctx.beginPath();
+        ctx.moveTo(x + radius, y);
+        ctx.lineTo(x + width - radius, y);
+        ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+        ctx.lineTo(x + width, y + height - radius);
+        ctx.quadraticCurveTo(x + width, y + height, x + width - radius.br, y + height);
+        ctx.lineTo(x + radius, y + height);
+        ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+        ctx.lineTo(x, y + radius);
+        ctx.quadraticCurveTo(x, y, x + radius, y);
+        ctx.closePath();
+        ctx.restore();
     }
 
 }

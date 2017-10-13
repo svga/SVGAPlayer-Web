@@ -1,55 +1,57 @@
 'use strict';
 
-import { CanvasRender } from './render'
+import { Render } from './render'
+import { Ticker } from './ticker'
 
 export class Player {
 
-    render = undefined;
     loops = 0;
     clearsAfterStop = true;
     isPaused = false;
 
-    constructor(canvas) {
-        this._canvas = typeof canvas === "string" ? document.querySelector(canvas) : canvas;
-        if (this._canvas instanceof HTMLDivElement) {
+    constructor(container, asChild) {
+        this._container = typeof container === "string" ? document.querySelector(container) : container;
+        this._asChild = asChild === true
+        this.init();
+    }
+
+    init() {
+        if (this._container instanceof HTMLDivElement) {
             this._drawingCanvas = document.createElement('canvas');
             this._drawingCanvas.style.backgroundColor = "transparent"
-            this._canvas.appendChild(this._drawingCanvas);
+            this._container.appendChild(this._drawingCanvas);
         }
-        this.render = CanvasRender;
-        this.resetRootStage();
-    }
-
-    container(stage) {
-        this._stage = stage;
-        return this._rootLayer;
-    }
-
-    resetRootStage() {
-        if (this._canvas !== undefined) {
-            this._rootLayer = this.render.Stage(this._canvas);
-            this._stage = this._rootLayer;
-        }
-        else {
-            this._rootLayer = this.render.Container();
-        }
+        this._render = new Render(this);
+        this._ticker = new Ticker(this);
     }
 
     setVideoItem(videoItem) {
         this._videoItem = videoItem;
+        this._render.prepare();
         if (this._drawingCanvas) {
             this._drawingCanvas.width = this._videoItem.videoSize.width;
             this._drawingCanvas.height = this._videoItem.videoSize.height;
         }
         this.clear();
-        this._draw();
+        this._update();
+    }
+
+    setContentMode(contentMode) {
+        this._contentMode = contentMode;
+        this._update();
+    }
+
+    setClipsToBounds(clipsToBounds) {
+        if (this._container instanceof HTMLDivElement) {
+            this._container.style.overflowX = this._container.style.overflowY = clipsToBounds ? "hidden" : undefined;
+        }
     }
 
     startAnimation() {
         this.isPaused = false;
         this.stopAnimation(false);
         this._loopCount = 0;
-        this._tickListener = this.render.AddTimer(this, this._onTick);
+        this._ticker.start();
     }
 
     pauseAnimation() {
@@ -61,7 +63,7 @@ export class Player {
         if (clear === undefined) {
             clear = this.clearsAfterStop;
         }
-        this.render.RemoveTimer(this, this._tickListener);
+        this._ticker.stop();
         if (clear) {
             this.clear();
         }
@@ -69,8 +71,6 @@ export class Player {
 
     clear() {
         this.isPaused = false;
-        this._rootLayer.removeAllChildren();
-        this._stage && this._stage.update(this);
     }
 
     stepToFrame(frame, andPlay) {
@@ -82,7 +82,7 @@ export class Player {
         this._update();
         if (andPlay) {
             this.isPaused = false;
-            this._tickListener = this.render.AddTimer(this, this._onTick);
+            this._ticker.start();
         }
     }
 
@@ -107,7 +107,7 @@ export class Player {
         let family = (typeof textORMap === "object" ? textORMap.family : "") || "";
         let color = (typeof textORMap === "object" ? textORMap.color : "#000000") || "#000000";
         let offset = (typeof textORMap === "object" ? textORMap.offset : { x: 0.0, y: 0.0 }) || { x: 0.0, y: 0.0 };
-        let textLayer = this.render.Text(text, `${size} family`, color);
+        let textLayer = this._render.Text(text, `${size} family`, color);
         textLayer.setState({ offset });
         this._dynamicText[forKey] = textLayer;
     }
@@ -134,23 +134,24 @@ export class Player {
      * Private methods & properties
      */
 
-    _canvas = ''
+    _asChild = false;
+    _container = undefined;
+    _render = undefined;
+    _ticker = undefined;
     _drawingCanvas = undefined;
-    _stage = null;
+    _contentMode = "AspectFit"
     _videoItem = null;
     _rootLayer = null;
-    _drawLayer = null;
     _loopCount = 0;
     _currentFrame = 0;
-    _tickListener = null;
     _dynamicImage = {};
     _dynamicImageTransform = {};
     _dynamicText = {};
     _onFinished = null;
     _onFrame = null;
     _onPercentage = null;
-
     _nextTickTime = 0;
+
     _onTick() {
         if (typeof this._videoItem === "object") {
             if ((new Date()).getTime() >= this._nextTickTime) {
@@ -181,63 +182,64 @@ export class Player {
         }
     }
 
-    _draw() {
-        let self = this;
-        this._drawLayer = this.render.Container();
-        this.render.setBounds(this._drawLayer, { x: 0.0, y: 0.0, width: this._videoItem.videoSize.width, height: this._videoItem.videoSize.height })
-        this._videoItem.sprites.forEach(function (sprite) {
-            let bitmap;
-            if (sprite.imageKey) {
-                bitmap = self._dynamicImage[sprite.imageKey] || self._videoItem.images[sprite.imageKey];
+    _resize() {
+        if (this._drawingCanvas && this._drawingCanvas.parentNode) {
+            let scaleX = 1.0; let scaleY = 1.0; let translateX = 0.0; let translateY = 0.0;
+            let targetSize = { width: this._drawingCanvas.parentNode.clientWidth, height: this._drawingCanvas.parentNode.clientHeight };
+            let imageSize = this._videoItem.videoSize;
+            if (this._contentMode === "Fill") {
+                const scaleX = targetSize.width / imageSize.width;
+                const scaleY = targetSize.height / imageSize.height;
+                const translateX = (imageSize.width * scaleX - imageSize.width) / 2.0
+                const translateY = (imageSize.height * scaleY - imageSize.height) / 2.0
+                this._drawingCanvas.style.transform = "matrix(" + scaleX + ", 0.0, 0.0, " + scaleY + ", " + translateX + ", " + translateY + ")"
             }
-            let contentLayer = sprite.requestLayer(bitmap, self._dynamicImageTransform[sprite.imageKey], self.render);
-            if (sprite.imageKey) {
-                if (self._dynamicText[sprite.imageKey]) {
-                    contentLayer.textLayer = self._dynamicText[sprite.imageKey];
-                    contentLayer.addChild(self._dynamicText[sprite.imageKey])
+            else if (this._contentMode === "AspectFit" || this._contentMode === "AspectFill") {
+                const imageRatio = imageSize.width / imageSize.height;
+                const viewRatio = targetSize.width / targetSize.height;
+                if ((imageRatio >= viewRatio && this._contentMode === "AspectFit") || (imageRatio < viewRatio && this._contentMode === "AspectFill")) {
+                    const scale = targetSize.width / imageSize.width;
+                    const translateX = (imageSize.width * scale - imageSize.width) / 2.0
+                    const translateY = (imageSize.height * scale - imageSize.height) / 2.0 + (targetSize.height - imageSize.height * scale) / 2.0
+                    this._drawingCanvas.style.transform = "matrix(" + scale + ", 0.0, 0.0, " + scale + ", " + translateX + ", " + translateY + ")"
+                }
+                else if ((imageRatio < viewRatio && this._contentMode === "AspectFit") || (imageRatio > viewRatio && this._contentMode === "AspectFill")) {
+                    const scale = targetSize.height / imageSize.height;
+                    const translateX = (imageSize.width * scale - imageSize.width) / 2.0 + (targetSize.width - imageSize.width * scale) / 2.0
+                    const translateY = (imageSize.height * scale - imageSize.height) / 2.0
+                    this._drawingCanvas.style.transform = "matrix(" + scale + ", 0.0, 0.0, " + scale + ", " + translateX + ", " + translateY + ")"
                 }
             }
-            self._drawLayer.addChild(contentLayer);
-        })
-        this._rootLayer.addChild(this._drawLayer);
-        this._currentFrame = 0;
-        this._update();
-    }
-
-    _resize() {
-        if (this._canvas !== undefined) {
-            this._canvas.width = this._canvas.offsetWidth;
-            this._canvas.height = this._canvas.offsetHeight;
-            let ratio = this._canvas.offsetWidth / this._videoItem.videoSize.width;
-            this._drawLayer.setState({
-                transform: this.render.Matrix2D(ratio, 0.0, 0.0, ratio, 0.0, 0.0)
-            })
         }
         else {
-            let ratio = this._rootLayer.width / this._videoItem.videoSize.width;
-            this._drawLayer.setState({
-                transform: this.render.Matrix2D(ratio, 0.0, 0.0, ratio, 0.0, 0.0)
-            })
-        }
-        if (this._drawingCanvas.parentNode) {
-            const scaleX = this._drawingCanvas.parentNode.clientWidth / this._drawingCanvas.width;
-            const scaleY = this._drawingCanvas.parentNode.clientHeight / this._drawingCanvas.height;
-            const translateX = (this._drawingCanvas.width * scaleX - this._drawingCanvas.width) / 2.0
-            const translateY = (this._drawingCanvas.height * scaleY - this._drawingCanvas.height) / 2.0
-            this._drawingCanvas.style.transform = "matrix(" + scaleX + ", 0.0, 0.0, " + scaleY + ", " + translateX + ", " + translateY + ")"
+            let scaleX = 1.0; let scaleY = 1.0; let translateX = 0.0; let translateY = 0.0;
+            let targetSize = { width: this._container !== undefined ? this._container.clientWidth : this._rootLayer.width, height: this._container !== undefined ? this._container.clientHeight : this._rootLayer.height };
+            let imageSize = this._videoItem.videoSize;
+            if (this._contentMode === "Fill") {
+                scaleX = targetSize.width / imageSize.width;
+                scaleY = targetSize.height / imageSize.height;
+            }
+            else if (this._contentMode === "AspectFit" || this._contentMode === "AspectFill") {
+                const imageRatio = imageSize.width / imageSize.height;
+                const viewRatio = targetSize.width / targetSize.height;
+                if ((imageRatio >= viewRatio && this._contentMode === "AspectFit") || (imageRatio < viewRatio && this._contentMode === "AspectFill")) {
+                    scaleX = scaleY = targetSize.width / imageSize.width;
+                    translateY = (targetSize.height - imageSize.height * scaleY) / 2.0
+                }
+                else if ((imageRatio < viewRatio && this._contentMode === "AspectFit") || (imageRatio > viewRatio && this._contentMode === "AspectFill")) {
+                    scaleX = scaleY = targetSize.height / imageSize.height;
+                    translateX = (targetSize.width - imageSize.width * scaleX) / 2.0
+                }
+            }
+            // this._drawLayer.setState({
+            //     transform: this._render.Matrix2D(scaleX, 0.0, 0.0, scaleY, translateX, translateY)
+            // })
         }
     }
 
     _update() {
-        let children = this._drawLayer.children instanceof Array ? this._drawLayer.children : this._drawLayer.children();
-        for (let index = 0; index < children.length; index++) {
-            let child = children[index];
-            if (typeof child.stepToFrame === "function") {
-                child.stepToFrame(this._currentFrame);
-            }
-        }
         this._resize();
-        this._stage && this._stage.update(this);
+        this._render.drawFrame(this._currentFrame);
     }
 
 }
