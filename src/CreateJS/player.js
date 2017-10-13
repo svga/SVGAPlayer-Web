@@ -42,7 +42,7 @@ export class Player extends createjs.Container {
         this._tickListener = () => {
             this._onTick();
         }
-        createjs.Ticker.setFPS(60);
+        createjs.Ticker.framerate = 60;
         createjs.Ticker.addEventListener("tick", this._tickListener);
     }
 
