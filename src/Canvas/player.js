@@ -156,8 +156,8 @@ export class Player {
 
     _onTick() {
         if (typeof this._videoItem === "object") {
-            if ((new Date()).getTime() >= this._nextTickTime) {
-                this._nextTickTime = parseInt(1000 / this._videoItem.FPS) + (new Date()).getTime() - (60 / this._videoItem.FPS) * 2
+            if (performance.now() >= this._nextTickTime) {
+                this._nextTickTime = parseInt(1000 / this._videoItem.FPS) + performance.now() - (60 / this._videoItem.FPS) * 2
                 this._next();
             }
         }

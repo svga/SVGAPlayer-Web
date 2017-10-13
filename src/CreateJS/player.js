@@ -1,59 +1,50 @@
 'use strict';
 
-import { CreateJSRender } from './render'
+import { Renderer } from './render'
 import { Parser } from '../parser'
 
-export class Player {
+export class Player extends createjs.Container {
 
-    render = undefined;
     loops = 0;
     clearsAfterStop = true;
-    isPaused = false;
 
-    static requestContainer(stage, url, success, failure) {
+    constructor(url, autoplay) {
+        super();
         (new Parser()).load(url, (videoItem) => {
-            const player = new Player();
-            player.setVideoItem(videoItem);
-            success(player.container(stage), player);
-        }, failure);
-    }
-
-    constructor(canvas) {
-        this._canvas = typeof canvas === "string" ? document.querySelector(canvas) : canvas;
-        this.render = CreateJSRender;
-        this.resetRootStage();
-    }
-
-    container(stage) {
-        this._stage = stage;
-        return this._rootLayer;
-    }
-
-    resetRootStage() {
-        if (this._canvas !== undefined) {
-            this._rootLayer = this.render.Stage(this._canvas);
-            this._stage = this._rootLayer;
-        }
-        else {
-            this._rootLayer = this.render.Container();
-        }
+            this.setVideoItem(videoItem);
+            if (autoplay !== false) {
+                this.startAnimation();
+            }
+        })
+        this._renderer = new Renderer(this);
     }
 
     setVideoItem(videoItem) {
         this._videoItem = videoItem;
-        this.clear();
-        this._draw();
+        this.removeAllChildren();
+        this._addLayers();
+    }
+
+    setContentMode(contentMode) {
+        this._contentMode = contentMode;
+        this._update();
+    }
+
+    setClipsToBounds(clipsToBounds) {
+        
     }
 
     startAnimation() {
-        this.isPaused = false;
         this.stopAnimation(false);
         this._loopCount = 0;
-        this._tickListener = this.render.AddTimer(this, this._onTick);
+        this._tickListener = () => {
+            this._onTick();
+        }
+        createjs.Ticker.setFPS(60);
+        createjs.Ticker.addEventListener("tick", this._tickListener);
     }
 
     pauseAnimation() {
-        this.isPaused = true;
         this.stopAnimation(false);
     }
 
@@ -61,16 +52,16 @@ export class Player {
         if (clear === undefined) {
             clear = this.clearsAfterStop;
         }
-        this.render.RemoveTimer(this, this._tickListener);
+        createjs.Ticker.removeEventListener("tick", this._tickListener);
         if (clear) {
             this.clear();
         }
     }
 
     clear() {
-        this.isPaused = false;
-        this._rootLayer.removeAllChildren();
-        this._stage && this._stage.update(this);
+        if (this.stage != null) {
+            this.stage.update();
+        }
     }
 
     stepToFrame(frame, andPlay) {
@@ -81,7 +72,6 @@ export class Player {
         this._currentFrame = frame;
         this._update();
         if (andPlay) {
-            this.isPaused = false;
             this._tickListener = this.render.AddTimer(this, this._onTick);
         }
     }
@@ -134,11 +124,9 @@ export class Player {
      * Private methods & properties
      */
 
-    _canvas = ''
-    _stage = null;
+    _renderer = undefined;
+    _contentMode = "AspectFit"
     _videoItem = null;
-    _rootLayer = null;
-    _drawLayer = null;
     _loopCount = 0;
     _currentFrame = 0;
     _tickListener = null;
@@ -148,12 +136,12 @@ export class Player {
     _onFinished = null;
     _onFrame = null;
     _onPercentage = null;
-
     _nextTickTime = 0;
+
     _onTick() {
         if (typeof this._videoItem === "object") {
-            if ((new Date()).getTime() >= this._nextTickTime) {
-                this._nextTickTime = parseInt(1000 / this._videoItem.FPS) + (new Date()).getTime() - (60 / this._videoItem.FPS) * 2
+            if (performance.now() >= this._nextTickTime) {
+                this._nextTickTime = parseInt(1000 / this._videoItem.FPS) + performance.now() - (60 / this._videoItem.FPS) * 2
                 this._next();
             }
         }
@@ -180,56 +168,43 @@ export class Player {
         }
     }
 
-    _draw() {
-        let self = this;
-        this._drawLayer = this.render.Container();
-        this.render.setBounds(this._drawLayer, { x: 0.0, y: 0.0, width: this._videoItem.videoSize.width, height: this._videoItem.videoSize.height })
-        this._videoItem.sprites.forEach(function (sprite) {
-            let bitmap;
-            if (sprite.imageKey) {
-                bitmap = self._dynamicImage[sprite.imageKey] || self._videoItem.images[sprite.imageKey];
-            }
-            let contentLayer = sprite.requestLayer(bitmap, self._dynamicImageTransform[sprite.imageKey], self.render);
-            if (sprite.imageKey) {
-                if (self._dynamicText[sprite.imageKey]) {
-                    contentLayer.textLayer = self._dynamicText[sprite.imageKey];
-                    contentLayer.addChild(self._dynamicText[sprite.imageKey])
-                }
-            }
-            self._drawLayer.addChild(contentLayer);
+    _addLayers() {
+        this._videoItem.sprites.forEach((sprite) =>  {
+            this.addChild(this._renderer.requestContentLayer(sprite));
         })
-        this._rootLayer.addChild(this._drawLayer);
         this._currentFrame = 0;
         this._update();
     }
 
     _resize() {
-        if (this._canvas !== undefined) {
-            this._canvas.width = this._canvas.offsetWidth;
-            this._canvas.height = this._canvas.offsetHeight;
-            let ratio = this._canvas.offsetWidth / this._videoItem.videoSize.width;
-            this._drawLayer.setState({
-                transform: this.render.Matrix2D(ratio, 0.0, 0.0, ratio, 0.0, 0.0)
-            })
+        let scaleX = 1.0; let scaleY = 1.0; let translateX = 0.0; let translateY = 0.0;
+        let targetSize = { width: this.width, height: this.height };
+        let imageSize = this._videoItem.videoSize;
+        if (this._contentMode === "Fill") {
+            scaleX = targetSize.width / imageSize.width;
+            scaleY = targetSize.height / imageSize.height;
         }
-        else {
-            let ratio = this._rootLayer.width / this._videoItem.videoSize.width;
-            this._drawLayer.setState({
-                transform: this.render.Matrix2D(ratio, 0.0, 0.0, ratio, 0.0, 0.0)
-            })
+        else if (this._contentMode === "AspectFit" || this._contentMode === "AspectFill") {
+            const imageRatio = imageSize.width / imageSize.height;
+            const viewRatio = targetSize.width / targetSize.height;
+            if ((imageRatio >= viewRatio && this._contentMode === "AspectFit") || (imageRatio < viewRatio && this._contentMode === "AspectFill")) {
+                scaleX = scaleY = targetSize.width / imageSize.width;
+                translateY = (targetSize.height - imageSize.height * scaleY) / 2.0
+            }
+            else if ((imageRatio < viewRatio && this._contentMode === "AspectFit") || (imageRatio > viewRatio && this._contentMode === "AspectFill")) {
+                scaleX = scaleY = targetSize.height / imageSize.height;
+                translateX = (targetSize.width - imageSize.width * scaleX) / 2.0
+            }
         }
+        this.transformMatrix = { a: scaleX, b: 0.0, c: 0.0, d: scaleY, tx: this.x + translateX, ty: this.y + translateY };
     }
 
     _update() {
-        let children = this._drawLayer.children instanceof Array ? this._drawLayer.children : this._drawLayer.children();
-        for (let index = 0; index < children.length; index++) {
-            let child = children[index];
-            if (typeof child.stepToFrame === "function") {
-                child.stepToFrame(this._currentFrame);
-            }
-        }
         this._resize();
-        this._stage && this._stage.update(this);
+        this._renderer.drawFrame(this._currentFrame);
+        if (this.stage != null) {
+            this.stage.update();
+        }
     }
 
 }
