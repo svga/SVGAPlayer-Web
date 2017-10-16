@@ -23,9 +23,9 @@ export class Player {
     pauseAnimation(): void
     stopAnimation(clear?: boolean): void
     clear(): void
-    stepToFrame(frame: number, andPlay: boolean): void
-    stepToPercentage(percentage: number, andPlay: boolean): void
-    setImage(urlORbase64: string, forKey: string, transform: number[]): void
+    stepToFrame(frame: number, andPlay?: boolean): void
+    stepToPercentage(percentage: number, andPlay?: boolean): void
+    setImage(urlORbase64: string, forKey: string, transform?: number[]): void
     setText(textORMap: string | {
         text: string,
         size?: string,

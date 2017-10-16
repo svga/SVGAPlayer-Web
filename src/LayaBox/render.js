@@ -273,7 +273,7 @@ export class Renderer {
                 contentLayer.addChild(this.requestBitmapLayer(bitmap, this._owner._dynamicImageTransform[sprite.imageKey], sprite.frames));
             }
             if (this._owner._dynamicText[sprite.imageKey]) {
-                this.textLayer = this._owner._dynamicText[sprite.imageKey];
+                contentLayer.textLayer = this._owner._dynamicText[sprite.imageKey];
                 contentLayer.addChild(this._owner._dynamicText[sprite.imageKey])
             }
         }
@@ -291,12 +291,11 @@ export class Renderer {
                         contentLayer.mask = Renderer.requestBezierShape(frameItem.maskPath);
                         contentLayer.mask.transform = contentLayer.transform;
                     }
-                    if (this.textLayer) {
-                        let offsetX = (layer.textLayer.offset !== undefined && layer.textLayer.offset.x !== undefined) ? layer.textLayer.offset.x : 0;
-                        let offsetY = (layer.textLayer.offset !== undefined && layer.textLayer.offset.y !== undefined) ? layer.textLayer.offset.y : 0;
-                        this.textLayer.textBaseline = "middle";
-                        this.textLayer.x = (frameItem.layout.width - layer.textLayer.getBounds().width) / 2.0 + offsetX;
-                        this.textLayer.y = frameItem.layout.height / 2.0 + offsetY;
+                    if (contentLayer.textLayer) {
+                        let offsetX = (contentLayer.textLayer.offset !== undefined && contentLayer.textLayer.offset.x !== undefined) ? contentLayer.textLayer.offset.x : 0;
+                        let offsetY = (contentLayer.textLayer.offset !== undefined && contentLayer.textLayer.offset.y !== undefined) ? contentLayer.textLayer.offset.y : 0;
+                        contentLayer.textLayer.x = (frameItem.layout.width - contentLayer.textLayer.getBounds().width) / 2.0 + offsetX;
+                        contentLayer.textLayer.y = (frameItem.layout.height - contentLayer.textLayer.getBounds().height) / 2.0 + offsetY;
                     }
                 }
                 else {
@@ -334,7 +333,7 @@ export class Renderer {
     drawFrame(frame) {
         for (let index = 0; index < this._owner.numChildren; index++) {
             const child = this._owner.getChildAt(index);
-            child.stepToFrame(frame);
+            child.stepToFrame && child.stepToFrame(frame);
         }
     }
 
@@ -542,12 +541,6 @@ export class Renderer {
             shape.transform = new Laya.Matrix(obj._transform.a, obj._transform.b, obj._transform.c, obj._transform.d, obj._transform.tx, obj._transform.ty);
         }
         return shape;
-    }
-
-    static Text(text, style, color) {
-        let layer = new Laya.Text();
-        // layer.setState = (state) => { CreateJSRender.setState(layer, state); }
-        return layer;
     }
 
 }

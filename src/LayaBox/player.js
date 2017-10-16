@@ -73,7 +73,7 @@ export class Player extends Laya.Sprite {
         this._currentFrame = frame;
         this._update();
         if (andPlay) {
-            this._tickListener = this.render.AddTimer(this, this._onTick);
+            Laya.timer.frameLoop(1, this, this._onTick.bind(this));
         }
     }
 
@@ -98,8 +98,16 @@ export class Player extends Laya.Sprite {
         let family = (typeof textORMap === "object" ? textORMap.family : "") || "";
         let color = (typeof textORMap === "object" ? textORMap.color : "#000000") || "#000000";
         let offset = (typeof textORMap === "object" ? textORMap.offset : { x: 0.0, y: 0.0 }) || { x: 0.0, y: 0.0 };
-        let textLayer = this.render.Text(text, `${size} family`, color);
-        textLayer.setState({ offset });
+        let textLayer = new Laya.Text();
+        textLayer.text = text;
+        textLayer.fontSize = isNaN(parseInt(size.split(' ')[0])) ? 14 : parseInt(size.split(' ')[0]);;
+        textLayer.color = color;
+        textLayer.align = "center";
+        textLayer.valign = "middle";
+        if (textLayer.y !== undefined) {
+            textLayer.y = textLayer.y - textLayer.textHeight / 2.0;
+        }
+        textLayer.offset = offset;
         this._dynamicText[forKey] = textLayer;
     }
 
