@@ -10,12 +10,13 @@
     <script src="../build/svga.createjs.min.js"></script>
     <script>
 
-        var sprite = new SVGA.createjs.Player('./samples/kingset.svga');
+        var sprite = new SVGA.createjs.Player('./samples/rose_2.0.0.svga');
         sprite.onError((err) => {
             console.error(err)
         })
-        sprite.setImage('./samples/avatar.png', "99");
-        sprite.setText({ text: '崔小姐不吃鱼 送了帝王套', size: "24px", color: "#ffe0a4" }, "banner");
+        sprite.loops = 1;
+        sprite.clearsAfterStop = false;
+        // sprite.fillMode = "Backward";
         var stage = new createjs.Stage('demoCanvas');
         sprite.x = 0;
         sprite.y = 0;

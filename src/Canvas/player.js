@@ -7,6 +7,7 @@ export class Player {
 
     loops = 0;
     clearsAfterStop = true;
+    fillMode = "Forward";
 
     constructor(container) {
         this._container = typeof container === "string" ? document.querySelector(container) : container;
@@ -173,6 +174,9 @@ export class Player {
             this._loopCount++;
             if (this.loops > 0 && this._loopCount >= this.loops) {
                 this.stopAnimation();
+                if (!this.clearsAfterStop && this.fillMode === "Backward") {
+                    this.stepToFrame(0)
+                }
                 if (typeof this._onFinished === "function") {
                     this._onFinished();
                 }

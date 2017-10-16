@@ -11,9 +11,7 @@
     <script>
         var parser = new SVGA.Parser()
         var player = new SVGA.Player('#testCanvas')
-        player.setImage('./samples/avatar.png', "99");
-        player.setText({ text: '崔小姐不吃鱼 送了帝王套', size: "24px", color: "#ffe0a4" }, "banner");
-        parser.load("./samples/kingset.svga", function (videoItem) {
+        parser.load("./samples/rose_2.0.0.svga", function (videoItem) {
             player.setVideoItem(videoItem);
             player.startAnimation()
         })

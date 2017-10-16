@@ -70,6 +70,7 @@ You use SVGA.Player controls animation play and stop.
 
 * int loops; - Animation loop count, defaults to 0 means infinity loop.
 * BOOL clearsAfterStop; - defaults to true, means player will clear all contents after stop.
+* string fillMode; - defaults to Forward，optional Forward / Backward，fillMode = Forward，Animation will pause on last frame while finished，fillMode = Backward , Animation will pause on first frame.
 
 #### Methods
 

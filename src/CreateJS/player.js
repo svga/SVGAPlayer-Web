@@ -7,6 +7,7 @@ export class Player extends createjs.Container {
 
     loops = 0;
     clearsAfterStop = true;
+    fillMode = "Forward";
 
     constructor(url, autoplay) {
         super();
@@ -163,9 +164,13 @@ export class Player extends createjs.Container {
             this._loopCount++;
             if (this.loops > 0 && this._loopCount >= this.loops) {
                 this.stopAnimation();
+                if (!this.clearsAfterStop && this.fillMode === "Backward") {
+                    this.stepToFrame(0)
+                }
                 if (typeof this._onFinished === "function") {
                     this._onFinished();
                 }
+                return;
             }
         }
         this._update();

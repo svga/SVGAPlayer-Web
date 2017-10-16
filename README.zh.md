@@ -110,6 +110,7 @@ SVGA.Player 用于控制动画的播放和停止
 
 * int loops; - 动画循环次数，默认值为 0，表示无限循环。
 * BOOL clearsAfterStop; - 默认值为 true，表示当动画结束时，清空画布。
+* string fillMode; - 默认值为 Forward，可选值 Forward / Backward，当 clearsAfterStop 为 false 时，Forward 表示动画会在结束后停留在最后一帧，Backward 则会在动画结束后停留在第一帧。
 
 #### Methods
 
