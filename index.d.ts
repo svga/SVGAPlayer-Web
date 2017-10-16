@@ -43,11 +43,35 @@ export class Player {
 
 export class createjs {
 
-    static Player: typeof createjsPlayer
+    static Player: typeof CreatejsPlayer
 
 }
 
-export class createjsPlayer extends Player {
+export class CreatejsPlayer extends Player {
+
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+
+    constructor(url: string, autoplay?: boolean)
+    onError(callback: (error: Error) => void): void
+
+}
+
+
+export class layabox {
+
+    static Player: typeof LayaboxPlayer
+
+}
+
+export class LayaboxPlayer extends Player {
+
+    x: number;
+    y: number;
+    width: number;
+    height: number;
 
     constructor(url: string, autoplay?: boolean)
     onError(callback: (error: Error) => void): void

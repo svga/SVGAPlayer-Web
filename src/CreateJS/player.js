@@ -37,6 +37,7 @@ export class Player extends createjs.Container {
     }
 
     startAnimation() {
+        this.visible = true;
         this.stopAnimation(false);
         this._loopCount = 0;
         this._tickListener = () => {
@@ -61,6 +62,7 @@ export class Player extends createjs.Container {
     }
 
     clear() {
+        this.visible = false;
         if (this.stage != null) {
             this.stage.update();
         }
@@ -70,6 +72,7 @@ export class Player extends createjs.Container {
         if (frame >= this._videoItem.frames || frame < 0) {
             return;
         }
+        this.visible = true;
         this.pauseAnimation();
         this._currentFrame = frame;
         this._update();
@@ -99,8 +102,8 @@ export class Player extends createjs.Container {
         let family = (typeof textORMap === "object" ? textORMap.family : "") || "";
         let color = (typeof textORMap === "object" ? textORMap.color : "#000000") || "#000000";
         let offset = (typeof textORMap === "object" ? textORMap.offset : { x: 0.0, y: 0.0 }) || { x: 0.0, y: 0.0 };
-        let textLayer = this.render.Text(text, `${size} family`, color);
-        textLayer.setState({ offset });
+        let textLayer = new createjs.Text(text, `${size} family`, color);
+        textLayer.offset = offset;
         this._dynamicText[forKey] = textLayer;
     }
 

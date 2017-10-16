@@ -2,7 +2,7 @@
 
 <body style="text-align: center">
     <div>
-        <div id="testCanvas" style="background-color: #000000; width: 500px; height: 250px; margin: auto"></div>
+        <div id="testCanvas" style="background-color: #000000; width: 500px; height: 500px; margin: auto"></div>
         <!-- <canvas id="testCanvas" width="500" height="1000" style="background-color: #000000; "></canvas> -->
         <p id="svgaPerformance"></p>
     </div>
@@ -11,7 +11,9 @@
     <script>
         var parser = new SVGA.Parser()
         var player = new SVGA.Player('#testCanvas')
-        parser.load("./samples/rose_2.0.0.svga", function (videoItem) {
+        player.setImage('./samples/avatar.png', "99");
+        player.setText({ text: '崔小姐不吃鱼 送了帝王套', size: "24px", color: "#ffe0a4" }, "banner");
+        parser.load("./samples/kingset.svga", function (videoItem) {
             player.setVideoItem(videoItem);
             player.startAnimation()
         })

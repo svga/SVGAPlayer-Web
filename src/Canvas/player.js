@@ -103,9 +103,12 @@ export class Player {
         let family = (typeof textORMap === "object" ? textORMap.family : "") || "";
         let color = (typeof textORMap === "object" ? textORMap.color : "#000000") || "#000000";
         let offset = (typeof textORMap === "object" ? textORMap.offset : { x: 0.0, y: 0.0 }) || { x: 0.0, y: 0.0 };
-        let textLayer = this._renderer.Text(text, `${size} family`, color);
-        textLayer.setState({ offset });
-        this._dynamicText[forKey] = textLayer;
+        this._dynamicText[forKey] = {
+            text,
+            style: `${size} family`,
+            color,
+            offset,
+        };
     }
 
     clearDynamicObjects() {

@@ -19,7 +19,7 @@ export class Player extends MPlayer { }
         Player,
         autoload: AutoLoader.autoload,
     }
-    define.createjsPlayer = Player;
+    define.CreatejsPlayer = Player;
     AutoLoader.autoload();
 })(
     (typeof this === "object" && this) ||
