@@ -26,43 +26,17 @@ Both Prebuild & NPM, if you need to support SVGA-Format 1.x, add JSZip script to
 
 ## Usage
 
-### Load Animation Mannally
-
-You may create Player and Parser by yourself.
-
 ```js
-var player = new SVGA.Player('#canvas'); // replace #canvas as <canvas id="!!!HERE!!!"></canvas>
-var parser = new SVGA.Parser();
-parser.load('rose_2.0.0.svga', function(videoItem) {
-    player.setVideoItem(videoItem);
-    player.startAnimation();
+var displayObject = new SVGA.createjs.Player('./samples/rose_2.0.0.svga');
+displayObject.onError(function(err) {
+    console.error(err)
 })
-```
-
-### Load Animation Automatically
-
-Assign canvas element properties as below.
-
-```html
-<canvas src="rose_2.0.0.svga" loops="0" clearsAfterStop="true"></canvas>
-```
-
-Animation will play after Web-Page onload.
-
-### As Child
-
-You could request a child from SVGA.Player instance, and add it to stage by yourself.
-
-```html
-var stage = new createjs.Stage('testCanvas');
-SVGA.Player.requestContainer(stage, "rose_2.0.0.svga", function (container, player) {
-    stage.addChild(container);
-    container.x = 100;      
-    container.y = 100;      
-    container.width = 300;  
-    container.height = 300; 
-    player.startAnimation();
-});
+displayObject.x = 0;
+displayObject.y = 0;
+displayObject.width = 500;
+displayObject.height = 500;
+var stage = new createjs.Stage('CanvasID');
+stage.addChild(displayObject);
 ```
 
 ### Replace Animation Images Dynamically
@@ -73,7 +47,7 @@ You can replace specific image by yourself, ask your designer tell you the Image
 * setImage operation MUST set BEFORE startAnimation.
 
 ```
-player.setImage('http://yourserver.com/xxx.png', 'ImageKey');
+displayObject.setImage('http://yourserver.com/xxx.png', 'ImageKey');
 ```
 
 ### Add Text on Animation Image Dynamically
@@ -83,11 +57,11 @@ You can add text on specific image, ask your designer tell you the ImageKey.
 * setText operation MUST set BEFORE startAnimation.
 
 ```
-player.setText('Hello, World!', 'ImageKey');
+displayObject.setText('Hello, World!', 'ImageKey');
 ```
 
 ```
-player.setText({ 
+displayObject.setText({ 
     text: 'Hello, World!, 
     size: "24px", 
     color: "#ffe0a4",
@@ -97,7 +71,7 @@ player.setText({
 
 ## Classes
 
-### SVGA.Player
+### Player
 
 You use SVGA.Player controls animation play and stop.
 
@@ -108,7 +82,7 @@ You use SVGA.Player controls animation play and stop.
 
 #### Methods
 
-* constructor (canvas); - first params could be '#id' or CanvasHTMLElement
+* constructor (url: string, autoPlay: boolean);
 * startAnimation(); - start animation from zero frame.
 * pauseAnimation(); - pause animation on current frame.
 * stopAnimation(); - stop animation, clear contents while clearsAfterStop === true
@@ -120,28 +94,16 @@ You use SVGA.Player controls animation play and stop.
 * clearDynamicObjects(); - clear all dynamic objects.
 
 #### Callback Method
+* onError(callback: (error: Error) => void): void; - call after load failure.
 * onFinished(callback: () => void): void; - call after animation stop.
 * onFrame(callback: (frame: number): void): void; - call after animation specific frame rendered.
 * onPercentage(callback: (percentage: number): void): void; - call after animation specific percentage rendered.
-
-### SVGA.Parser
-
-You use SVGA.Parser load VideoItem from remote or Base64 string.
-
-Only Cross-Domain allow files could be loaded.
-
-If you eager to load resources from Base64 or File, deliver as ```load(File)``` or ```load('data:svga/2.0;base64,xxxxxx')```.
-
-#### Methods
-
-* constructor();
-* load(url: string, success: (videoItem: VideoEntity) => void, failure: (error: Error) => void): void;
 
 ## Issues
 
 ### Android 4.x Breaks
 
-As known, some Android OS leaks Blob support, add Blob Polyfill by yourself.
+As known, some Android OS lack Blob support, add Blob Polyfill by yourself.
 
 ```
 <script src="//cdn.bootcss.com/blob-polyfill/1.0.20150320/Blob.min.js"></script>

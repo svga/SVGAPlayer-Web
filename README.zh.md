@@ -43,8 +43,16 @@ SVGAPlayer 2.0.0 同时支持以下游戏引擎使用
 
 你可以自行创建 Player 和 Parser 并加载动画
 
+1. 添加 Div 容器
+
+```html
+<div id="demoCanvas" style="styles..."></div>
+```
+
+2. 加载动画
+
 ```js
-var player = new SVGA.Player('#canvas'); // replace #canvas as <canvas id="!!!HERE!!!"></canvas>
+var player = new SVGA.Player('#demoCanvas');
 var parser = new SVGA.Parser();
 parser.load('rose_2.0.0.svga', function(videoItem) {
     player.setVideoItem(videoItem);
@@ -57,7 +65,7 @@ parser.load('rose_2.0.0.svga', function(videoItem) {
 为 canvas 元素添加以下属性
 
 ```html
-<canvas src="rose_2.0.0.svga" loops="0" clearsAfterStop="true"></canvas>
+<div src="rose_2.0.0.svga" loops="0" clearsAfterStop="true"></div>
 ```
 
 动画会在页面加载完成后播放

@@ -148,7 +148,7 @@ If you eager to load resources from Base64 or File, deliver as ```load(File)``` 
 
 ### Android 4.x Breaks
 
-As known, some Android OS leaks Blob support, add Blob Polyfill by yourself.
+As known, some Android OS lack Blob support, add Blob Polyfill by yourself.
 
 ```
 <script src="//cdn.bootcss.com/blob-polyfill/1.0.20150320/Blob.min.js"></script>
