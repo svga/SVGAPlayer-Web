@@ -38,4 +38,16 @@ export class Player {
     onFrame(callback: () => void): void
     onPercentage(callback: () => void): void
     drawOnContext(ctx: CanvasRenderingContext2D, x: number, y: number, width?: number, height?: number): void
+
+    // Other Players
+    static createjs?: cjsPlayer
+
+}
+
+// cjsPlayer extends createjs.Container
+export class cjsPlayer extends Player {
+
+    constructor(url: string, autoplay?: boolean)
+    onError(callback: (error: Error) => void): void
+
 }

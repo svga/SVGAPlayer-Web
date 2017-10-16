@@ -85,10 +85,10 @@ export class Renderer {
             if (bitmap) {
                 contentLayer.addChild(this.requestBitmapLayer(bitmap, this._owner._dynamicImageTransform[sprite.imageKey], sprite.frames));
             }
-            // if (this._dynamicText[sprite.imageKey]) {
-            //     contentLayer.textLayer = this._dynamicText[sprite.imageKey];
-            //     contentLayer.addChild(this._dynamicText[sprite.imageKey])
-            // }
+            if (this._owner._dynamicText[sprite.imageKey]) {
+                this.textLayer = this._owner._dynamicText[sprite.imageKey];
+                this.addChild(this._owner._dynamicText[sprite.imageKey])
+            }
         }
         contentLayer.addChild(this.requestVectorLayer(sprite));
         contentLayer.stepToFrame = (frame) => {
@@ -106,15 +106,13 @@ export class Renderer {
                     else {
                         contentLayer.mask = undefined;
                     }
-                    // if (layer.textLayer) {
-                    //     let offsetX = (layer.textLayer.offset !== undefined && layer.textLayer.offset.x !== undefined) ? layer.textLayer.offset.x : 0;
-                    //     let offsetY = (layer.textLayer.offset !== undefined && layer.textLayer.offset.y !== undefined) ? layer.textLayer.offset.y : 0;
-                    //     layer.textLayer.setState({
-                    //         textBaseline: "middle",
-                    //         x: (frameItem.layout.width - layer.textLayer.getBounds().width) / 2.0 + offsetX,
-                    //         y: frameItem.layout.height / 2.0 + offsetY,
-                    //     });
-                    // }
+                    if (this.textLayer) {
+                        let offsetX = (layer.textLayer.offset !== undefined && layer.textLayer.offset.x !== undefined) ? layer.textLayer.offset.x : 0;
+                        let offsetY = (layer.textLayer.offset !== undefined && layer.textLayer.offset.y !== undefined) ? layer.textLayer.offset.y : 0;
+                        this.textLayer.textBaseline = "middle";
+                        this.textLayer.x = (frameItem.layout.width - layer.textLayer.getBounds().width) / 2.0 + offsetX;
+                        this.textLayer.y = frameItem.layout.height / 2.0 + offsetY;
+                    }
                 }
                 else {
                     contentLayer.visible = false;
