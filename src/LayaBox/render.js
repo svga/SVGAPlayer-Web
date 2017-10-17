@@ -240,14 +240,14 @@ class VectorLayer extends Laya.Sprite {
             }
             this.removeChildren(0, this.numChildren);
             frameItem.shapes.forEach((shape) => {
-                if (shape.type === "shape" && shape.args && shape.args.d) {
-                    this.addChild(Renderer.requestBezierShape(new BezierPath(shape.args.d, shape.transform, shape.styles)));
+                if (shape.type === "shape" && shape.pathArgs && shape.pathArgs.d) {
+                    this.addChild(Renderer.requestBezierShape(new BezierPath(shape.pathArgs.d, shape.transform, shape.styles)));
                 }
-                else if (shape.type === "ellipse" && shape.args) {
-                    this.addChild(Renderer.requestEllipseShape(new EllipsePath(parseFloat(shape.args.x) || 0.0, parseFloat(shape.args.y) || 0.0, parseFloat(shape.args.radiusX) || 0.0, parseFloat(shape.args.radiusY) || 0.0, shape.transform, shape.styles)));
+                else if (shape.type === "ellipse" && shape.pathArgs) {
+                    this.addChild(Renderer.requestEllipseShape(new EllipsePath(parseFloat(shape.pathArgs.x) || 0.0, parseFloat(shape.pathArgs.y) || 0.0, parseFloat(shape.pathArgs.radiusX) || 0.0, parseFloat(shape.pathArgs.radiusY) || 0.0, shape.transform, shape.styles)));
                 }
-                else if (shape.type === "rect" && shape.args) {
-                    this.addChild(Renderer.requestRectShape(new RectPath(parseFloat(shape.args.x) || 0.0, parseFloat(shape.args.y) || 0.0, parseFloat(shape.args.width) || 0.0, parseFloat(shape.args.height) || 0.0, parseFloat(shape.args.cornerRadius) || 0.0, shape.transform, shape.styles)));
+                else if (shape.type === "rect" && shape.pathArgs) {
+                    this.addChild(Renderer.requestRectShape(new RectPath(parseFloat(shape.pathArgs.x) || 0.0, parseFloat(shape.pathArgs.y) || 0.0, parseFloat(shape.pathArgs.width) || 0.0, parseFloat(shape.pathArgs.height) || 0.0, parseFloat(shape.pathArgs.cornerRadius) || 0.0, shape.transform, shape.styles)));
                 }
             })
             this._drawedFrame = frame;

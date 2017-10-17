@@ -119,14 +119,14 @@ export class Renderer {
                     }
                 }
                 frameItem.shapes && frameItem.shapes.forEach(shape => {
-                    if (shape.type === "shape" && shape.args && shape.args.d) {
-                        this.drawBezier(ctx, new BezierPath(shape.args.d, shape.transform, shape.styles))
+                    if (shape.type === "shape" && shape.pathArgs && shape.pathArgs.d) {
+                        this.drawBezier(ctx, new BezierPath(shape.pathArgs.d, shape.transform, shape.styles))
                     }
-                    if (shape.type === "ellipse" && shape.args) {
-                        this.drawEllipse(ctx, new EllipsePath(parseFloat(shape.args.x) || 0.0, parseFloat(shape.args.y) || 0.0, parseFloat(shape.args.radiusX) || 0.0, parseFloat(shape.args.radiusY) || 0.0, shape.transform, shape.styles))
+                    if (shape.type === "ellipse" && shape.pathArgs) {
+                        this.drawEllipse(ctx, new EllipsePath(parseFloat(shape.pathArgs.x) || 0.0, parseFloat(shape.pathArgs.y) || 0.0, parseFloat(shape.pathArgs.radiusX) || 0.0, parseFloat(shape.pathArgs.radiusY) || 0.0, shape.transform, shape.styles))
                     }
-                    if (shape.type === "rect" && shape.args) {
-                        this.drawRect(ctx, new RectPath(parseFloat(shape.args.x) || 0.0, parseFloat(shape.args.y) || 0.0, parseFloat(shape.args.width) || 0.0, parseFloat(shape.args.height) || 0.0, parseFloat(shape.args.cornerRadius) || 0.0, shape.transform, shape.styles))
+                    if (shape.type === "rect" && shape.pathArgs) {
+                        this.drawRect(ctx, new RectPath(parseFloat(shape.pathArgs.x) || 0.0, parseFloat(shape.pathArgs.y) || 0.0, parseFloat(shape.pathArgs.width) || 0.0, parseFloat(shape.pathArgs.height) || 0.0, parseFloat(shape.pathArgs.cornerRadius) || 0.0, shape.transform, shape.styles))
                     }
                 })
                 let dynamicText = this._owner._dynamicText[sprite.imageKey];

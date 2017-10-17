@@ -54,6 +54,42 @@ export class FrameEntity {
             this.maskPath = new BezierPath(spec.clipPath, undefined, { fill: "#000000" });
         }
         if (spec.shapes) {
+            if (spec.shapes instanceof Array) {
+                spec.shapes.forEach(shape => {
+                    shape.pathArgs = shape.args;
+                    switch (shape.type) {
+                        case 0:
+                            shape.type = "shape";
+                            shape.pathArgs = shape.shape;
+                            break;
+                        case 1:
+                            shape.type = "rect";
+                            shape.pathArgs = shape.rect;
+                            break;
+                        case 2:
+                            shape.type = "ellipse";
+                            shape.pathArgs = shape.ellipse;
+                            break;
+                        case 3:
+                            shape.type = "keep";
+                            break;
+                    }
+                    if (shape.styles) {
+                        if (shape.styles.fill) {
+                            if (shape.styles.fill["r"]) shape.styles.fill[0] = shape.styles.fill["r"];
+                            if (shape.styles.fill["g"]) shape.styles.fill[1] = shape.styles.fill["g"];
+                            if (shape.styles.fill["b"]) shape.styles.fill[2] = shape.styles.fill["b"];
+                            if (shape.styles.fill["a"]) shape.styles.fill[3] = shape.styles.fill["a"];
+                        }
+                        if (shape.styles.stroke) {
+                            if (shape.styles.stroke["r"]) shape.styles.stroke[0] = shape.styles.stroke["r"];
+                            if (shape.styles.stroke["g"]) shape.styles.stroke[1] = shape.styles.stroke["g"];
+                            if (shape.styles.stroke["b"]) shape.styles.stroke[2] = shape.styles.stroke["b"];
+                            if (shape.styles.stroke["a"]) shape.styles.stroke[3] = shape.styles.stroke["a"];
+                        }
+                    }
+                })
+            } 
             if (spec.shapes[0] && spec.shapes[0].type === "keep") {
                 this.shapes = FrameEntity.lastShapes;
             }
