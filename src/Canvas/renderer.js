@@ -16,6 +16,11 @@ export class Renderer {
 
     prepare() {
         this._prepared = false;
+        if (this._owner._videoItem.images === undefined || Object.keys(this._owner._videoItem.images).length == 0) {
+            this._owner._videoItem.bitmapCache = {};
+            this._prepared = true;
+            return;
+        }
         if (this._owner._videoItem.bitmapCache === undefined) {
             this._owner._videoItem.bitmapCache = {};
             let totalCount = 0
@@ -328,6 +333,12 @@ export class Renderer {
                     break;
             }
         }
+        if (obj._styles && obj._styles.fill) {
+            ctx.fill();
+        }
+        if (obj._styles && obj._styles.stroke) {
+            ctx.stroke();
+        }
         ctx.restore();
     }
 
@@ -355,6 +366,12 @@ export class Renderer {
         ctx.bezierCurveTo(xm + ox, y, xe, ym - oy, xe, ym);
         ctx.bezierCurveTo(xe, ym + oy, xm + ox, ye, xm, ye);
         ctx.bezierCurveTo(xm - ox, ye, x, ym + oy, x, ym);
+        if (obj._styles && obj._styles.fill) {
+            ctx.fill();
+        }
+        if (obj._styles && obj._styles.stroke) {
+            ctx.stroke();
+        }
         ctx.restore();
     }
 
@@ -380,6 +397,12 @@ export class Renderer {
         ctx.lineTo(x, y + radius);
         ctx.quadraticCurveTo(x, y, x + radius, y);
         ctx.closePath();
+        if (obj._styles && obj._styles.fill) {
+            ctx.fill();
+        }
+        if (obj._styles && obj._styles.stroke) {
+            ctx.stroke();
+        }
         ctx.restore();
     }
 
