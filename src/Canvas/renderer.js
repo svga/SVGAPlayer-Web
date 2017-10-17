@@ -105,6 +105,7 @@ export class Renderer {
                 }
                 else if (typeof src === "object") {
                     if (frameItem.maskPath !== undefined && frameItem.maskPath !== null) {
+                        frameItem.maskPath._styles = undefined;
                         this.drawBezier(ctx, frameItem.maskPath);
                         ctx.clip();
                     }
