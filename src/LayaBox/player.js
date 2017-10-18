@@ -1,6 +1,6 @@
 'use strict';
 
-import { Renderer } from './render'
+import { Renderer } from './renderer'
 import { Parser } from '../parser'
 
 export class Player extends Laya.Sprite {
