@@ -4,6 +4,11 @@ const { ProtoMovieEntity } = require("./proto")
 export class VideoEntity {
 
     /**
+     * SVGA 文件版本
+     */
+    version = "";
+
+    /**
      * 影片尺寸
      */
     videoSize = {
@@ -34,6 +39,7 @@ export class VideoEntity {
     constructor(spec, images) {
         if (typeof spec === "object" && spec.$type == ProtoMovieEntity) {
             if (typeof spec.params === "object") {
+                this.version = spec.version;
                 this.videoSize.width = spec.params.viewBoxWidth || 0.0;
                 this.videoSize.height = spec.params.viewBoxHeight || 0.0;
                 this.FPS = spec.params.fps || 20;

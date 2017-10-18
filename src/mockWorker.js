@@ -88,6 +88,7 @@ const actions = {
                 if (typeof window === "object") {
                     window.SVGAPerformance.unzipEnd = performance.now()
                 }
+                movieData["version"] = "2.0";
                 cb({
                     movie: movieData,
                     images,
@@ -101,9 +102,17 @@ const actions = {
     },
 
     _decodeAssets: (zip, cb) => {
+
+        var version = "1.0";
+        if(zip.file("movie.binary")){
+            version = "1.5";
+        }
+
         zip.file("movie.spec").async("string").then(function (spec) {
             let movieData = JSON.parse(spec);
             let images = {};
+
+            movieData["version"] = version;
             actions._loadImages(images, zip, movieData, function () {
                 if (typeof window === "object") {
                     window.SVGAPerformance.unzipEnd = performance.now()
