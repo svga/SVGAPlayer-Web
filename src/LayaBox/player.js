@@ -34,7 +34,13 @@ export class Player extends Laya.Sprite {
     }
 
     setClipsToBounds(clipsToBounds) {
+        this._clipsToBounds = clipsToBounds;
+        this._update();
+    }
 
+    setFrame(x, y, width, height) {
+        this._frame = { x, y, width, height }
+        this._update();
     }
 
     startAnimation() {
@@ -151,6 +157,8 @@ export class Player extends Laya.Sprite {
     _onFrame = undefined;
     _onPercentage = undefined;
     _nextTickTime = 0;
+    _clipsToBounds = false;
+    _frame = { x: 0, y: 0, width: 0, height: 0 };
 
     _onTick() {
         if (typeof this._videoItem === "object") {
@@ -196,7 +204,7 @@ export class Player extends Laya.Sprite {
 
     _resize() {
         let scaleX = 1.0; let scaleY = 1.0; let translateX = 0.0; let translateY = 0.0;
-        let targetSize = { width: this.width, height: this.height };
+        let targetSize = { width: this._frame.width, height: this._frame.height };
         let imageSize = this._videoItem.videoSize;
         if (this._contentMode === "Fill") {
             scaleX = targetSize.width / imageSize.width;
@@ -205,7 +213,7 @@ export class Player extends Laya.Sprite {
         else if (this._contentMode === "AspectFit" || this._contentMode === "AspectFill") {
             const imageRatio = imageSize.width / imageSize.height;
             const viewRatio = targetSize.width / targetSize.height;
-            if ((imageRatio >= viewRatio && this._contentMode === "AspectFit") || (imageRatio < viewRatio && this._contentMode === "AspectFill")) {
+            if ((imageRatio >= viewRatio && this._contentMode === "AspectFit") || (imageRatio <= viewRatio && this._contentMode === "AspectFill")) {
                 scaleX = scaleY = targetSize.width / imageSize.width;
                 translateY = (targetSize.height - imageSize.height * scaleY) / 2.0
             }
@@ -214,12 +222,15 @@ export class Player extends Laya.Sprite {
                 translateX = (targetSize.width - imageSize.width * scaleX) / 2.0
             }
         }
-        this.transform = new Laya.Matrix(scaleX, 0.0, 0.0, scaleY, this.x + translateX, this.y + translateY);
+        this.transform = new Laya.Matrix(scaleX, 0.0, 0.0, scaleY, this._frame.x + translateX, this._frame.y + translateY);
     }
+
+    _updateMask() { }
 
     _update() {
         if (this._videoItem === undefined) { return; }
         this._resize();
+        this._updateMask();
         this._renderer.drawFrame(this._currentFrame);
     }
 

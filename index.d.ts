@@ -49,13 +49,9 @@ export class createjs {
 
 export class CreatejsPlayer extends Player {
 
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-
     constructor(url: string, autoplay?: boolean)
     onError(callback: (error: Error) => void): void
+    setFrame(x: number, y: number, width: number, height: number): void
 
 }
 
@@ -68,12 +64,8 @@ export class layabox {
 
 export class LayaboxPlayer extends Player {
 
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-
     constructor(url: string, autoplay?: boolean)
     onError(callback: (error: Error) => void): void
+    setFrame(x: number, y: number, width: number, height: number): void
 
 }

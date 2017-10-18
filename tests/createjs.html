@@ -15,10 +15,8 @@
             console.error(err)
         })
         var stage = new createjs.Stage('demoCanvas');
-        sprite.x = 0;
-        sprite.y = 0;
-        sprite.width = 750;
-        sprite.height = 750;
+        sprite.setFrame(0, 0, 750, 750);
+        sprite.setContentMode("AspectFill")
         stage.addChild(sprite);
         stage.update();
 

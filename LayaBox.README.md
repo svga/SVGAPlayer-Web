@@ -23,10 +23,7 @@ If you need to support SVGA-Format 1.x, add JSZip script to html.
 
 ```js
 const displayObject = new SVGA.layabox.Player('res/svga/rose_2.0.0.svga')
-displayObject.x = 0;
-displayObject.y = 0;
-displayObject.width = 750;
-displayObject.height = 750;
+displayObject.setFrame(0, 0, 750, 750);
 Laya.stage.addChild(displayObject as any)
 ```
 

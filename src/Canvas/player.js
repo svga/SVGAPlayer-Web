@@ -19,8 +19,10 @@ export class Player {
         if (this._container instanceof HTMLDivElement || this._asChild) {
             this._drawingCanvas = document.createElement('canvas');
             this._drawingCanvas.style.backgroundColor = "transparent"
-            this._container && this._container.appendChild(this._drawingCanvas);
-            this._container.style.textAlign = "left";
+            if (this._container) {
+                this._container.appendChild(this._drawingCanvas);
+                this._container.style.textAlign = "left";
+            }
         }
         this._renderer = new Renderer(this);
         this._ticker = new Ticker(this);
@@ -245,7 +247,7 @@ export class Player {
             else if (this._contentMode === "AspectFit" || this._contentMode === "AspectFill") {
                 const imageRatio = imageSize.width / imageSize.height;
                 const viewRatio = targetSize.width / targetSize.height;
-                if ((imageRatio >= viewRatio && this._contentMode === "AspectFit") || (imageRatio < viewRatio && this._contentMode === "AspectFill")) {
+                if ((imageRatio >= viewRatio && this._contentMode === "AspectFit") || (imageRatio <= viewRatio && this._contentMode === "AspectFill")) {
                     scaleX = scaleY = targetSize.width / imageSize.width;
                     translateY = (targetSize.height - imageSize.height * scaleY) / 2.0
                 }

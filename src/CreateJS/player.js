@@ -38,6 +38,11 @@ export class Player extends createjs.Container {
         this._update();
     }
 
+    setFrame(x, y, width, height) {
+        this._frame = { x, y, width, height }
+        this._update();
+    }
+
     startAnimation() {
         this.visible = true;
         this.stopAnimation(false);
@@ -149,6 +154,7 @@ export class Player extends createjs.Container {
     _onPercentage = undefined;
     _nextTickTime = 0;
     _clipsToBounds = false;
+    _frame = { x: 0, y: 0, width: 0, height: 0 };
 
     _onTick() {
         if (typeof this._videoItem === "object") {
@@ -194,7 +200,7 @@ export class Player extends createjs.Container {
 
     _resize() {
         let scaleX = 1.0; let scaleY = 1.0; let translateX = 0.0; let translateY = 0.0;
-        let targetSize = { width: this.width, height: this.height };
+        let targetSize = { width: this._frame.width, height: this._frame.height };
         let imageSize = this._videoItem.videoSize;
         if (this._contentMode === "Fill") {
             scaleX = targetSize.width / imageSize.width;
@@ -203,7 +209,7 @@ export class Player extends createjs.Container {
         else if (this._contentMode === "AspectFit" || this._contentMode === "AspectFill") {
             const imageRatio = imageSize.width / imageSize.height;
             const viewRatio = targetSize.width / targetSize.height;
-            if ((imageRatio >= viewRatio && this._contentMode === "AspectFit") || (imageRatio < viewRatio && this._contentMode === "AspectFill")) {
+            if ((imageRatio >= viewRatio && this._contentMode === "AspectFit") || (imageRatio <= viewRatio && this._contentMode === "AspectFill")) {
                 scaleX = scaleY = targetSize.width / imageSize.width;
                 translateY = (targetSize.height - imageSize.height * scaleY) / 2.0
             }
@@ -212,17 +218,17 @@ export class Player extends createjs.Container {
                 translateX = (targetSize.width - imageSize.width * scaleX) / 2.0
             }
         }
-        this.transformMatrix = { a: scaleX, b: 0.0, c: 0.0, d: scaleY, tx: this.x + translateX, ty: this.y + translateY };
+        this.transformMatrix = { a: scaleX, b: 0.0, c: 0.0, d: scaleY, tx: this._frame.x + translateX, ty: this._frame.y + translateY };
     }
 
     _updateMask() {
         if (this._clipsToBounds) {
             this.mask = new createjs.Shape();
-            if (this.mask.width !== this.width || this.mask.height !== this.height) {
+            if (this.mask.__width !== this._frame.__width || this.mask.height !== this._frame.height) {
                 this.mask.graphics.clear();
-                this.mask.graphics.drawRect(0.0, 0.0, this.width || 0.0, this.height || 0.0);
-                this.mask.width = this.width || 0.0;
-                this.mask.height = this.height || 0.0;
+                this.mask.graphics.drawRect(0.0, 0.0, this._frame.width, this._frame.height);
+                this.mask.__width = this._frame.width;
+                this.mask.__height = this._frame.height;
             }
         }
         else {
