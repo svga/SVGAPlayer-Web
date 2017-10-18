@@ -14,6 +14,7 @@ export class Player {
 
     loops: number;
     clearsAfterStop: boolean;
+    fillMode: "Forward" | "Backward"
 
     constructor(canvas: string | HTMLCanvasElement | HTMLDivElement)
     setVideoItem(videoItem: VideoEntity): void
