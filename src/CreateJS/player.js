@@ -34,7 +34,8 @@ export class Player extends createjs.Container {
     }
 
     setClipsToBounds(clipsToBounds) {
-
+        this._clipsToBounds = clipsToBounds;
+        this._update();
     }
 
     startAnimation() {
@@ -136,17 +137,18 @@ export class Player extends createjs.Container {
 
     _renderer = undefined;
     _contentMode = "AspectFit"
-    _videoItem = null;
+    _videoItem = undefined;
     _loopCount = 0;
     _currentFrame = 0;
-    _tickListener = null;
+    _tickListener = undefined;
     _dynamicImage = {};
     _dynamicImageTransform = {};
     _dynamicText = {};
-    _onFinished = null;
-    _onFrame = null;
-    _onPercentage = null;
+    _onFinished = undefined;
+    _onFrame = undefined;
+    _onPercentage = undefined;
     _nextTickTime = 0;
+    _clipsToBounds = false;
 
     _onTick() {
         if (typeof this._videoItem === "object") {
@@ -213,8 +215,25 @@ export class Player extends createjs.Container {
         this.transformMatrix = { a: scaleX, b: 0.0, c: 0.0, d: scaleY, tx: this.x + translateX, ty: this.y + translateY };
     }
 
+    _updateMask() {
+        if (this._clipsToBounds) {
+            this.mask = new createjs.Shape();
+            if (this.mask.width !== this.width || this.mask.height !== this.height) {
+                this.mask.graphics.clear();
+                this.mask.graphics.drawRect(0.0, 0.0, this.width || 0.0, this.height || 0.0);
+                this.mask.width = this.width || 0.0;
+                this.mask.height = this.height || 0.0;
+            }
+        }
+        else {
+            this.mask = undefined;
+        }
+    }
+
     _update() {
+        if (this._videoItem === undefined) { return; }
         this._resize();
+        this._updateMask();
         this._renderer.drawFrame(this._currentFrame);
         if (this.stage != null) {
             this.stage.update();

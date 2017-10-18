@@ -87,6 +87,8 @@ You use SVGA.Player controls animation play and stop.
 * startAnimation(); - start animation from zero frame.
 * pauseAnimation(); - pause animation on current frame.
 * stopAnimation(); - stop animation, clear contents while clearsAfterStop === true
+* setContentMode(mode: "ScaleToFill" | "AspectFill" | "AspectFit"); - Specific Scale Mode
+* setClipsToBounds(clipsToBounds: boolean); - Clips if image render out of box.
 * clear(); - force clear contents.
 * stepToFrame(frame: int, andPlay: Boolean); - stop to specific frame, play animation while andPlay === true
 * stepToPercentage(percentage: float, andPlay: Boolean); - stop to specific percentage, play animation while andPlay === true

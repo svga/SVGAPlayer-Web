@@ -143,16 +143,15 @@ export class Player {
     _ticker = undefined;
     _drawingCanvas = undefined;
     _contentMode = "AspectFit"
-    _videoItem = null;
-    _rootLayer = null;
+    _videoItem = undefined;
     _loopCount = 0;
     _currentFrame = 0;
     _dynamicImage = {};
     _dynamicImageTransform = {};
     _dynamicText = {};
-    _onFinished = null;
-    _onFrame = null;
-    _onPercentage = null;
+    _onFinished = undefined;
+    _onFrame = undefined;
+    _onPercentage = undefined;
     _nextTickTime = 0;
 
     _onTick() {
@@ -237,7 +236,7 @@ export class Player {
         }
         if (this._drawingCanvas === undefined || asParent === true) {
             let scaleX = 1.0; let scaleY = 1.0; let translateX = 0.0; let translateY = 0.0;
-            let targetSize = { width: this._container !== undefined ? this._container.clientWidth : this._rootLayer.width, height: this._container !== undefined ? this._container.clientHeight : this._rootLayer.height };
+            let targetSize = { width: this._container !== undefined ? this._container.clientWidth : 0.0, height: this._container !== undefined ? this._container.clientHeight : 0.0 };
             let imageSize = this._videoItem.videoSize;
             if (this._contentMode === "Fill") {
                 scaleX = targetSize.width / imageSize.width;
@@ -260,6 +259,7 @@ export class Player {
     }
 
     _update() {
+        if (this._videoItem === undefined) { return; }
         this._resize();
         this._renderer.drawFrame(this._currentFrame);
     }

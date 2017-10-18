@@ -140,16 +140,16 @@ export class Player extends Laya.Sprite {
 
     _renderer = undefined;
     _contentMode = "AspectFit"
-    _videoItem = null;
+    _videoItem = undefined;
     _loopCount = 0;
     _currentFrame = 0;
-    _tickListener = null;
+    _tickListener = undefined;
     _dynamicImage = {};
     _dynamicImageTransform = {};
     _dynamicText = {};
-    _onFinished = null;
-    _onFrame = null;
-    _onPercentage = null;
+    _onFinished = undefined;
+    _onFrame = undefined;
+    _onPercentage = undefined;
     _nextTickTime = 0;
 
     _onTick() {
@@ -218,6 +218,7 @@ export class Player extends Laya.Sprite {
     }
 
     _update() {
+        if (this._videoItem === undefined) { return; }
         this._resize();
         this._renderer.drawFrame(this._currentFrame);
     }
