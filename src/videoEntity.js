@@ -37,9 +37,10 @@ export class VideoEntity {
     sprites = []
 
     constructor(spec, images) {
+
         if (typeof spec === "object" && spec.$type == ProtoMovieEntity) {
             if (typeof spec.params === "object") {
-                this.version = spec.version;
+                this.version = spec.ver;
                 this.videoSize.width = spec.params.viewBoxWidth || 0.0;
                 this.videoSize.height = spec.params.viewBoxHeight || 0.0;
                 this.FPS = spec.params.fps || 20;
@@ -53,6 +54,7 @@ export class VideoEntity {
                     this.videoSize.width = parseFloat(spec.movie.viewBox.width) || 0.0;
                     this.videoSize.height = parseFloat(spec.movie.viewBox.height) || 0.0;
                 }
+                this.version = spec.ver;
                 this.FPS = parseInt(spec.movie.fps) || 20;
                 this.frames = parseInt(spec.movie.frames) || 0;
             }

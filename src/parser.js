@@ -21,7 +21,8 @@ export class Parser {
         }
         MockWorker(url, (data) => {
             let movie = data.movie;
-            movie["version"] = data.version;
+
+            movie["version"] = data.ver;
             let images = data.images;
             if (typeof window === "object") {
                 window.SVGAPerformance.parseStart = performance.now()
