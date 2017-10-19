@@ -1,1 +1,29 @@
-{"name":"svga-web-canvas","version":"1.1.0","repository":{},"author":"UED.lijialiang","license":"MIT"}
+{
+  "name": "svgaplayerweb",
+  "version": "2.0.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yyued/SVGAPlayer-Web.git"
+  },
+  "main": "./build/svga.min.js",
+  "types": "index.d.ts",
+  "scripts": {
+    "start": "http-server ./ & webpack -w & open http://127.0.0.1:8080/tests/",
+    "build": "webpack"
+  },
+  "author": "YYUED",
+  "license": "Apache License 2.0",
+  "dependencies": {
+    "pako": "^1.0.6",
+    "protobufjs": "^6.8.0"
+  },
+  "devDependencies": {
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.2",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-stage-0": "^6.24.1",
+    "http-server": "^0.10.0",
+    "uglify-js": "^3.1.2",
+    "webpack": "^3.6.0"
+  }
+}

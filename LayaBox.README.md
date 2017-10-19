@@ -1,39 +1,19 @@
 # SVGAPlayer-Web
 
-Language: [中文](README.zh.md)
-
-## News
-
-* 2.0.0
-    * Add SVGA-Format 2.0.0 support.
-    * Add npm support, use ```npm install svgaplayerweb --save```.
-
-## Can I Use
-
-SVGAPlayer 2.0.0 only supports below browsers.
-
-* Edge
-* Safari / Chrome
-* iOS 6.0+ / Android 4.0+
-
-SVGAPlayer 2.0.0 also supports below Game Engines.
-
-* CreateJS [Usage](CreateJS.README.md)
-* LayaBox [Usage](LayaBox.README.md)
-
 ## Install
 
-### Prebuild JS
-1. Goto [https://github.com/yyued/SVGAPlayer-Web/tree/master/build](https://github.com/yyued/SVGAPlayer-Web/tree/master/build) Download svga.min.js
-2. Add ```<script src="svga.min.js"></script>``` to xxx.html
+### Patch laya.webgl.js library
 
-### NPM
-1. ```npm install svgaplayerweb --save```
-2. Add ``` require('svgaplayerweb') ``` to ```xxx.js```
+1. Goto [https://github.com/yyued/SVGAPlayer-Web/tree/master/patch/layabox](https://github.com/yyued/SVGAPlayer-Web/tree/master/patch/layabox) Download laya.webgl.js
+2. Replace to {LayaProjectDir}/bin/libs/laya.webgl.js
+
+### Prebuild JS
+1. Goto [https://github.com/yyued/SVGAPlayer-Web/tree/master/build](https://github.com/yyued/SVGAPlayer-Web/tree/master/build) Download svga.layabox.min.js
+2. Add ```<script src="svga.layabox.min.js"></script>``` to index.html
 
 ### SVGA-Format 1.x support
 
-Both Prebuild & NPM, if you need to support SVGA-Format 1.x, add JSZip script to html.
+If you need to support SVGA-Format 1.x, add JSZip script to html.
 
 ```html
 <script src="http://assets.dwstatic.com/common/lib/??jszip/3.1.3/jszip.min.js,jszip/3.1.3/jszip-utils.min.js" charset="utf-8"></script>
@@ -41,36 +21,11 @@ Both Prebuild & NPM, if you need to support SVGA-Format 1.x, add JSZip script to
 
 ## Usage
 
-### Load Animation Mannally
-
-You may create Player and Parser by yourself.
-
-1. Add Div Tag.
-
-```html
-<div id="demoCanvas" style="styles..."></div>
-```
-
-2. Load Animation
-
 ```js
-var player = new SVGA.Player('#demoCanvas');
-var parser = new SVGA.Parser();
-parser.load('rose_2.0.0.svga', function(videoItem) {
-    player.setVideoItem(videoItem);
-    player.startAnimation();
-})
+const displayObject = new SVGA.layabox.Player('res/svga/rose_2.0.0.svga')
+displayObject.setFrame(0, 0, 750, 750);
+Laya.stage.addChild(displayObject as any)
 ```
-
-### Load Animation Automatically
-
-Assign canvas element properties as below.
-
-```html
-<div src="rose_2.0.0.svga" loops="0" clearsAfterStop="true" style="styles..."></div>
-```
-
-Animation will play after Web-Page onload.
 
 ### Replace Animation Images Dynamically
 
@@ -80,7 +35,7 @@ You can replace specific image by yourself, ask your designer tell you the Image
 * setImage operation MUST set BEFORE startAnimation.
 
 ```
-player.setImage('http://yourserver.com/xxx.png', 'ImageKey');
+displayObject.setImage('http://yourserver.com/xxx.png', 'ImageKey');
 ```
 
 ### Add Text on Animation Image Dynamically
@@ -90,11 +45,11 @@ You can add text on specific image, ask your designer tell you the ImageKey.
 * setText operation MUST set BEFORE startAnimation.
 
 ```
-player.setText('Hello, World!', 'ImageKey');
+displayObject.setText('Hello, World!', 'ImageKey');
 ```
 
 ```
-player.setText({ 
+displayObject.setText({ 
     text: 'Hello, World!, 
     size: "24px", 
     color: "#ffe0a4",
@@ -104,7 +59,7 @@ player.setText({
 
 ## Classes
 
-### SVGA.Player
+### Player
 
 You use SVGA.Player controls animation play and stop.
 
@@ -116,7 +71,7 @@ You use SVGA.Player controls animation play and stop.
 
 #### Methods
 
-* constructor (canvas); - first params could be '#id' or CanvasHTMLElement
+* constructor (url: string, autoPlay: boolean); - first params could be '#id' or CanvasHTMLElement
 * startAnimation(); - start animation from zero frame.
 * pauseAnimation(); - pause animation on current frame.
 * stopAnimation(); - stop animation, clear contents while clearsAfterStop === true
@@ -130,29 +85,7 @@ You use SVGA.Player controls animation play and stop.
 * clearDynamicObjects(); - clear all dynamic objects.
 
 #### Callback Method
+* onError(callback: (error: Error) => void): void; - call after load failure.
 * onFinished(callback: () => void): void; - call after animation stop.
 * onFrame(callback: (frame: number): void): void; - call after animation specific frame rendered.
 * onPercentage(callback: (percentage: number): void): void; - call after animation specific percentage rendered.
-
-### SVGA.Parser
-
-You use SVGA.Parser load VideoItem from remote or Base64 string.
-
-Only Cross-Domain allow files could be loaded.
-
-If you eager to load resources from Base64 or File, deliver as ```load(File)``` or ```load('data:svga/2.0;base64,xxxxxx')```.
-
-#### Methods
-
-* constructor();
-* load(url: string, success: (videoItem: VideoEntity) => void, failure: (error: Error) => void): void;
-
-## Issues
-
-### Android 4.x Breaks
-
-As known, some Android OS lack Blob support, add Blob Polyfill by yourself.
-
-```
-<script src="//cdn.bootcss.com/blob-polyfill/1.0.20150320/Blob.min.js"></script>
-```

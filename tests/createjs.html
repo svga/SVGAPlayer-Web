@@ -1,0 +1,26 @@
+<html>
+
+<body style="text-align: center">
+    <div id="test">
+        <canvas id="demoCanvas" width="750" height="750" style="background-color: #000000"></canvas>
+        <p id="svgaPerformance"></p>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/createjs@1.0.1/builds/1.0.0/createjs.min.js"></script>
+    <script src="http://assets.dwstatic.com/common/lib/??jszip/3.1.3/jszip.min.js,jszip/3.1.3/jszip-utils.min.js" charset="utf-8"></script>
+    <script src="../build/svga.createjs.min.js"></script>
+    <script>
+
+        var sprite = new SVGA.createjs.Player('./samples/EmptyState.svga');
+        sprite.onError((err) => {
+            console.error(err)
+        })
+        var stage = new createjs.Stage('demoCanvas');
+        sprite.setFrame(0, 0, 750, 750);
+        sprite.setContentMode("AspectFill")
+        stage.addChild(sprite);
+        stage.update();
+
+    </script>
+</body>
+
+</html>
