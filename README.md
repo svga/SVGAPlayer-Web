@@ -36,7 +36,7 @@ SVGAPlayer 2.0.0 also supports below Game Engines.
 Both Prebuild & NPM, if you need to support SVGA-Format 1.x, add JSZip script to html.
 
 ```html
-<script src="http://assets.dwstatic.com/common/lib/??jszip/3.1.3/jszip.min.js,jszip/3.1.3/jszip-utils.min.js" charset="utf-8"></script>
+<script src="//s1.yy.com/ued_web_static/lib/jszip/3.1.4/??jszip.min.js,jszip-utils.min.js" charset="utf-8"></script>
 ```
 
 ## Usage
