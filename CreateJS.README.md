@@ -31,10 +31,7 @@ var displayObject = new SVGA.createjs.Player('./samples/rose_2.0.0.svga');
 displayObject.onError(function(err) {
     console.error(err)
 })
-displayObject.x = 0;
-displayObject.y = 0;
-displayObject.width = 500;
-displayObject.height = 500;
+displayObject.setFrame(0, 0, 500, 500)
 var stage = new createjs.Stage('CanvasID');
 stage.addChild(displayObject);
 ```
