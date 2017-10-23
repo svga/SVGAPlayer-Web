@@ -34,7 +34,7 @@ SVGAPlayer 2.0.0 同时支持以下游戏引擎使用
 无论是使用预编译 JS 或是 NPM， 如果你需要播放 1.x 格式的 SVGA 文件，需要添加 JSZip 到你的 HTML 页面中。
 
 ```html
-<script src="http://assets.dwstatic.com/common/lib/??jszip/3.1.3/jszip.min.js,jszip/3.1.3/jszip-utils.min.js" charset="utf-8"></script>
+<script src="//s1.yy.com/ued_web_static/lib/jszip/3.1.4/??jszip.min.js,jszip-utils.min.js" charset="utf-8"></script>
 ```
 
 ## 使用指南
@@ -65,7 +65,7 @@ parser.load('rose_2.0.0.svga', function(videoItem) {
 为 canvas 元素添加以下属性
 
 ```html
-<div src="rose_2.0.0.svga" loops="0" clearsAfterStop="true"></div>
+<div src="rose_2.0.0.svga" loops="0" clearsAfterStop="true" style="styles..."></div>
 ```
 
 动画会在页面加载完成后播放
