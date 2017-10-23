@@ -31,6 +31,7 @@ export class Player {
     setVideoItem(videoItem) {
         this._currentFrame = 0;
         this._videoItem = videoItem;
+        this._renderer.bitmapCache = undefined;
         this._renderer.prepare();
         this.clear();
         this._update();

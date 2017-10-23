@@ -9,6 +9,7 @@ export class Renderer {
     _owner = undefined;
     _prepared = false;
     _undrawFrame = undefined;
+    _bitmapCache = undefined;
 
     constructor(owner) {
         this._owner = owner;
@@ -17,12 +18,12 @@ export class Renderer {
     prepare() {
         this._prepared = false;
         if (this._owner._videoItem.images === undefined || Object.keys(this._owner._videoItem.images).length == 0) {
-            this._owner._videoItem.bitmapCache = {};
+            this._bitmapCache = {};
             this._prepared = true;
             return;
         }
-        if (this._owner._videoItem.bitmapCache === undefined) {
-            this._owner._videoItem.bitmapCache = {};
+        if (this._bitmapCache === undefined) {
+            this._bitmapCache = {};
             let totalCount = 0
             let loadedCount = 0
             for (var imageKey in this._owner._videoItem.images) {
@@ -41,7 +42,7 @@ export class Renderer {
                         }
                     }.bind(this);
                     imgTag.src = 'data:image/png;base64,' + src;
-                    this._owner._videoItem.bitmapCache[imageKey] = imgTag;
+                    this._bitmapCache[imageKey] = imgTag;
                 }
             }
         }
@@ -79,7 +80,7 @@ export class Renderer {
                 }
                 ctx.globalAlpha = frameItem.alpha;
                 ctx.transform(frameItem.transform.a, frameItem.transform.b, frameItem.transform.c, frameItem.transform.d, frameItem.transform.tx, frameItem.transform.ty)
-                let src = this._owner._dynamicImage[sprite.imageKey] || this._owner._videoItem.bitmapCache[sprite.imageKey] || this._owner._videoItem.images[sprite.imageKey];
+                let src = this._owner._dynamicImage[sprite.imageKey] || this._bitmapCache[sprite.imageKey] || this._owner._videoItem.images[sprite.imageKey];
                 if (typeof src === "string") {
                     let imgTag = document.createElement('img');
                     if (src.indexOf("iVBO") === 0 || src.indexOf("/9j/2w") === 0) {
@@ -88,7 +89,7 @@ export class Renderer {
                     else {
                         imgTag.src = src;
                     }
-                    this._owner._videoItem.bitmapCache[sprite.imageKey] = imgTag;
+                    this._bitmapCache[sprite.imageKey] = imgTag;
                     if (frameItem.maskPath !== undefined && frameItem.maskPath !== null) {
                         this.drawBezier(ctx, frameItem.maskPath);
                         ctx.clip();
