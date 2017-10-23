@@ -29,6 +29,7 @@ export class Player {
     }
 
     setVideoItem(videoItem) {
+        this._currentFrame = 0;
         this._videoItem = videoItem;
         this._renderer.prepare();
         this.clear();
@@ -48,6 +49,7 @@ export class Player {
 
     startAnimation() {
         this.stopAnimation(false);
+        this._currentFrame = 0;
         this._loopCount = 0;
         this._ticker.start();
     }
@@ -191,7 +193,7 @@ export class Player {
     }
 
     _resize() {
-        let asParent = false; 
+        let asParent = false;
         if (this._drawingCanvas) {
             let scaleX = 1.0; let scaleY = 1.0; let translateX = 0.0; let translateY = 0.0;
             let targetSize;
@@ -234,7 +236,7 @@ export class Player {
                     }
                 }
                 this._globalTransform = undefined;
-            }            
+            }
         }
         if (this._drawingCanvas === undefined || asParent === true) {
             let scaleX = 1.0; let scaleY = 1.0; let translateX = 0.0; let translateY = 0.0;

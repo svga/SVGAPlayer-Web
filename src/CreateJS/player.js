@@ -23,6 +23,7 @@ export class Player extends createjs.Container {
     }
 
     setVideoItem(videoItem) {
+        this._currentFrame = 0;
         this._videoItem = videoItem;
         this.removeAllChildren();
         this._addLayers();
@@ -46,6 +47,7 @@ export class Player extends createjs.Container {
     startAnimation() {
         this.visible = true;
         this.stopAnimation(false);
+        this._currentFrame = 0;
         this._loopCount = 0;
         this._tickListener = () => {
             this._onTick();

@@ -23,6 +23,7 @@ export class Player extends Laya.Sprite {
     }
 
     setVideoItem(videoItem) {
+        this._currentFrame = 0;
         this._videoItem = videoItem;
         this.removeChildren(0, this.numChildren);
         this._addLayers();
@@ -46,6 +47,7 @@ export class Player extends Laya.Sprite {
     startAnimation() {
         this.visible = true;
         this.stopAnimation(false);
+        this._currentFrame = 0;
         this._loopCount = 0;
         this._tickListener = () => {
             this._onTick();
