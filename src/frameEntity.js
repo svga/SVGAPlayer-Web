@@ -76,16 +76,16 @@ export class FrameEntity {
                     }
                     if (shape.styles) {
                         if (shape.styles.fill) {
-                            if (shape.styles.fill["r"]) shape.styles.fill[0] = shape.styles.fill["r"];
-                            if (shape.styles.fill["g"]) shape.styles.fill[1] = shape.styles.fill["g"];
-                            if (shape.styles.fill["b"]) shape.styles.fill[2] = shape.styles.fill["b"];
-                            if (shape.styles.fill["a"]) shape.styles.fill[3] = shape.styles.fill["a"];
+                            if (typeof shape.styles.fill["r"] === "number") shape.styles.fill[0] = shape.styles.fill["r"];
+                            if (typeof shape.styles.fill["g"] === "number") shape.styles.fill[1] = shape.styles.fill["g"];
+                            if (typeof shape.styles.fill["b"] === "number") shape.styles.fill[2] = shape.styles.fill["b"];
+                            if (typeof shape.styles.fill["a"] === "number") shape.styles.fill[3] = shape.styles.fill["a"];
                         }
                         if (shape.styles.stroke) {
-                            if (shape.styles.stroke["r"]) shape.styles.stroke[0] = shape.styles.stroke["r"];
-                            if (shape.styles.stroke["g"]) shape.styles.stroke[1] = shape.styles.stroke["g"];
-                            if (shape.styles.stroke["b"]) shape.styles.stroke[2] = shape.styles.stroke["b"];
-                            if (shape.styles.stroke["a"]) shape.styles.stroke[3] = shape.styles.stroke["a"];
+                            if (typeof shape.styles.stroke["r"] === "number") shape.styles.stroke[0] = shape.styles.stroke["r"];
+                            if (typeof shape.styles.stroke["g"] === "number") shape.styles.stroke[1] = shape.styles.stroke["g"];
+                            if (typeof shape.styles.stroke["b"] === "number") shape.styles.stroke[2] = shape.styles.stroke["b"];
+                            if (typeof shape.styles.stroke["a"] === "number") shape.styles.stroke[3] = shape.styles.stroke["a"];
                         }
                     }
                 })
