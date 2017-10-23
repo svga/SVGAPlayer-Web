@@ -17,6 +17,7 @@ export class Renderer {
 
     prepare() {
         this._prepared = false;
+        this._bitmapCache = undefined;
         if (this._owner._videoItem.images === undefined || Object.keys(this._owner._videoItem.images).length == 0) {
             this._bitmapCache = {};
             this._prepared = true;

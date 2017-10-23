@@ -17,7 +17,13 @@ export class Player {
 
     _init() {
         if (this._container instanceof HTMLDivElement || this._asChild) {
+            this._container.querySelectorAll('canvas').forEach(element => {
+                if (element.__isPlayer) {
+                    this._container.removeChild(element);
+                }
+            })
             this._drawingCanvas = document.createElement('canvas');
+            this._drawingCanvas.__isPlayer = true
             this._drawingCanvas.style.backgroundColor = "transparent"
             if (this._container) {
                 this._container.appendChild(this._drawingCanvas);
@@ -31,7 +37,6 @@ export class Player {
     setVideoItem(videoItem) {
         this._currentFrame = 0;
         this._videoItem = videoItem;
-        this._renderer.bitmapCache = undefined;
         this._renderer.prepare();
         this.clear();
         this._update();
@@ -208,6 +213,7 @@ export class Player {
             if (targetSize.width >= imageSize.width && targetSize.height >= imageSize.height) {
                 this._drawingCanvas.width = targetSize.width;
                 this._drawingCanvas.height = targetSize.height;
+                this._drawingCanvas.style.transform = "";
                 asParent = true;
             }
             else {
