@@ -74,6 +74,28 @@ export class FrameEntity {
                             shape.type = "keep";
                             break;
                     }
+                    switch (shape.lineCap) {
+                        case 0:
+                            shape.lineCap = "butt";
+                            break;
+                        case 1:
+                            shape.lineCap = "round";
+                            break;
+                        case 2:
+                            shape.lineCap = "square";
+                            break;
+                    }
+                    switch (shape.lineJoin) {
+                        case 0:
+                            shape.lineJoin = "miter";
+                            break;
+                        case 1:
+                            shape.lineJoin = "round";
+                            break;
+                        case 2:
+                            shape.lineJoin = "bevel";
+                            break;
+                    }
                     if (shape.styles) {
                         if (shape.styles.fill) {
                             if (typeof shape.styles.fill["r"] === "number") shape.styles.fill[0] = shape.styles.fill["r"];
@@ -87,9 +109,23 @@ export class FrameEntity {
                             if (typeof shape.styles.stroke["b"] === "number") shape.styles.stroke[2] = shape.styles.stroke["b"];
                             if (typeof shape.styles.stroke["a"] === "number") shape.styles.stroke[3] = shape.styles.stroke["a"];
                         }
+                        let lineDash = shape.styles.lineDash || []
+                        if (shape.styles.lineDashI > 0) {
+                            lineDash.push(shape.styles.lineDashI)
+                        }
+                        if (shape.styles.lineDashII > 0) {
+                            if (lineDash.length < 1) { lineDash.push(0) }
+                            lineDash.push(shape.styles.lineDashII)
+                            lineDash.push(0)
+                        }
+                        if (shape.styles.lineDashIII > 0) {
+                            if (lineDash.length < 2) { lineDash.push(0); lineDash.push(0); }
+                            lineDash[2] = shape.styles.lineDashIII
+                        }
+                        shape.styles.lineDash = lineDash
                     }
                 })
-            } 
+            }
             if (spec.shapes[0] && spec.shapes[0].type === "keep") {
                 this.shapes = FrameEntity.lastShapes;
             }
