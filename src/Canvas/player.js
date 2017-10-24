@@ -17,11 +17,13 @@ export class Player {
 
     _init() {
         if (this._container instanceof HTMLDivElement || this._asChild) {
-            this._container.querySelectorAll('canvas').forEach(element => {
-                if (element.__isPlayer) {
-                    this._container.removeChild(element);
-                }
-            })
+            if (this._container.querySelectorAll('canvas').length > 0) {
+                this._container.querySelectorAll('canvas').forEach(element => {
+                    if (element.__isPlayer) {
+                        this._container.removeChild(element);
+                    }
+                })
+            }
             this._drawingCanvas = document.createElement('canvas');
             this._drawingCanvas.__isPlayer = true
             this._drawingCanvas.style.backgroundColor = "transparent"
