@@ -17,11 +17,13 @@ export class Player {
 
     _init() {
         if (this._container instanceof HTMLDivElement || this._asChild) {
-            const existedCanvasElements = this._container.querySelectorAll('canvas');
-            for (let index = 0; index < existedCanvasElements.length; index++) {
-                let element = existedCanvasElements[index];
-                if (element !== undefined && element.__isPlayer) {
-                    this._container.removeChild(element);
+            if (this._container) {
+                const existedCanvasElements = this._container.querySelectorAll('canvas');
+                for (let index = 0; index < existedCanvasElements.length; index++) {
+                    let element = existedCanvasElements[index];
+                    if (element !== undefined && element.__isPlayer) {
+                        this._container.removeChild(element);
+                    }
                 }
             }
             this._drawingCanvas = document.createElement('canvas');
