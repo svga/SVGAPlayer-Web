@@ -3,6 +3,21 @@
 import { Renderer } from './renderer'
 import { Ticker } from './ticker'
 
+let performance = window.performance;
+
+if (typeof performance === "undefined") {
+    performance = {
+        now: () => {
+            return (new Date()).getTime()
+        }
+    }
+}
+else if (typeof performance.now === "undefined") {
+    performance.now = () => {
+        return (new Date()).getTime()
+    }
+}
+
 export class Player {
 
     loops = 0;
@@ -215,7 +230,7 @@ export class Player {
             if (targetSize.width >= imageSize.width && targetSize.height >= imageSize.height) {
                 this._drawingCanvas.width = targetSize.width;
                 this._drawingCanvas.height = targetSize.height;
-                this._drawingCanvas.style.transform = "";
+                this._drawingCanvas.style.webkitTransform = this._drawingCanvas.style.transform = "";
                 asParent = true;
             }
             else {
@@ -226,7 +241,7 @@ export class Player {
                     const scaleY = targetSize.height / imageSize.height;
                     const translateX = (imageSize.width * scaleX - imageSize.width) / 2.0
                     const translateY = (imageSize.height * scaleY - imageSize.height) / 2.0
-                    this._drawingCanvas.style.transform = "matrix(" + scaleX + ", 0.0, 0.0, " + scaleY + ", " + translateX + ", " + translateY + ")"
+                    this._drawingCanvas.style.webkitTransform = this._drawingCanvas.style.transform = "matrix(" + scaleX + ", 0.0, 0.0, " + scaleY + ", " + translateX + ", " + translateY + ")"
                 }
                 else if (this._contentMode === "AspectFit" || this._contentMode === "AspectFill") {
                     const imageRatio = imageSize.width / imageSize.height;
@@ -235,13 +250,13 @@ export class Player {
                         const scale = targetSize.width / imageSize.width;
                         const translateX = (imageSize.width * scale - imageSize.width) / 2.0
                         const translateY = (imageSize.height * scale - imageSize.height) / 2.0 + (targetSize.height - imageSize.height * scale) / 2.0
-                        this._drawingCanvas.style.transform = "matrix(" + scale + ", 0.0, 0.0, " + scale + ", " + translateX + ", " + translateY + ")"
+                        this._drawingCanvas.style.webkitTransform = this._drawingCanvas.style.transform = "matrix(" + scale + ", 0.0, 0.0, " + scale + ", " + translateX + ", " + translateY + ")"
                     }
                     else if ((imageRatio < viewRatio && this._contentMode === "AspectFit") || (imageRatio > viewRatio && this._contentMode === "AspectFill")) {
                         const scale = targetSize.height / imageSize.height;
                         const translateX = (imageSize.width * scale - imageSize.width) / 2.0 + (targetSize.width - imageSize.width * scale) / 2.0
                         const translateY = (imageSize.height * scale - imageSize.height) / 2.0
-                        this._drawingCanvas.style.transform = "matrix(" + scale + ", 0.0, 0.0, " + scale + ", " + translateX + ", " + translateY + ")"
+                        this._drawingCanvas.style.webkitTransform = this._drawingCanvas.style.transform = "matrix(" + scale + ", 0.0, 0.0, " + scale + ", " + translateX + ", " + translateY + ")"
                     }
                 }
                 this._globalTransform = undefined;
