@@ -177,163 +177,137 @@ export class Renderer {
         const shape = new createjs.Shape()
         const g = shape.graphics;
         this.resetStyle(obj, shape);
-        let args = [];
-        let tempArg = [];
-        let items = obj._d.replace(/,/g, ' ').split(' ');
-        let point = {
-            x: 0,
-            y: 0,
-        };
-        for (let i = 0; i < items.length; i++) {
-            let item = items[i];
-            if (item.length < 1) {
-                continue;
-            }
-            let firstLetter = item.substr(0, 1);
+        let currentPoint = { x: 0, y: 0, x1: 0, y1: 0, x2: 0, y2: 0 }
+        const d = obj._d.replace(/([a-zA-Z])/g, '|||$1 ').replace(/,/g, ' ');
+        d.split('|||').forEach(segment => {
+            if (segment.length == 0) { return; }
+            const firstLetter = segment.substr(0, 1);
             if (validMethods.indexOf(firstLetter) >= 0) {
-                if (tempArg.length > 0) {
-                    args.push(tempArg);
-                    tempArg = [];
-                }
-                tempArg.push(firstLetter);
-                if (item.substr(1).trim().length > 0) {
-                    tempArg.push(item.substr(1));
-                }
-            } else {
-                tempArg.push(item);
+                const args = segment.substr(1).trim().split(" ");
+                this.drawBezierElement(g, currentPoint, firstLetter, args);
             }
-        }
-        if (tempArg.length > 0) {
-            args.push(tempArg);
-            tempArg = [];
-        }
-        for (let i = 0; i < args.length; i++) {
-            let arg = args[i];
-            if (!(arg[0] == 'C' || arg[0] == 'c')) {
-                delete (point.x1);
-                delete (point.y1);
-                delete (point.x2);
-                delete (point.y2);
-            }
-            switch (arg[0]) {
-                case 'M':
-                    point.x = Number(arg[1]);
-                    point.y = Number(arg[2]);
-                    g.moveTo(point.x, point.y);
-                    break;
-                case 'm':
-                    point.x += Number(arg[1]);
-                    point.y += Number(arg[2]);
-                    g.moveTo(point.x, point.y);
-                    break;
-                case 'L':
-                    point.x = Number(arg[1]);
-                    point.y = Number(arg[2]);
-                    g.lineTo(point.x, point.y);
-                    break;
-                case 'l':
-                    point.x += Number(arg[1]);
-                    point.y += Number(arg[2]);
-                    g.lineTo(point.x, point.y);
-                    break;
-                case 'H':
-                    point.x = Number(arg[1]);
-                    g.lineTo(point.x, point.y);
-                    break;
-                case 'h':
-                    point.x += Number(arg[1]);
-                    g.lineTo(point.x, point.y);
-                    break;
-                case 'V':
-                    point.y = Number(arg[1]);
-                    g.lineTo(point.x, point.y);
-                    break;
-                case 'v':
-                    point.y += Number(arg[1]);
-                    g.lineTo(point.x, point.y);
-                    break;
-                case 'C':
-                    point.x1 = Number(arg[1]);
-                    point.y1 = Number(arg[2]);
-                    point.x2 = Number(arg[3]);
-                    point.y2 = Number(arg[4]);
-                    point.x = Number(arg[5]);
-                    point.y = Number(arg[6]);
-                    g.bezierCurveTo(point.x1, point.y1, point.x2, point.y2, point.x, point.y);
-                    break;
-                case 'c':
-                    point.x1 = point.x + Number(arg[1]);
-                    point.y1 = point.y + Number(arg[2]);
-                    point.x2 = point.x + Number(arg[3]);
-                    point.y2 = point.y + Number(arg[4]);
-                    point.x += Number(arg[5]);
-                    point.y += Number(arg[6]);
-                    g.bezierCurveTo(point.x1, point.y1, point.x2, point.y2, point.x, point.y);
-                    break;
-                case 'S':
-                    if (point.x1 && point.y1 && point.x2 && point.y2) {
-                        point.x1 = point.x - point.x2 + point.x;
-                        point.y1 = point.y - point.y2 + point.y;
-                        point.x2 = Number(arg[1]);
-                        point.y2 = Number(arg[2]);
-                        point.x = Number(arg[3]);
-                        point.y = Number(arg[4]);
-                        g.bezierCurveTo(point.x1, point.y1, point.x2, point.y2, point.x, point.y);
-                    } else {
-                        point.x1 = Number(arg[1]);
-                        point.y1 = Number(arg[2]);
-                        point.x = Number(arg[3]);
-                        point.y = Number(arg[4]);
-                        g.quadraticCurveTo(point.x1, point.y1, point.x, point.y);
-                    }
-                    break;
-                case 's':
-                    if (point.x1 && point.y1 && point.x2 && point.y2) {
-                        point.x1 = point.x - point.x2 + point.x;
-                        point.y1 = point.y - point.y2 + point.y;
-                        point.x2 = point.x + Number(arg[1]);
-                        point.y2 = point.y + Number(arg[2]);
-                        point.x += Number(arg[3]);
-                        point.y += Number(arg[4]);
-                        g.bezierCurveTo(point.x1, point.y1, point.x2, point.y2, point.x, point.y);
-                    } else {
-                        point.x1 = point.x + Number(arg[1]);
-                        point.y1 = point.y + Number(arg[2]);
-                        point.x += Number(arg[3]);
-                        point.y += Number(arg[4]);
-                        g.quadraticCurveTo(point.x1, point.y1, point.x, point.y);
-                    }
-                    break;
-                case 'Q':
-                    point.x1 = Number(arg[1]);
-                    point.y1 = Number(arg[2]);
-                    point.x = Number(arg[3]);
-                    point.y = Number(arg[4]);
-                    g.quadraticCurveTo(point.x1, point.y1, point.x, point.y);
-                    break;
-                case 'q':
-                    point.x1 = point.x + Number(arg[1]);
-                    point.y1 = point.y + Number(arg[2]);
-                    point.x += Number(arg[3]);
-                    point.y += Number(arg[4]);
-                    g.quadraticCurveTo(point.x1, point.y1, point.x, point.y);
-                    break;
-                case 'A':
-                    break;
-                case 'a':
-                    break;
-                case 'Z':
-                case 'z':
-                    g.closePath();
-                    break;
-                default:
-                    break;
-            }
-        }
+        })
         if (obj._transform !== undefined && obj._transform !== null) {
             shape.transformMatrix = new createjs.Matrix2D(obj._transform.a, obj._transform.b, obj._transform.c, obj._transform.d, obj._transform.tx, obj._transform.ty);
         }
         return shape;
+    }
+
+    static drawBezierElement(g, currentPoint, method, args) {
+        switch (method) {
+            case 'M':
+                currentPoint.x = Number(args[0]);
+                currentPoint.y = Number(args[1]);
+                g.moveTo(currentPoint.x, currentPoint.y);
+                break;
+            case 'm':
+                currentPoint.x += Number(args[0]);
+                currentPoint.y += Number(args[1]);
+                g.moveTo(currentPoint.x, currentPoint.y);
+                break;
+            case 'L':
+                currentPoint.x = Number(args[0]);
+                currentPoint.y = Number(args[1]);
+                g.lineTo(currentPoint.x, currentPoint.y);
+                break;
+            case 'l':
+                currentPoint.x += Number(args[0]);
+                currentPoint.y += Number(args[1]);
+                g.lineTo(currentPoint.x, currentPoint.y);
+                break;
+            case 'H':
+                currentPoint.x = Number(args[0]);
+                g.lineTo(currentPoint.x, currentPoint.y);
+                break;
+            case 'h':
+                currentPoint.x += Number(args[0]);
+                g.lineTo(currentPoint.x, currentPoint.y);
+                break;
+            case 'V':
+                currentPoint.y = Number(args[0]);
+                g.lineTo(currentPoint.x, currentPoint.y);
+                break;
+            case 'v':
+                currentPoint.y += Number(args[0]);
+                g.lineTo(currentPoint.x, currentPoint.y);
+                break;
+            case 'C':
+                currentPoint.x1 = Number(args[0]);
+                currentPoint.y1 = Number(args[1]);
+                currentPoint.x2 = Number(args[2]);
+                currentPoint.y2 = Number(args[3]);
+                currentPoint.x = Number(args[4]);
+                currentPoint.y = Number(args[5]);
+                g.bezierCurveTo(currentPoint.x1, currentPoint.y1, currentPoint.x2, currentPoint.y2, currentPoint.x, currentPoint.y);
+                break;
+            case 'c':
+                currentPoint.x1 = currentPoint.x + Number(args[0]);
+                currentPoint.y1 = currentPoint.y + Number(args[1]);
+                currentPoint.x2 = currentPoint.x + Number(args[2]);
+                currentPoint.y2 = currentPoint.y + Number(args[3]);
+                currentPoint.x += Number(args[4]);
+                currentPoint.y += Number(args[5]);
+                g.bezierCurveTo(currentPoint.x1, currentPoint.y1, currentPoint.x2, currentPoint.y2, currentPoint.x, currentPoint.y);
+                break;
+            case 'S':
+                if (currentPoint.x1 && currentPoint.y1 && currentPoint.x2 && currentPoint.y2) {
+                    currentPoint.x1 = currentPoint.x - currentPoint.x2 + currentPoint.x;
+                    currentPoint.y1 = currentPoint.y - currentPoint.y2 + currentPoint.y;
+                    currentPoint.x2 = Number(args[0]);
+                    currentPoint.y2 = Number(args[1]);
+                    currentPoint.x = Number(args[2]);
+                    currentPoint.y = Number(args[3]);
+                    g.bezierCurveTo(currentPoint.x1, currentPoint.y1, currentPoint.x2, currentPoint.y2, currentPoint.x, currentPoint.y);
+                } else {
+                    currentPoint.x1 = Number(args[0]);
+                    currentPoint.y1 = Number(args[1]);
+                    currentPoint.x = Number(args[2]);
+                    currentPoint.y = Number(args[3]);
+                    g.quadraticCurveTo(currentPoint.x1, currentPoint.y1, currentPoint.x, currentPoint.y);
+                }
+                break;
+            case 's':
+                if (currentPoint.x1 && currentPoint.y1 && currentPoint.x2 && currentPoint.y2) {
+                    currentPoint.x1 = currentPoint.x - currentPoint.x2 + currentPoint.x;
+                    currentPoint.y1 = currentPoint.y - currentPoint.y2 + currentPoint.y;
+                    currentPoint.x2 = currentPoint.x + Number(args[0]);
+                    currentPoint.y2 = currentPoint.y + Number(args[1]);
+                    currentPoint.x += Number(args[2]);
+                    currentPoint.y += Number(args[3]);
+                    g.bezierCurveTo(currentPoint.x1, currentPoint.y1, currentPoint.x2, currentPoint.y2, currentPoint.x, currentPoint.y);
+                } else {
+                    currentPoint.x1 = currentPoint.x + Number(args[0]);
+                    currentPoint.y1 = currentPoint.y + Number(args[1]);
+                    currentPoint.x += Number(args[2]);
+                    currentPoint.y += Number(args[3]);
+                    g.quadraticCurveTo(currentPoint.x1, currentPoint.y1, currentPoint.x, currentPoint.y);
+                }
+                break;
+            case 'Q':
+                currentPoint.x1 = Number(args[0]);
+                currentPoint.y1 = Number(args[1]);
+                currentPoint.x = Number(args[2]);
+                currentPoint.y = Number(args[3]);
+                g.quadraticCurveTo(currentPoint.x1, currentPoint.y1, currentPoint.x, currentPoint.y);
+                break;
+            case 'q':
+                currentPoint.x1 = currentPoint.x + Number(args[0]);
+                currentPoint.y1 = currentPoint.y + Number(args[1]);
+                currentPoint.x += Number(args[2]);
+                currentPoint.y += Number(args[3]);
+                g.quadraticCurveTo(currentPoint.x1, currentPoint.y1, currentPoint.x, currentPoint.y);
+                break;
+            case 'A':
+                break;
+            case 'a':
+                break;
+            case 'Z':
+            case 'z':
+                g.closePath();
+                break;
+            default:
+                break;
+        }
     }
 
     static requestEllipseShape(obj) {
