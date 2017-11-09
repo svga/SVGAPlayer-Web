@@ -103,6 +103,13 @@ export class Player extends createjs.Container {
         if (transform !== undefined && transform instanceof Array && transform.length == 6) {
             this._dynamicImageTransform[forKey] = transform;
         }
+        if (this._videoItem !== undefined) {
+            const currentFrame = this._currentFrame;
+            this.removeAllChildren();
+            this._addLayers();
+            this._currentFrame = currentFrame;
+            this._update();
+        }
     }
 
     setText(textORMap, forKey) {
@@ -114,6 +121,13 @@ export class Player extends createjs.Container {
         let textLayer = new createjs.Text(text, `${size} family`, color);
         textLayer.offset = offset;
         this._dynamicText[forKey] = textLayer;
+        if (this._videoItem !== undefined) {
+            const currentFrame = this._currentFrame;
+            this.removeAllChildren();
+            this._addLayers();
+            this._currentFrame = currentFrame;
+            this._update();
+        }
     }
 
     clearDynamicObjects() {

@@ -127,13 +127,22 @@ export class Renderer {
 
     requestBitmapLayer(bitmap, bitmapTransform, frames) {
         let imgTag = document.createElement('img');
+        let backCanvas;
         if (bitmap.indexOf("iVBO") === 0 || bitmap.indexOf("/9j/2w") === 0) {
             imgTag.src = 'data:image/png;base64,' + bitmap;
         }
         else {
             imgTag.src = bitmap;
+            if (frames[0] && frames[0].layout) {
+                backCanvas = document.createElement('canvas');
+                backCanvas.width = frames[0].layout.width
+                backCanvas.height = frames[0].layout.height
+                imgTag.onload = function() {
+                    backCanvas.getContext('2d').drawImage(imgTag, 0, 0, frames[0].layout.width, frames[0].layout.height)
+                }
+            }
         }
-        let layer = new createjs.Bitmap(imgTag);
+        let layer = new createjs.Bitmap(backCanvas || imgTag);
         if (bitmapTransform !== undefined) {
             layer.transformMatrix = new createjs.Matrix2D(bitmapTransform[0], bitmapTransform[1], bitmapTransform[2], bitmapTransform[3], bitmapTransform[4], bitmapTransform[5]);
         }

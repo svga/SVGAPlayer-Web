@@ -16,22 +16,11 @@ export class Parser {
     }
 
     loadViaWorker(url, success, failure) {
-        if (typeof window === "object") {
-            window.SVGAPerformance.networkStart = performance.now()
-        }
         MockWorker(url, (data) => {
             let movie = data.movie;
-
             movie["version"] = data.ver;
             let images = data.images;
-            if (typeof window === "object") {
-                window.SVGAPerformance.parseStart = performance.now()
-            }
             let videoItem = new VideoEntity(movie, images);
-            if (typeof window === "object") {
-                window.SVGAPerformance.parseEnd = performance.now()
-                console.log(window.SVGAPerformance);
-            }
             success(videoItem);
         }, failure)
     }

@@ -99,6 +99,13 @@ export class Player extends Laya.Sprite {
         if (transform !== undefined && transform instanceof Array && transform.length == 6) {
             this._dynamicImageTransform[forKey] = transform;
         }
+        if (this._videoItem !== undefined) {
+            const currentFrame = this._currentFrame;
+            this.removeChildren(0, this.numChildren);
+            this._addLayers();
+            this._currentFrame = currentFrame;
+            this._update();
+        }
     }
 
     setText(textORMap, forKey) {
@@ -118,6 +125,13 @@ export class Player extends Laya.Sprite {
         }
         textLayer.offset = offset;
         this._dynamicText[forKey] = textLayer;
+        if (this._videoItem !== undefined) {
+            const currentFrame = this._currentFrame;
+            this.removeChildren(0, this.numChildren);
+            this._addLayers();
+            this._currentFrame = currentFrame;
+            this._update();
+        }
     }
 
     clearDynamicObjects() {

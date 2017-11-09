@@ -84,6 +84,8 @@ export class Renderer {
                 let src = this._owner._dynamicImage[sprite.imageKey] || this._bitmapCache[sprite.imageKey] || this._owner._videoItem.images[sprite.imageKey];
                 if (typeof src === "string") {
                     let imgTag = this._bitmapCache[sprite.imageKey] || document.createElement('img');
+                    let targetWidth = undefined;
+                    let targetHeight = undefined;
                     if (src.indexOf("iVBO") === 0 || src.indexOf("/9j/2w") === 0) {
                         imgTag.src = 'data:image/png;base64,' + src;
                     }
@@ -92,6 +94,8 @@ export class Renderer {
                             imgTag._svgaSrc = src;
                             imgTag.src = src;
                         }
+                        targetWidth = frameItem.layout.width;
+                        targetHeight = frameItem.layout.height;
                     }
                     this._bitmapCache[sprite.imageKey] = imgTag;
                     if (frameItem.maskPath !== undefined && frameItem.maskPath !== null) {
@@ -103,7 +107,8 @@ export class Renderer {
                         const concatTransform = this._owner._dynamicImageTransform[sprite.imageKey];
                         ctx.transform(concatTransform[0], concatTransform[1], concatTransform[2], concatTransform[3], concatTransform[4], concatTransform[5]);
                     }
-                    ctx.drawImage(imgTag, 0, 0);
+                    if (targetWidth && targetHeight) { ctx.drawImage(imgTag, 0, 0, targetWidth, targetHeight); }
+                    else { ctx.drawImage(imgTag, 0, 0); }
                     if (this._owner._dynamicImageTransform[sprite.imageKey] !== undefined) {
                         ctx.restore();
                     }
