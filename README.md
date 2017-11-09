@@ -4,6 +4,11 @@ Language: [中文](README.zh.md)
 
 ## News
 
+* 2.0.6
+    * Bug-fix: setImage on safari leads inifity loop.
+    * Improve: BezierPath drawing performance.
+    * Improve: Now can set image and text anytime. set image can be any size, it will be resize by SVGAPlayer.
+
 * 2.0.0
     * Add SVGA-Format 2.0.0 support.
     * Add npm support, use ```npm install svgaplayerweb --save```.
@@ -76,9 +81,6 @@ Animation will play after Web-Page onload.
 
 You can replace specific image by yourself, ask your designer tell you the ImageKey.
 
-* The Replacing Image MUST have same WIDTH and HEIGHT as Original.
-* setImage operation MUST set BEFORE startAnimation.
-
 ```
 player.setImage('http://yourserver.com/xxx.png', 'ImageKey');
 ```
@@ -86,8 +88,6 @@ player.setImage('http://yourserver.com/xxx.png', 'ImageKey');
 ### Add Text on Animation Image Dynamically
 
 You can add text on specific image, ask your designer tell you the ImageKey.
-
-* setText operation MUST set BEFORE startAnimation.
 
 ```
 player.setText('Hello, World!', 'ImageKey');
