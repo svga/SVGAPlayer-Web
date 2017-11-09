@@ -83,12 +83,15 @@ export class Renderer {
                 ctx.transform(frameItem.transform.a, frameItem.transform.b, frameItem.transform.c, frameItem.transform.d, frameItem.transform.tx, frameItem.transform.ty)
                 let src = this._owner._dynamicImage[sprite.imageKey] || this._bitmapCache[sprite.imageKey] || this._owner._videoItem.images[sprite.imageKey];
                 if (typeof src === "string") {
-                    let imgTag = document.createElement('img');
+                    let imgTag = this._bitmapCache[sprite.imageKey] || document.createElement('img');
                     if (src.indexOf("iVBO") === 0 || src.indexOf("/9j/2w") === 0) {
                         imgTag.src = 'data:image/png;base64,' + src;
                     }
                     else {
-                        imgTag.src = src;
+                        if (imgTag._svgaSrc !== src) {
+                            imgTag._svgaSrc = src;
+                            imgTag.src = src;
+                        }
                     }
                     this._bitmapCache[sprite.imageKey] = imgTag;
                     if (frameItem.maskPath !== undefined && frameItem.maskPath !== null) {
