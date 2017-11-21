@@ -4980,19 +4980,20 @@ var Bezier=function(t){function n(i){if(r[i])return r[i].exports;var e=r[i]={exp
 			_x1 = cp2x, _y1 = cp2y;
 			cp2x = this._curMat.a * _x1 + this._curMat.c * _y1 + this._curMat.tx;
 			cp2y = this._curMat.b * _x1 + this._curMat.d * _y1 + this._curMat.ty;
-			let sx = this._path.getEndPointX();
-			let sy = this._path.getEndPointY();
+			var sx = this._path.getEndPointX();
+			var sy = this._path.getEndPointY();
 			if (sx == undefined || isNaN(sx)) {
 				sx = 0;
 			}
 			if (sy == undefined || isNaN(sy)) {
 				sy = 0;
 			}
-			let bezier = new window.Bezier(sx, sy, cp1x, cp1y, cp2x, cp2y, x, y);
-			let arr = bezier.getLUT(Math.ceil(bezier.length()));
-			arr.forEach((pt, idx) => {
+			var bezier = new window.Bezier(sx, sy, cp1x, cp1y, cp2x, cp2y, x, y);
+			var arr = bezier.getLUT(Math.ceil(bezier.length()));
+			for (var index = 0; index < arr.length; index++) {
+				var pt = arr[index];
 				this.lineTo(pt.x, pt.y, false);
-			})
+			}
 			this.lineTo(x, y, false);
 		}
 
