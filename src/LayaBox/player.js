@@ -24,7 +24,7 @@ export class Player extends Laya.Sprite {
         this._renderer = new Renderer(this);
     }
 
-    setVideoUrl(url, success, failure) {
+    setVideoUrl(url, autoplay, success, failure) {
         (new Parser()).load(url, (videoItem) => {
             if (success) {
                 success(videoItem);
