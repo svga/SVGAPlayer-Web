@@ -10,7 +10,7 @@
 
 SVGAPlayer 2.0.0 只支持以下浏览器使用
 
-* Edge
+* Edge / IE 10+
 * Safari / Chrome
 * iOS 6.0+ / Android 4.0+
 
