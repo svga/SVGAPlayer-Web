@@ -17,7 +17,7 @@ Language: [中文](README.zh.md)
 
 SVGAPlayer 2.0.0 only supports below browsers.
 
-* Edge
+* Edge / IE 10+
 * Safari / Chrome
 * iOS 6.0+ / Android 4.0+
 
