@@ -29,8 +29,7 @@ SVGAPlayer 2.0.0 also supports below Game Engines.
 ## Install
 
 ### Prebuild JS
-1. Goto [https://github.com/yyued/SVGAPlayer-Web/tree/master/build](https://github.com/yyued/SVGAPlayer-Web/tree/master/build) Download svga.min.js
-2. Add ```<script src="svga.min.js"></script>``` to xxx.html
+1. Add ```<script src="https://cdn.jsdelivr.net/npm/svgaplayerweb@2.0.6/build/svga.min.js"></script>``` to your.html
 
 ### NPM
 1. ```npm install svgaplayerweb --save```
