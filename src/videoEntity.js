@@ -37,7 +37,6 @@ export class VideoEntity {
     sprites = []
 
     constructor(spec, images) {
-        debugger;
         if (typeof spec === "object" && spec.$type == ProtoMovieEntity) {
             if (typeof spec.params === "object") {
                 this.version = spec.ver;
