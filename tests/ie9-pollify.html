@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="./swfobject.js"></script>
+    <script src="../build/svga.min.js"></script>
+</head>
+<body>
+<div id="testCanvas" style="width:500px;height:500px;overflow:hidden;"></div>
+<script>
+    //    var parser = new SVGA.Parser();
+    var parser = new SVGA.IE9Parser('../build/ie9-pollify.swf');
+    var player = new SVGA.Player('#testCanvas');
+    parser.load("./samples/angel.svga", function (videoItem) {
+        player.setVideoItem(videoItem);
+        player.startAnimation()
+    })
+</script>
+</body>
+</html>

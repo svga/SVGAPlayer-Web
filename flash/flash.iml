@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="Flex" version="4">
+  <component name="FlexBuildConfigurationManager" active="flash">
+    <configurations>
+      <configuration name="flash" pure-as="true" main-class="Main" output-file="flash.swf" output-folder="$MODULE_DIR$/out/production/flash">
+        <dependencies target-player="27.0">
+          <entries>
+            <entry library-name="as3" library-level="project">
+              <dependency linkage="Merged" />
+            </entry>
+            <entry library-name="protobuf" library-level="project">
+              <dependency linkage="Merged" />
+            </entry>
+            <entry library-name="base64lib" library-level="project">
+              <dependency linkage="Merged" />
+            </entry>
+          </entries>
+          <sdk name="air sdk" />
+        </dependencies>
+        <compiler-options />
+        <packaging-air-desktop />
+        <packaging-android />
+        <packaging-ios />
+      </configuration>
+    </configurations>
+    <compiler-options />
+  </component>
+  <component name="NewModuleRootManager" inherit-compiler-output="true">
+    <exclude-output />
+    <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
+    </content>
+    <orderEntry type="jdk" jdkName="air sdk" jdkType="Flex SDK Type (new)" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" exported="" name="src" level="project" />
+    <orderEntry type="library" exported="" name="as3" level="project" />
+    <orderEntry type="library" exported="" name="svga-proto" level="project" />
+    <orderEntry type="library" exported="" name="protobuf" level="project" />
+    <orderEntry type="library" exported="" name="libs" level="project" />
+    <orderEntry type="library" exported="" name="redtamarin" level="project" />
+    <orderEntry type="library" exported="" name="base64lib" level="project" />
+  </component>
+</module>
