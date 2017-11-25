@@ -93,7 +93,7 @@ public class Parser {
         var timer:uint = setInterval(function ():void {
             if (ExternalInterface.available) {
                 ExternalInterface.call('window.' + _me._prefix + '.receive', {
-                    spriteData: spriteDatas.splice(0, 25),
+                    spriteData: spriteDatas.splice(0, 15),
                     id: id,
                     state: 'continue'
                 });
@@ -102,7 +102,7 @@ public class Parser {
                     ExternalInterface.call('window.' + _me._prefix + '.receive', {id: id, state: 'done'});
                 }
             }
-        }, 100);
+        }, 350);
     }
 
     private function onSecurityError(e:SecurityErrorEvent, id:Number):void {
