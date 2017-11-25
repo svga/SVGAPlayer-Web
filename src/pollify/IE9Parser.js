@@ -15,7 +15,7 @@ export class IE9Parser {
     }
 
     load(url, success, faild) {
-        if (!this.ref) {
+        if (!this.ref || !this.ref.load) {
             this.loadQueue.push({
                 url: url,
                 success: success,
