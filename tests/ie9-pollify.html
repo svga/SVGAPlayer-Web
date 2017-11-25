@@ -18,7 +18,7 @@
     //    var parser = new SVGA.Parser();
     var parser = new SVGA.IE9Parser('../build/ie9-pollify.swf');
     var player = new SVGA.Player('#testCanvas');
-    parser.load("./samples/angel.svga", function (videoItem) {
+    parser.load("./samples/success.svga", function (videoItem) {
         player.setVideoItem(videoItem);
         player.startAnimation()
     })

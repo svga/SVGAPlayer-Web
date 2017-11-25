@@ -103,7 +103,6 @@ export class IE9Parser {
             let success = this.waitQueue[id].success;
             this.waitQueue[id] = null;
             delete this.waitQueue[id];
-            debugger;
             if (typeof success === 'function') {
                 success(new VideoEntity({
                     movie: {
