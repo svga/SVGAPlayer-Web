@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="./swfobject.js"></script>
+    <script src="../build/svga.min.js"></script>
+    <style>
+        #testCanvas canvas {
+            width: 500px;
+            height: 500px;
+        }
+
+        #animate {
+            width: 100px;
+            height: 100px;
+            position: absolute;
+            left: 0;
+            top: 0;
+            background: red;
+            z-index: 1000;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="testCanvas" style="width:500px;height:500px;overflow:hidden;"></div>
+    <div id="animate"></div>
+    <script>
+        var assets = [
+            'angel.svga',
+            'halloween.svga',
+            'HamburgerArrow.svga',
+            'kingset.svga',
+            'PinJump.svga',
+            'posche.svga',
+            'rose.svga',
+            'success.svga',
+            'TwitterHeart.svga',
+            'Walkthrough.svga'
+        ];
+
+        //    var parser = new SVGA.Parser();
+        var parser = new SVGA.IE9Parser('../build/ie9-pollify.swf');
+        var player = new SVGA.Player('#testCanvas');
+        player.loops = 1;
+        player.clearsAfterStop = true;
+        player.setContentMode('AspectFill');
+        player.onFinished(function () {
+            animate();
+        });
+
+        animate();
+
+        function animate() {
+            var asset = assets[Math.floor(Math.random() * assets.length)];
+            parser.load('./samples/' + asset, function (videoItem) {
+                console.log(videoItem);
+                player.setVideoItem(videoItem);
+                player.startAnimation();
+            });
+        }
+
+        var x = 0;
+        var an = 2;
+        var $a = document.getElementById('animate');
+        setInterval(function () {
+            var cw = document.documentElement.clientWidth || document.body.clientWidth;
+            if (x < 0 || x > cw - 100) {
+                an = -an;
+            }
+            x += an;
+            $a.style.transform = 'translate('+x + 'px, 0)';
+            $a.style.msTransform = 'translate('+x + 'px, 0)';
+        }, 1000 / 60);
+    </script>
+</body>
+
+</html>

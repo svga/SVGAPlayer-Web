@@ -1,4 +1,4 @@
-import { VideoEntity } from './videoEntity'
+import {VideoEntity} from './videoEntity'
 import MockWorker from './mockWorker'
 
 if (typeof window === "object") {

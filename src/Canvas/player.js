@@ -1,9 +1,10 @@
 'use strict';
 
-import { Renderer } from './renderer'
-import { Ticker } from './ticker'
+import {Renderer} from './renderer'
+import {Ticker} from './ticker'
 
 let performance = window.performance;
+let transforms = ['transform', 'webkitTransform', 'mozTransform', 'msTransform'];
 
 if (typeof performance === "undefined") {
     performance = {
@@ -129,7 +130,7 @@ export class Player {
         let size = (typeof textORMap === "object" ? textORMap.size : "14px") || "14px";
         let family = (typeof textORMap === "object" ? textORMap.family : "") || "";
         let color = (typeof textORMap === "object" ? textORMap.color : "#000000") || "#000000";
-        let offset = (typeof textORMap === "object" ? textORMap.offset : { x: 0.0, y: 0.0 }) || { x: 0.0, y: 0.0 };
+        let offset = (typeof textORMap === "object" ? textORMap.offset : {x: 0.0, y: 0.0}) || {x: 0.0, y: 0.0};
         this._dynamicText[forKey] = {
             text,
             style: `${size} family`,
@@ -220,10 +221,16 @@ export class Player {
     _resize() {
         let asParent = false;
         if (this._drawingCanvas) {
-            let scaleX = 1.0; let scaleY = 1.0; let translateX = 0.0; let translateY = 0.0;
+            let scaleX = 1.0;
+            let scaleY = 1.0;
+            let translateX = 0.0;
+            let translateY = 0.0;
             let targetSize;
             if (this._drawingCanvas.parentNode) {
-                targetSize = { width: this._drawingCanvas.parentNode.clientWidth, height: this._drawingCanvas.parentNode.clientHeight };
+                targetSize = {
+                    width: this._drawingCanvas.parentNode.clientWidth,
+                    height: this._drawingCanvas.parentNode.clientHeight
+                };
             }
             else {
                 targetSize = this._videoItem.videoSize;
@@ -243,7 +250,9 @@ export class Player {
                     const scaleY = targetSize.height / imageSize.height;
                     const translateX = (imageSize.width * scaleX - imageSize.width) / 2.0
                     const translateY = (imageSize.height * scaleY - imageSize.height) / 2.0
-                    this._drawingCanvas.style.webkitTransform = this._drawingCanvas.style.transform = "matrix(" + scaleX + ", 0.0, 0.0, " + scaleY + ", " + translateX + ", " + translateY + ")"
+                    transforms.forEach((item) => {
+                        this._drawingCanvas.style[item] = "matrix(" + scaleX + ", 0.0, 0.0, " + scaleY + ", " + translateX + ", " + translateY + ")"
+                    });
                 }
                 else if (this._contentMode === "AspectFit" || this._contentMode === "AspectFill") {
                     const imageRatio = imageSize.width / imageSize.height;
@@ -252,21 +261,31 @@ export class Player {
                         const scale = targetSize.width / imageSize.width;
                         const translateX = (imageSize.width * scale - imageSize.width) / 2.0
                         const translateY = (imageSize.height * scale - imageSize.height) / 2.0 + (targetSize.height - imageSize.height * scale) / 2.0
-                        this._drawingCanvas.style.webkitTransform = this._drawingCanvas.style.transform = "matrix(" + scale + ", 0.0, 0.0, " + scale + ", " + translateX + ", " + translateY + ")"
+                        transforms.forEach((item) => {
+                            this._drawingCanvas.style[item] = "matrix(" + scale + ", 0.0, 0.0, " + scale + ", " + translateX + ", " + translateY + ")"
+                        });
                     }
                     else if ((imageRatio < viewRatio && this._contentMode === "AspectFit") || (imageRatio > viewRatio && this._contentMode === "AspectFill")) {
                         const scale = targetSize.height / imageSize.height;
                         const translateX = (imageSize.width * scale - imageSize.width) / 2.0 + (targetSize.width - imageSize.width * scale) / 2.0
                         const translateY = (imageSize.height * scale - imageSize.height) / 2.0
-                        this._drawingCanvas.style.webkitTransform = this._drawingCanvas.style.transform = "matrix(" + scale + ", 0.0, 0.0, " + scale + ", " + translateX + ", " + translateY + ")"
+                        transforms.forEach((item) => {
+                            this._drawingCanvas.style[item] = "matrix(" + scale + ", 0.0, 0.0, " + scale + ", " + translateX + ", " + translateY + ")"
+                        });
                     }
                 }
                 this._globalTransform = undefined;
             }
         }
         if (this._drawingCanvas === undefined || asParent === true) {
-            let scaleX = 1.0; let scaleY = 1.0; let translateX = 0.0; let translateY = 0.0;
-            let targetSize = { width: this._container !== undefined ? this._container.clientWidth : 0.0, height: this._container !== undefined ? this._container.clientHeight : 0.0 };
+            let scaleX = 1.0;
+            let scaleY = 1.0;
+            let translateX = 0.0;
+            let translateY = 0.0;
+            let targetSize = {
+                width: this._container !== undefined ? this._container.clientWidth : 0.0,
+                height: this._container !== undefined ? this._container.clientHeight : 0.0
+            };
             let imageSize = this._videoItem.videoSize;
             if (this._contentMode === "Fill") {
                 scaleX = targetSize.width / imageSize.width;
@@ -284,12 +303,14 @@ export class Player {
                     translateX = (targetSize.width - imageSize.width * scaleX) / 2.0
                 }
             }
-            this._globalTransform = { a: scaleX, b: 0.0, c: 0.0, d: scaleY, tx: translateX, ty: translateY };
+            this._globalTransform = {a: scaleX, b: 0.0, c: 0.0, d: scaleY, tx: translateX, ty: translateY};
         }
     }
 
     _update() {
-        if (this._videoItem === undefined) { return; }
+        if (this._videoItem === undefined) {
+            return;
+        }
         this._resize();
         this._renderer.drawFrame(this._currentFrame);
     }

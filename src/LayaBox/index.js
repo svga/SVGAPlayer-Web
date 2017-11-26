@@ -1,8 +1,12 @@
-import { Parser as MParser } from '../parser'
-import { Player as MPlayer } from './player'
+import {Parser as MParser} from '../parser'
+import {Player as MPlayer} from './player'
+import {IE9Parser} from "../pollify/IE9Parser";
 
-export class Parser extends MParser { }
-export class Player extends MPlayer { }
+export class Parser extends MParser {
+}
+
+export class Player extends MPlayer {
+}
 
 ((global) => {
     var define = {};
@@ -16,6 +20,7 @@ export class Player extends MPlayer { }
     define.layabox = {
         Parser,
         Player,
+        IE9Parser
     }
     define.LayaboxPlayer = Player;
 })(

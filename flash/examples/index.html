@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="./swfobject.js"></script>
+    <style>
+        #container {
+            width: 400px;
+            height: 400px;
+        }
+
+        #base64img {
+            width: 400px;
+            height: 400px;
+            background-image: url("data:image/png;base64,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");
+            background-repeat: no-repeat;
+        }
+    </style>
+</head>
+<body>
+<div id="container">
+    <div id="player"></div>
+    <div id="base64img"></div>
+</div>
+<script>
+    var parser = null;
+    swfobject.embedSWF(
+        './flash.swf',
+        document.getElementById('player'),
+        '100%',
+        '100%',
+        '10.0.0.0',
+        '',
+        {
+            cbname: 'svga'
+        },
+        {
+            quality: 'high',
+            wmode: 'transparent',
+            bgcolor: '0x000',
+            allowscriptaccess: 'always'
+        },
+        '',
+        function (res) {
+            parser = res.ref;
+        }
+    );
+
+    var data = {};
+    var spriteDatas = [];
+    window.svga = {
+        complete: function () {
+            parser.load('./rose_2.0.0.svga', 1001);
+        },
+        receive: function (info) {
+            if (info.state == 'done') {
+                data.spriteDatas = spriteDatas;
+                console.log(data);
+            } else if (info.spriteData) {
+                spriteDatas = spriteDatas.concat(info.spriteData);
+            } else {
+                info.imageDatas = JSON.parse(info.imageDatas);
+                data = info;
+            }
+        }
+    };
+
+    document.body.onclick = function () {
+        console.log('test!');
+    }
+</script>
+</body>
+</html>
