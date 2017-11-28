@@ -74,28 +74,6 @@ export class FrameEntity {
                             shape.type = "keep";
                             break;
                     }
-                    switch (shape.lineCap) {
-                        case 0:
-                            shape.lineCap = "butt";
-                            break;
-                        case 1:
-                            shape.lineCap = "round";
-                            break;
-                        case 2:
-                            shape.lineCap = "square";
-                            break;
-                    }
-                    switch (shape.lineJoin) {
-                        case 0:
-                            shape.lineJoin = "miter";
-                            break;
-                        case 1:
-                            shape.lineJoin = "round";
-                            break;
-                        case 2:
-                            shape.lineJoin = "bevel";
-                            break;
-                    }
                     if (shape.styles) {
                         if (shape.styles.fill) {
                             if (typeof shape.styles.fill["r"] === "number") shape.styles.fill[0] = shape.styles.fill["r"];
@@ -123,6 +101,30 @@ export class FrameEntity {
                             lineDash[2] = shape.styles.lineDashIII
                         }
                         shape.styles.lineDash = lineDash
+
+                        switch (shape.styles.lineJoin) {
+                            case 0:
+                                shape.styles.lineJoin = "miter";
+                                break;
+                            case 1:
+                                shape.styles.lineJoin = "round";
+                                break;
+                            case 2:
+                                shape.styles.lineJoin = "bevel";
+                                break;
+                        }
+
+                        switch (shape.styles.lineCap) {
+                            case 0:
+                                shape.styles.lineCap = "butt";
+                                break;
+                            case 1:
+                                shape.styles.lineCap = "round";
+                                break;
+                            case 2:
+                                shape.styles.lineCap = "square";
+                                break;
+                        }
                     }
                 })
             }
