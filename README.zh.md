@@ -41,7 +41,7 @@ SVGAPlayer 2.0.0 同时支持以下游戏引擎使用
 <!--[if lt IE 9]> 
     <script src="../build/svga.ie.min.js"></script>
 <![endif]-->
-<!--[if gt IE 10]><!-->
+<!--[if gte IE 10]><!-->
     <script src="../build/svga.min.js"></script>
 <!--<![endif]-->
 ```

@@ -52,7 +52,7 @@ SVGAPlayer 2.0.0 also supports below Game Engines.
 <!--[if lt IE 9]> 
     <script src="../build/svga.ie.min.js"></script>
 <![endif]-->
-<!--[if gt IE 10]><!-->
+<!--[if gte IE 10]><!-->
     <script src="../build/svga.min.js"></script>
 <!--<![endif]-->
 ```
