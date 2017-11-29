@@ -45,7 +45,7 @@ SVGAPlayer 2.0.0 also supports below Game Engines.
 * IE6+ only supports 2.x format.
 * You couldn't use npm to install SVGA library.
 
-1. Add SVGAPlayerWeb.swf to your.html locate directory.
+1. Add [SVGAPlayerWeb.swf](https://github.com/yyued/SVGAPlayer-Web/blob/master/tests/SVGAPlayerWeb.swf) to your.html locate directory.
 2. Add following code to your.html
 
 ```
