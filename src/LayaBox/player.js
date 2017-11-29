@@ -11,15 +11,34 @@ export class Player extends Laya.Sprite {
 
     constructor(url, autoplay) {
         super();
+        if (url) {
+            (new Parser()).load(url, (videoItem) => {
+                this.setVideoItem(videoItem);
+                if (autoplay !== false) {
+                    this.startAnimation();
+                }
+            }, (error) => {
+                this._onError && this._onError(error);
+            })
+        }
+        this._renderer = new Renderer(this);
+    }
+
+    setVideoUrl(url, autoplay, success, failure) {
         (new Parser()).load(url, (videoItem) => {
+            if (success) {
+                success(videoItem);
+            }
             this.setVideoItem(videoItem);
             if (autoplay !== false) {
                 this.startAnimation();
             }
         }, (error) => {
+            if (failure) {
+                failure(error);
+            }
             this._onError && this._onError(error);
         })
-        this._renderer = new Renderer(this);
     }
 
     setVideoItem(videoItem) {

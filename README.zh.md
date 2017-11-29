@@ -10,7 +10,7 @@
 
 SVGAPlayer 2.0.0 只支持以下浏览器使用
 
-* Edge
+* Edge / IE 6+
 * Safari / Chrome
 * iOS 6.0+ / Android 4.0+
 
@@ -28,6 +28,23 @@ SVGAPlayer 2.0.0 同时支持以下游戏引擎使用
 ### NPM
 1. ```npm install svgaplayerweb --save```
 2. 添加 ``` require('svgaplayerweb') ``` 至 ```xxx.js```
+
+### IE6 ~ IE9
+
+* IE6+ 只支持 2.x 格式文件.
+* 你不能使用 NPM 方式安装 SVGAPlayer.
+
+1. 添加 [SVGAPlayerWeb.swf](https://github.com/yyued/SVGAPlayer-Web/blob/master/tests/SVGAPlayerWeb.swf) 到 your.html 同级目录
+2. 添加以下代码至 your.html
+
+```
+<!--[if lt IE 9]> 
+    <script src="../build/svga.ie.min.js"></script>
+<![endif]-->
+<!--[if gte IE 10]><!-->
+    <script src="../build/svga.min.js"></script>
+<!--<![endif]-->
+```
 
 ### 支持 SVGA-Format 1.x 格式
 
@@ -53,7 +70,7 @@ SVGAPlayer 2.0.0 同时支持以下游戏引擎使用
 
 ```js
 var player = new SVGA.Player('#demoCanvas');
-var parser = new SVGA.Parser();
+var parser = new SVGA.Parser('#demoCanvas'); // 如果你需要支持 IE6+，那么必须把同样的选择器传给 Parser。
 parser.load('rose_2.0.0.svga', function(videoItem) {
     player.setVideoItem(videoItem);
     player.startAnimation();

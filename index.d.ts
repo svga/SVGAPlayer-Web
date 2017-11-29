@@ -65,7 +65,8 @@ export class layabox {
 
 export class LayaboxPlayer extends Player {
 
-    constructor(url: string, autoplay?: boolean)
+    constructor(url?: string, autoplay?: boolean)
+    setVideoUrl(url?: string, autoplay?: boolean, success?: (videoItem: VideoEntity) => void, failure?: (error: Error) => void): void;
     onError(callback: (error: Error) => void): void
     setFrame(x: number, y: number, width: number, height: number): void
 

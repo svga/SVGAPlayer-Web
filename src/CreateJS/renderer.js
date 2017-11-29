@@ -2,7 +2,7 @@ import { BezierPath } from '../bezierPath'
 import { EllipsePath } from '../ellipsePath'
 import { RectPath } from '../rectPath'
 
-const validMethods = 'MLHVCSQRZ'
+const validMethods = 'MLHVCSQRZmlhvcsqrz'
 
 class VectorLayer extends createjs.Container {
 
