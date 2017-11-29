@@ -4,6 +4,9 @@ Language: [中文](README.zh.md)
 
 ## News
 
+* 2.0.7
+    * Improve: Add IE6+ Support via Flash Player.
+
 * 2.0.6
     * Bug-fix: setImage on safari leads inifity loop.
     * Improve: BezierPath drawing performance.
@@ -17,7 +20,7 @@ Language: [中文](README.zh.md)
 
 SVGAPlayer 2.0.0 only supports below browsers.
 
-* Edge / IE 10+
+* Edge / IE 6+
 * Safari / Chrome
 * iOS 6.0+ / Android 4.0+
 
@@ -29,11 +32,30 @@ SVGAPlayer 2.0.0 also supports below Game Engines.
 ## Install
 
 ### Prebuild JS
+
 1. Add ```<script src="https://cdn.jsdelivr.net/npm/svgaplayerweb@2.0.6/build/svga.min.js"></script>``` to your.html
 
 ### NPM
+
 1. ```npm install svgaplayerweb --save```
 2. Add ``` require('svgaplayerweb') ``` to ```xxx.js```
+
+### IE6 ~ IE9
+
+* IE6+ only supports 2.x format.
+* You couldn't use npm to install SVGA library.
+
+1. Add SVGAPlayerWeb.swf to your.html locate directory.
+2. Add following code to your.html
+
+```
+<!--[if lt IE 9]> 
+    <script src="../build/svga.ie.min.js"></script>
+<![endif]-->
+<!--[if gt IE 10]><!-->
+    <script src="../build/svga.min.js"></script>
+<!--<![endif]-->
+```
 
 ### SVGA-Format 1.x support
 
