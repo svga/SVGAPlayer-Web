@@ -1,5 +1,15 @@
 export as namespace SVGA;
 
+declare global {
+    const SVGA: {
+        VideoEntity: typeof VideoEntity,
+        Parser: typeof Parser,
+        Player: typeof Player,
+        createjs: typeof createjs,
+        layabox: typeof layabox,
+    }
+}
+
 export class VideoEntity {
     videoSize: { width: number, height: number }
     FPS: number
