@@ -366,22 +366,24 @@ export class Renderer {
         if (obj._transform !== undefined && obj._transform !== null) {
             ctx.transform(obj._transform.a, obj._transform.b, obj._transform.c, obj._transform.d, obj._transform.tx, obj._transform.ty);
         }
+
         let x = obj._x;
         let y = obj._y;
         let width = obj._width;
         let height = obj._height;
         let radius = obj._cornerRadius;
+
+        if (width < 2 * radius) {radius = width / 2;}
+        if (height < 2 * radius){ radius = height / 2;}
+
         ctx.beginPath();
         ctx.moveTo(x + radius, y);
-        ctx.lineTo(x + width - radius, y);
-        ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
-        ctx.lineTo(x + width, y + height - radius);
-        ctx.quadraticCurveTo(x + width, y + height, x + width - radius.br, y + height);
-        ctx.lineTo(x + radius, y + height);
-        ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
-        ctx.lineTo(x, y + radius);
-        ctx.quadraticCurveTo(x, y, x + radius, y);
+        ctx.arcTo(x + width, y, x + width, y + height, radius);
+        ctx.arcTo(x + width, y + height, x, y + height, radius);
+        ctx.arcTo(x, y + height, x, y, radius);
+        ctx.arcTo(x, y, x + width, y, radius);
         ctx.closePath();
+
         if (obj._styles && obj._styles.fill) {
             ctx.fill();
         }
@@ -390,5 +392,4 @@ export class Renderer {
         }
         ctx.restore();
     }
-
 }
