@@ -9,7 +9,9 @@ module.exports = {
     },
     output: {
         path: __dirname,
-        filename: "build/[name].js"
+        filename: "build/[name].js",
+        libraryTarget: 'umd',
+        library: 'SVGA',
     },
     module: {
         loaders: [

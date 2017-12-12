@@ -33,7 +33,7 @@ SVGAPlayer 2.0.0 also supports below Game Engines.
 
 ### Prebuild JS
 
-1. Add ```<script src="https://cdn.jsdelivr.net/npm/svgaplayerweb@2.0.6/build/svga.min.js"></script>``` to your.html
+1. Add ```<script src="https://cdn.jsdelivr.net/npm/svgaplayerweb@2.0.7/build/svga.min.js"></script>``` to your.html
 
 ### NPM
 
