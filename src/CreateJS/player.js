@@ -50,6 +50,8 @@ export class Player extends createjs.Container {
     }
 
     startAnimationWithRange(range, reverse) {
+        this.visible = true;
+        this.stopAnimation(false);
         this._doStart(range, reverse, undefined)
     }
 

@@ -10,6 +10,7 @@
 ### Prebuild JS
 1. Goto [https://github.com/yyued/SVGAPlayer-Web/tree/master/build](https://github.com/yyued/SVGAPlayer-Web/tree/master/build) Download svga.layabox.min.js
 2. Add ```<script src="svga.layabox.min.js"></script>``` to index.html
+3. Optional add ```index.d.ts``` to your project.
 
 ### SVGA-Format 1.x support
 
@@ -22,7 +23,7 @@ If you need to support SVGA-Format 1.x, add JSZip script to html.
 ## Usage
 
 ```js
-const displayObject = new SVGA.layabox.Player('res/svga/rose_2.0.0.svga')
+const displayObject = new SVGA.LayaboxPlayer('res/svga/rose_2.0.0.svga')
 displayObject.setFrame(0, 0, 750, 750);
 Laya.stage.addChild(displayObject as any)
 ```
@@ -72,7 +73,8 @@ You use SVGA.Player controls animation play and stop.
 #### Methods
 
 * constructor (url: string, autoPlay: boolean); - first params could be '#id' or CanvasHTMLElement
-* startAnimation(); - start animation from zero frame.
+* startAnimation(reverse: boolean); - start animation from zero frame.
+* startAnimationWithRange(range: {location: number, length: number}, reverse: boolean = false); - start animation in [location, location+length] frame range.
 * pauseAnimation(); - pause animation on current frame.
 * stopAnimation(); - stop animation, clear contents while clearsAfterStop === true
 * setContentMode(mode: "ScaleToFill" | "AspectFill" | "AspectFit"); - Specific Scale Mode

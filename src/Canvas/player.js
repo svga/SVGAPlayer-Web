@@ -40,6 +40,7 @@ export class Player {
     }
 
     startAnimationWithRange(range, reverse) {
+        this.stopAnimation(false);
         this._doStart(range, reverse, undefined)
     }
 
