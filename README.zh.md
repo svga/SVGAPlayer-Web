@@ -1,6 +1,20 @@
 # SVGAPlayer-Web
 
+Language: [English](README.md)
+
 ## 版本更新
+
+* 2.1.0
+    * 新增 SVGA 动画倒序播放
+    * 新增 SVGA 动画指定片段播放
+
+* 2.0.7
+    * 新增 IE6+ 播放支持
+
+* 2.0.6
+    * 修复 Safari 上 setImage 导致的无限循环
+    * 提高 BezierPath 绘图性能
+    * 新增 设置图片和文字支持，图像的大小会根据播放器自动调整
 
 * 2.0.0
     * 新增 SVGA-Format 2.0.0 格式支持
