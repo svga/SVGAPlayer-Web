@@ -197,6 +197,9 @@ export class Player extends createjs.Container {
             }
         }
         this._animator.onEnd = () => {
+            if (this.clearsAfterStop === true) {
+                this.clear()
+            }
             if (typeof this._onFinished === "function") {
                 this._onFinished();
             }
