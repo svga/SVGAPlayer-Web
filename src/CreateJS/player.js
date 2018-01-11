@@ -1,7 +1,6 @@
-'use strict';
-
 import { Renderer } from './renderer'
 import { Parser } from '../parser'
+const ValueAnimator = require("value-animator")
 
 export class Player extends createjs.Container {
 
@@ -44,16 +43,14 @@ export class Player extends createjs.Container {
         this._update();
     }
 
-    startAnimation() {
+    startAnimation(reverse) {
         this.visible = true;
         this.stopAnimation(false);
-        this._currentFrame = 0;
-        this._loopCount = 0;
-        this._tickListener = () => {
-            this._onTick();
-        }
-        createjs.Ticker.framerate = 60;
-        createjs.Ticker.addEventListener("tick", this._tickListener);
+        this._doStart(undefined, reverse, undefined);
+    }
+
+    startAnimationWithRange(range, reverse) {
+        this._doStart(range, reverse, undefined)
     }
 
     pauseAnimation() {
@@ -61,10 +58,12 @@ export class Player extends createjs.Container {
     }
 
     stopAnimation(clear) {
+        if (this._animator !== undefined) {
+            this._animator.stop()
+        }
         if (clear === undefined) {
             clear = this.clearsAfterStop;
         }
-        createjs.Ticker.removeEventListener("tick", this._tickListener);
         if (clear) {
             this.clear();
         }
@@ -86,7 +85,7 @@ export class Player extends createjs.Container {
         this._currentFrame = frame;
         this._update();
         if (andPlay) {
-            this._tickListener = this.render.AddTimer(this, this._onTick);
+            this._doStart(undefined, false, this._currentFrame)
         }
     }
 
@@ -157,52 +156,56 @@ export class Player extends createjs.Container {
      */
 
     _renderer = undefined;
+    _animator = undefined;
     _contentMode = "AspectFit"
     _videoItem = undefined;
-    _loopCount = 0;
     _currentFrame = 0;
-    _tickListener = undefined;
     _dynamicImage = {};
     _dynamicImageTransform = {};
     _dynamicText = {};
     _onFinished = undefined;
     _onFrame = undefined;
     _onPercentage = undefined;
-    _nextTickTime = 0;
     _clipsToBounds = false;
     _frame = { x: 0, y: 0, width: 0, height: 0 };
 
-    _onTick() {
-        if (typeof this._videoItem === "object") {
-            if (performance.now() >= this._nextTickTime) {
-                this._nextTickTime = parseInt(1000 / this._videoItem.FPS) + performance.now() - (60 / this._videoItem.FPS) * 2
-                this._next();
-            }
+    _doStart(range, reverse, fromFrame) {
+        this._animator = new ValueAnimator()
+        if (range !== undefined) {
+            this._animator.startValue = Math.max(0, range.location)
+            this._animator.endValue = Math.min(this._videoItem.frames - 1, range.location + range.length)
+            this._animator.duration = (this._animator.endValue - this._animator.startValue + 1) * (1.0 / this._videoItem.FPS) * 1000
         }
-    }
-
-    _next() {
-        this._currentFrame++;
-        if (this._currentFrame >= this._videoItem.frames) {
-            this._currentFrame = 0;
-            this._loopCount++;
-            if (this.loops > 0 && this._loopCount >= this.loops) {
-                this.stopAnimation();
-                if (!this.clearsAfterStop && this.fillMode === "Backward") {
-                    this.stepToFrame(0)
-                }
-                if (typeof this._onFinished === "function") {
-                    this._onFinished();
-                }
+        else {
+            this._animator.startValue = 0
+            this._animator.endValue = this._videoItem.frames - 1
+            this._animator.duration = this._videoItem.frames * (1.0 / this._videoItem.FPS) * 1000
+        }
+        this._animator.loops = this.loops <= 0 ? Infinity : 1
+        this._animator.fillRule = this.fillMode === "Backward" ? 1 : 0
+        this._animator.onUpdate = (value) => {
+            if (this._currentFrame === Math.floor(value)) {
                 return;
             }
+            this._currentFrame = Math.floor(value)
+            this._update()
+            if (typeof this._onFrame === "function") {
+                this._onFrame(this._currentFrame);
+            }
+            if (typeof this._onPercentage === "function") {
+                this._onPercentage(parseFloat(this._currentFrame + 1) / parseFloat(this._videoItem.frames));
+            }
         }
-        this._update();
-        if (typeof this._onFrame === "function") {
-            this._onFrame(this._currentFrame);
+        this._animator.onEnd = () => {
+            if (typeof this._onFinished === "function") {
+                this._onFinished();
+            }
         }
-        if (typeof this._onPercentage === "function") {
-            this._onPercentage(parseFloat(this._currentFrame + 1) / parseFloat(this._videoItem.frames));
+        if (reverse === true) {
+            this._animator.reverse(fromFrame)
+        }
+        else {
+            this._animator.start(fromFrame)
         }
     }
 

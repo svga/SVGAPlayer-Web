@@ -22,8 +22,7 @@ SVGAPlayer 2.0.0 同时支持以下游戏引擎使用
 ## 安装
 
 ### 预编译 JS
-1. 进入 [https://github.com/yyued/SVGAPlayer-Web/tree/master/build](https://github.com/yyued/SVGAPlayer-Web/tree/master/build) 下载 svga.min.js
-2. 添加 ```<script src="svga.min.js"></script>``` 至 xxx.html
+1. 添加 ```<script src="https://cdn.jsdelivr.net/npm/svgaplayerweb@2.1.0/build/svga.min.js"></script>``` 到 your.html 页面
 
 ### NPM
 1. ```npm install svgaplayerweb --save```
@@ -132,7 +131,8 @@ SVGA.Player 用于控制动画的播放和停止
 #### Methods
 
 * constructor (canvas); - 传入 #id 或者 CanvasHTMLElement 至第一个参数
-* startAnimation(); - 从第 0 帧开始播放动画
+* startAnimation(reverse: boolean = false); - 从第 0 帧开始播放动画
+* startAnimationWithRange(range: {location: number, length: number}, reverse: boolean = false); - 播放 [location, location+length] 指定区间帧动画
 * pauseAnimation(); - 暂停在当前帧
 * stopAnimation(); - 停止播放动画，如果 clearsAfterStop === true，将会清空画布
 * setContentMode(mode: "ScaleToFill" | "AspectFill" | "AspectFit"); - 设置动画的拉伸模式

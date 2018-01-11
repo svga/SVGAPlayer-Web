@@ -27,7 +27,7 @@ Both Prebuild & NPM, if you need to support SVGA-Format 1.x, add JSZip script to
 ## Usage
 
 ```js
-var displayObject = new SVGA.createjs.Player('./samples/rose_2.0.0.svga');
+var displayObject = new SVGA.CreatejsPlayer('./samples/rose_2.0.0.svga');
 displayObject.onError(function(err) {
     console.error(err)
 })
@@ -68,9 +68,9 @@ displayObject.setText({
 
 ## Classes
 
-### Player
+### CreatejsPlayer
 
-You use SVGA.Player controls animation play and stop.
+You use SVGA.CreatejsPlayer controls animation play and stop.
 
 #### Properties
 
@@ -81,7 +81,8 @@ You use SVGA.Player controls animation play and stop.
 #### Methods
 
 * constructor (url: string, autoPlay: boolean);
-* startAnimation(); - start animation from zero frame.
+* startAnimation(, reverse: boolean = false); - start animation from zero frame.
+* startAnimationWithRange(range: {location: number, length: number}, reverse: boolean = false); - start animation in [location, location+length] frame range.
 * pauseAnimation(); - pause animation on current frame.
 * stopAnimation(); - stop animation, clear contents while clearsAfterStop === true
 * setContentMode(mode: "ScaleToFill" | "AspectFill" | "AspectFit"); - Specific Scale Mode
