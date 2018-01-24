@@ -8,12 +8,16 @@
   "main": "./build/svga.min.js",
   "types": "index.d.ts",
   "scripts": {
-    "start": "http-server ./ & webpack -w & open http://127.0.0.1:8080/tests/",
+    "start": "tsc & http-server ./ & webpack -w & open http://127.0.0.1:8080/tests/",
     "build": "webpack"
   },
   "author": "YYUED",
   "license": "Apache License 2.0",
-  "dependencies": {},
+  "dependencies": {
+    "source-map-loader": "^0.2.3",
+    "ts-loader": "^3.3.1",
+    "typescript": "^2.6.2"
+  },
   "devDependencies": {
     "pako": "^1.0.6",
     "protobufjs": "^6.8.0",
@@ -24,6 +28,7 @@
     "http-server": "^0.10.0",
     "uglify-js": "^3.1.2",
     "value-animator": "git+https://github.com/yyued/value-animator.git",
-    "webpack": "^3.6.0"
+    "webpack": "^3.6.0",
+    "ts-loader": "^3.3.1"
   }
 }
