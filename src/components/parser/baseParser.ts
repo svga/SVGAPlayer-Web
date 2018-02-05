@@ -11,6 +11,12 @@ import { Downloader } from "../interface/helper/downloader";
 export class BaseParser {
   protected downloader: Downloader;
 
+  /**
+   * load svga file
+   * @param url 
+   * @param success 
+   * @param failure 
+   */
   public load(
     url: string,
     success: (videoItem: VideoEntity) => void,
@@ -25,7 +31,7 @@ export class BaseParser {
     }else{
 
         this.downloader.downloadFileWithURL(url, (result) => {
-            
+          
         });
 
     }

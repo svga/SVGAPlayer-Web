@@ -6,9 +6,13 @@
 "use strict";
 
 import { BaseParser } from "./components/parser/baseParser";
+import { HTTPDownloader } from './httpDownloader'
 
 export class Parser extends BaseParser {
 
-    
+    public constructor(){
+        super();
 
+        this.downloader = new HTTPDownloader();
+    }
 }

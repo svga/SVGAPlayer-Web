@@ -6,5 +6,5 @@
 'use strict';
 
 export class Player {
-
+    
 }
