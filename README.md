@@ -53,7 +53,7 @@ SVGAPlayer 2.0.0 also supports below Game Engines.
 2. Add following code to your.html
 
 ```
-<!--[if lt IE 9]> 
+<!--[if lt IE 10]> 
     <script src="../build/svga.ie.min.js"></script>
 <![endif]-->
 <!--[if gte IE 10]><!-->
