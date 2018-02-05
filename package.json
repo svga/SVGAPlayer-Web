@@ -8,7 +8,7 @@
   "main": "./build/svga.min.js",
   "types": "index.d.ts",
   "scripts": {
-    "start": "tsc & http-server ./ & webpack -w & open http://127.0.0.1:8080/tests/",
+    "start": "http-server ./ & webpack -w & open http://127.0.0.1:8080/tests/",
     "build": "webpack"
   },
   "author": "YYUED",

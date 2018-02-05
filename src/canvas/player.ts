@@ -5,7 +5,6 @@
 
 'use strict';
 
-export class Parser {
+export class Player {
 
-    public load(url: any, success:(result: any) => void, failure:(error: any) => void) {}
 }

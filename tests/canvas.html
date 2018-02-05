@@ -14,11 +14,12 @@
     <!--<![endif]-->
     <script>
         var parser = new SVGA.Parser('#testCanvas')
-        var player = new SVGA.Player('#testCanvas')
+        // var player = new SVGA.Player('#testCanvas')
         parser.load("./samples/kingset.svga", function (videoItem) {
-            player.setImage('./samples/avatar.png', '99')
-            player.setVideoItem(videoItem);
-            player.startAnimation()
+            console.log(videoItem);
+            // player.setImage('./samples/avatar.png', '99')
+            // player.setVideoItem(videoItem);
+            // player.startAnimation()
         }, function(error) {
             alert(error.message);
         })
