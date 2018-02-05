@@ -51,7 +51,7 @@ SVGAPlayer 2.0.0 同时支持以下游戏引擎使用
 2. 添加以下代码至 your.html
 
 ```
-<!--[if lt IE 9]> 
+<!--[if lt IE 10]> 
     <script src="../build/svga.ie.min.js"></script>
 <![endif]-->
 <!--[if gte IE 10]><!-->
