@@ -5,13 +5,16 @@
 
 "use strict";
 
-import { Downloader } from '../components/interface/helper/downloader';
+import { Downloader } from '../interface/helper/downloader';
 
 export class EgretDownloader extends Downloader {
 
+  /**
+   * @override
+   */
   public downloadFileWithURL(
     url: string,
-    success: (result: ArrayBuffer) => void,
+    success: (fileData: ArrayBuffer) => void,
     failure: (err: Error) => void
   ) {
     const req = new egret.HttpRequest();

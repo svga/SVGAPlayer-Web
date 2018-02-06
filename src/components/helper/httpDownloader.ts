@@ -5,7 +5,7 @@
 
 "use strict";
 
-import { Downloader } from './components/interface/helper/downloader';
+import { Downloader } from '../interface/helper/downloader';
 
 export class HTTPDownloader extends Downloader {
   
@@ -14,7 +14,7 @@ export class HTTPDownloader extends Downloader {
   */
   public downloadFileWithURL(
     url: string,
-    success: (result: ArrayBuffer) => void,
+    success: (fileData: ArrayBuffer) => void,
     failure: (err: Error) => void
   ) {
     const req = new XMLHttpRequest()

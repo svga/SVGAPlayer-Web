@@ -4,6 +4,8 @@ var webpack = require('webpack')
 module.exports = {
     entry: {
         "svga.min": "./src/canvas/index.ts",
+        "svga.createjs.min": "./src/CreateJS/index.ts",
+        "svga.layabox.min": "./src/LayaBox/index.ts",
         "svga.egret.min": "./src/egret/index.ts",
     },
 

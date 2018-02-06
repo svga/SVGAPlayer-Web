@@ -5,18 +5,20 @@
 
 "use strict";
 
-export class Downloader {
+import { VideoEntity } from "../../entity/videoEntity";
+
+export class Decompresser {
   /**
    * @abstract
    *
-   * @param {string} url
-   * @param {(fileData: ArrayBuffer) => void} success
+   * @param {ArrayBuffer} fileData
+   * @param {(data: {movie: any, images: any}) => void} success
    * @param {(err: Error) => void} failure
    * @memberof Downloader
    */
-  public downloadFileWithURL(
-    url: string,
-    success: (fileData: ArrayBuffer) => void,
+  public decompressFileData(
+    fileData: ArrayBuffer,
+    success: (data: {movie: any, images: any}) => void,
     failure?: (err: Error) => void
   ) {}
 }

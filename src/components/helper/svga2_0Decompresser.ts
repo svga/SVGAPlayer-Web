@@ -5,18 +5,18 @@
 
 "use strict";
 
-export class Downloader {
+import { Decompresser } from '../interface/helper/decompresser';
+import { VideoEntity } from '../entity/VideoEntity';
+
+export class SVGA2_0Decompresser extends Decompresser {
   /**
-   * @abstract
-   *
-   * @param {string} url
-   * @param {(fileData: ArrayBuffer) => void} success
-   * @param {(err: Error) => void} failure
-   * @memberof Downloader
+   * @override
    */
-  public downloadFileWithURL(
-    url: string,
-    success: (fileData: ArrayBuffer) => void,
+  public decompressFileData(
+    fileData: ArrayBuffer,
+    success: (data: {movie: any, images: any}) => void,
     failure?: (err: Error) => void
-  ) {}
+  ) {
+      
+  }
 }

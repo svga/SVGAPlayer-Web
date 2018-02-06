@@ -5,7 +5,6 @@
 
 'use strict';
 
-import { Parser } from './parser'
-import { Player } from './player'
+import { Parser } from '../canvas/parser'
 
-export { Parser, Player }
+export { Parser }

@@ -6,13 +6,13 @@
 "use strict";
 
 import { BaseParser } from '../components/parser/baseParser';
-import { EgretDownloader } from './egretDownloader';
+import { EgretDownloader } from '../components/helper/egretDownloader';
 
 export class Parser extends BaseParser {
 
     public constructor(){
         super();
-
+        
         this.downloader = new EgretDownloader;
     }
 }
