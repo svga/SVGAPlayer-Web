@@ -5,7 +5,7 @@
 
 "use strict";
 
-import { Downloader } from '../interface/helper/downloader';
+import { Downloader } from '../../components/interface/helper/downloader';
 
 export class EgretDownloader extends Downloader {
 

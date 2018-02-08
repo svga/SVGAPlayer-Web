@@ -2,6 +2,7 @@ var path = require('path');
 var webpack = require('webpack')
 
 module.exports = {
+    devtool: 'eval-source-map',
     entry: {
         "svga.min": "./src/canvas/index.ts",
         "svga.createjs.min": "./src/CreateJS/index.ts",

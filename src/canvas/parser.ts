@@ -6,8 +6,7 @@
 "use strict";
 
 import { BaseParser } from '../components/parser/baseParser';
-import { HTTPDownloader } from '../components/helper/httpDownloader'
-import { SVGA1_0Decompresser } from '../components/helper/svga1_0Decompresser';
+import { HTTPDownloader } from './helper/httpDownloader'
 
 export class Parser extends BaseParser {
 
@@ -15,6 +14,5 @@ export class Parser extends BaseParser {
         super();
 
         this.downloader = new HTTPDownloader();
-        this.decompresser = new SVGA1_0Decompresser(); 
     }
 }
