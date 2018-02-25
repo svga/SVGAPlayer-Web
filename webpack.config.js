@@ -8,6 +8,7 @@ module.exports = {
         "svga.createjs.min": "./src/CreateJS/index.ts",
         "svga.layabox.min": "./src/LayaBox/index.ts",
         "svga.egret.min": "./src/egret/index.ts",
+        "svga.cocosjs.min": "./src/cocosjs/index.ts",
     },
 
     output: {
