@@ -30,13 +30,12 @@ export class BaseParser {
 
       this.downloader.downloadFileWithURL(url, (fileData) => {
         this.getDecompresser(fileData).decompressFileData(fileData, (data) => {
-          
+
           let videoItem = new VideoEntity(data.movie, data.images);
           success(videoItem);
         });
-      });
+      });   
     } else {
-
       this.getDecompresser().loadFileData(url, (fileData) => {
         this.getDecompresser(fileData).decompressFileData(fileData, (data) => {
 
@@ -60,7 +59,7 @@ export class BaseParser {
     if (dataHeader[0] == 80 && dataHeader[1] == 75 && dataHeader[2] == 3 && dataHeader[3] == 4) {
 
       return SVGA1_0Decompresser.shareDecompresser();
-    }else{
+    } else {
 
       return SVGA2_0Decompresser.shareDecompresser();
     }

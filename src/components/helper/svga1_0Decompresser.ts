@@ -11,15 +11,16 @@ import { VideoEntity } from '../entity/VideoEntity';
 declare var JSZip;
 
 export class SVGA1_0Decompresser extends Decompresser {
-
+    private static svga1_0Decompresser: SVGA1_0Decompresser = null;
+    
     /**
      * @override
      */
     public static shareDecompresser(): Decompresser {
-        if (!this.decompresser) {
-            this.decompresser = new SVGA1_0Decompresser();
+        if (!this.svga1_0Decompresser) {
+            this.svga1_0Decompresser = new SVGA1_0Decompresser();
         }
-        return this.decompresser;
+        return this.svga1_0Decompresser;
     }
 
     /**
@@ -35,6 +36,14 @@ export class SVGA1_0Decompresser extends Decompresser {
 
                 zip.file("movie.spec").async("string").then(function (spec) {
                     let movieData = JSON.parse(spec);
+
+                    let params = {};
+                    params["viewBoxWidth"] = movieData.movie.viewBox.width;
+                    params["viewBoxHeight"] = movieData.movie.viewBox.height;
+                    params["fps"] = movieData.movie.fps;
+                    params["frames"] = movieData.movie.frames;
+                    movieData["params"] = params;
+
                     let images = {};
                     let currentIndex = 0;
 
@@ -55,16 +64,17 @@ export class SVGA1_0Decompresser extends Decompresser {
     private loadImages(currentIndex: number, images: any, zip: any, movieData: any, success: (data: { movie: any, images: any }) => void) {
         if (currentIndex == Object.getOwnPropertyNames(movieData.images).length) {
             success({ movie: movieData, images: images });
+            return;
         }
         let key = Object.getOwnPropertyNames(movieData.images)[currentIndex];
-        let element = movieData.images[key];
         if (images.hasOwnProperty(key)) {
             this.loadImages(currentIndex + 1, images, zip, movieData, success);
             return;
         }
+        let element = movieData.images[key];
         zip.file(element + ".png").async("base64").then(function (data) {
             images[key] = data;
             this.loadImages(currentIndex + 1, images, zip, movieData, success);
-        }.bind(this))
+        }.bind(this));
     }
 }

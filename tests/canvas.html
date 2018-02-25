@@ -14,12 +14,11 @@
     <!--<![endif]-->
     <script>
         var parser = new SVGA.Parser('#testCanvas')
-        // var player = new SVGA.Player('#testCanvas')
-        parser.load("http://p275rzl86.bkt.clouddn.com/shengli1_0.svga", function (videoItem) {
-            console.log(videoItem);
+        var player = new SVGA.Player('#testCanvas')
+        parser.load("./samples/rose.svga", function (videoItem) {
             // player.setImage('./samples/avatar.png', '99')
-            // player.setVideoItem(videoItem);
-            // player.startAnimation()
+            player.setVideoItem(videoItem);
+            player.startAnimation()
         }, function(error) {
             alert(error.message);
         })

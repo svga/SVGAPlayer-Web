@@ -7,6 +7,7 @@
 
 import { Transform, TransformMake } from '../../components/interface/transform';
 import { Rect, RectMake } from '../../components/interface/rect';
+import { BezierPath } from './bezierPath';
 
 export class FrameEntity {
 
@@ -29,18 +30,20 @@ export class FrameEntity {
   constructor(spec: any) {
     this.alpha = parseFloat(spec.alpha) || 0.0;
     if (spec.layout) {
-        this.layout.x = parseFloat(spec.layout.x) || 0.0;
-        this.layout.y = parseFloat(spec.layout.y) || 0.0;
-        this.layout.width = parseFloat(spec.layout.width) || 0.0;
-        this.layout.height = parseFloat(spec.layout.height) || 0.0;
+        this.layout = RectMake(
+                               parseFloat(spec.layout.x) || 0.0,
+                               parseFloat(spec.layout.y) || 0.0,
+                               parseFloat(spec.layout.width) || 0.0, 
+                               parseFloat(spec.layout.height) || 0.0);
     }
     if (spec.transform) {
-        this.transform.a = parseFloat(spec.transform.a) || 1.0;
-        this.transform.b = parseFloat(spec.transform.b) || 0.0;
-        this.transform.c = parseFloat(spec.transform.c) || 0.0;
-        this.transform.d = parseFloat(spec.transform.d) || 1.0;
-        this.transform.tx = parseFloat(spec.transform.tx) || 0.0;
-        this.transform.ty = parseFloat(spec.transform.ty) || 0.0;
+        this.transform = TransformMake(
+                               parseFloat(spec.transform.a) || 1.0, 
+                               parseFloat(spec.transform.b) || 0.0, 
+                               parseFloat(spec.transform.c) || 0.0, 
+                               parseFloat(spec.transform.d) || 1.0, 
+                               parseFloat(spec.transform.tx) || 0.0, 
+                               parseFloat(spec.transform.ty) || 0.0);
     }
 
     if (spec.clipPath && spec.clipPath.length > 0) {

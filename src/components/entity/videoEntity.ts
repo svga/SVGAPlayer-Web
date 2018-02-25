@@ -23,19 +23,14 @@ export class VideoEntity {
   public sprites: Array<any> = [];
 
   public constructor(spec: any, images: any) {
-    if (
-      typeof spec === "object"
-      // spec.$type == ProtoBufDecoder.shareProtoBufDecoder().protoMovieEntity
-    ) {
-      if (typeof spec.params === "object") {
-        this.version = spec.ver;
-        this.videoSize.width = spec.params.viewBoxWidth || 0.0;
-        this.videoSize.height = spec.params.viewBoxHeight || 0.0;
-        this.FPS = spec.params.fps || 20;
-        this.frames = spec.params.frames || 0;
-      }
-      this.resetSprites(spec);
+    if (spec.params) {
+      this.version = spec.ver;
+      this.videoSize.width = spec.params.viewBoxWidth || 0.0;
+      this.videoSize.height = spec.params.viewBoxHeight || 0.0;
+      this.FPS = spec.params.fps || 20;
+      this.frames = spec.params.frames || 0;
     }
+    this.resetSprites(spec)
 
     if (images) {
       this.images = images;

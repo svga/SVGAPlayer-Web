@@ -5,6 +5,8 @@
 
 'use strict';
 
-import { Parser } from '../canvas/parser'
+import { Player } from './player'
 
-export { Parser }
+export = {
+    CreatejsPlayer: Player,
+}

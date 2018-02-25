@@ -5,7 +5,7 @@
 
 "use strict";
 
-class BezierPath {
+export class BezierPath {
     /**
      * @private
      */

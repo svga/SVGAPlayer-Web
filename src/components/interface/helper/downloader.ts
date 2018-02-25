@@ -18,5 +18,5 @@ export class Downloader {
     url: string,
     success: (fileData: ArrayBuffer) => void,
     failure?: (err: Error) => void
-  ) {}
+  ) { }
 }
