@@ -5,9 +5,9 @@
 
 'use strict';
 
-// import { BezierPath } from '../bezierPath'
-// import { EllipsePath } from '../ellipsePath'
-// import { RectPath } from '../rectPath'
+import { BezierPath } from '../components/entity/bezierPath'
+import { EllipsePath } from '../components/entity/ellipsePath'
+import { RectPath } from '../components/entity/rectPath'
 
 const validMethods = 'MLHVCSQRZmlhvcsqrz';
 
@@ -137,15 +137,15 @@ export class Renderer {
                     }
                 }
                 frameItem.shapes && frameItem.shapes.forEach(shape => {
-                    // if (shape.type === "shape" && shape.pathArgs && shape.pathArgs.d) {
-                    //     this.drawBezier(ctx, new BezierPath(shape.pathArgs.d, shape.transform, shape.styles))
-                    // }
-                    // if (shape.type === "ellipse" && shape.pathArgs) {
-                    //     this.drawEllipse(ctx, new EllipsePath(parseFloat(shape.pathArgs.x) || 0.0, parseFloat(shape.pathArgs.y) || 0.0, parseFloat(shape.pathArgs.radiusX) || 0.0, parseFloat(shape.pathArgs.radiusY) || 0.0, shape.transform, shape.styles))
-                    // }
-                    // if (shape.type === "rect" && shape.pathArgs) {
-                    //     this.drawRect(ctx, new RectPath(parseFloat(shape.pathArgs.x) || 0.0, parseFloat(shape.pathArgs.y) || 0.0, parseFloat(shape.pathArgs.width) || 0.0, parseFloat(shape.pathArgs.height) || 0.0, parseFloat(shape.pathArgs.cornerRadius) || 0.0, shape.transform, shape.styles))
-                    // }
+                    if (shape.type === "shape" && shape.pathArgs && shape.pathArgs.d) {
+                        this.drawBezier(ctx, new BezierPath(shape.pathArgs.d, shape.transform, shape.styles))
+                    }
+                    if (shape.type === "ellipse" && shape.pathArgs) {
+                        this.drawEllipse(ctx, new EllipsePath(parseFloat(shape.pathArgs.x) || 0.0, parseFloat(shape.pathArgs.y) || 0.0, parseFloat(shape.pathArgs.radiusX) || 0.0, parseFloat(shape.pathArgs.radiusY) || 0.0, shape.transform, shape.styles))
+                    }
+                    if (shape.type === "rect" && shape.pathArgs) {
+                        this.drawRect(ctx, new RectPath(parseFloat(shape.pathArgs.x) || 0.0, parseFloat(shape.pathArgs.y) || 0.0, parseFloat(shape.pathArgs.width) || 0.0, parseFloat(shape.pathArgs.height) || 0.0, parseFloat(shape.pathArgs.cornerRadius) || 0.0, shape.transform, shape.styles))
+                    }
                 })
                 let dynamicText = this._owner.dynamicText[sprite.imageKey];
                 if (dynamicText !== undefined) {
@@ -169,7 +169,7 @@ export class Renderer {
         const styles = obj._styles;
         if (styles === undefined) { return; }
         if (styles && styles.stroke) {
-            // ctx.strokeStyle = `rgba(${parseInt(styles.stroke[0] * 255)}, ${parseInt(styles.stroke[1] * 255)}, ${parseInt(styles.stroke[2] * 255)}, ${styles.stroke[3]})`;
+            ctx.strokeStyle = `rgba(${parseInt((styles.stroke[0] * 255).toString())}, ${parseInt((styles.stroke[1] * 255).toString())}, ${parseInt((styles.stroke[2] * 255).toString())}, ${styles.stroke[3]})`;
         }
         else {
             ctx.strokeStyle = "transparent"
@@ -181,7 +181,7 @@ export class Renderer {
             ctx.miterLimit = styles.miterLimit || undefined;
         }
         if (styles && styles.fill) {
-            // ctx.fillStyle = `rgba(${parseInt(styles.fill[0] * 255)}, ${parseInt(styles.fill[1] * 255)}, ${parseInt(styles.fill[2] * 255)}, ${styles.fill[3]})`
+            ctx.fillStyle = `rgba(${parseInt((styles.fill[0] * 255).toString())}, ${parseInt((styles.fill[1] * 255).toString())}, ${parseInt((styles.fill[2] * 255).toString())}, ${styles.fill[3]})`
         }
         else {
             ctx.fillStyle = "transparent"

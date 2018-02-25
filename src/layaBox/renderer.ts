@@ -5,9 +5,9 @@
 
 'use strict';
 
-// import { BezierPath } from '../bezierPath'
-// import { EllipsePath } from '../ellipsePath'
-// import { RectPath } from '../rectPath'
+import { BezierPath } from '../components/entity/bezierPath'
+import { EllipsePath } from '../components/entity/ellipsePath'
+import { RectPath } from '../components/entity/rectPath'
 
 const validMethods = 'MLHVCSQRZmlhvcsqrz'
 
@@ -248,13 +248,13 @@ class VectorLayer extends Laya.Sprite {
             this.removeChildren(0, this.numChildren);
             frameItem.shapes.forEach((shape) => {
                 if (shape.type === "shape" && shape.pathArgs && shape.pathArgs.d) {
-                    // this.addChild(Renderer.requestBezierShape(new BezierPath(shape.pathArgs.d, shape.transform, shape.styles)));
+                    this.addChild(Renderer.requestBezierShape(new BezierPath(shape.pathArgs.d, shape.transform, shape.styles)));
                 }
                 else if (shape.type === "ellipse" && shape.pathArgs) {
-                    // this.addChild(Renderer.requestEllipseShape(new EllipsePath(parseFloat(shape.pathArgs.x) || 0.0, parseFloat(shape.pathArgs.y) || 0.0, parseFloat(shape.pathArgs.radiusX) || 0.0, parseFloat(shape.pathArgs.radiusY) || 0.0, shape.transform, shape.styles)));
+                    this.addChild(Renderer.requestEllipseShape(new EllipsePath(parseFloat(shape.pathArgs.x) || 0.0, parseFloat(shape.pathArgs.y) || 0.0, parseFloat(shape.pathArgs.radiusX) || 0.0, parseFloat(shape.pathArgs.radiusY) || 0.0, shape.transform, shape.styles)));
                 }
                 else if (shape.type === "rect" && shape.pathArgs) {
-                    // this.addChild(Renderer.requestRectShape(new RectPath(parseFloat(shape.pathArgs.x) || 0.0, parseFloat(shape.pathArgs.y) || 0.0, parseFloat(shape.pathArgs.width) || 0.0, parseFloat(shape.pathArgs.height) || 0.0, parseFloat(shape.pathArgs.cornerRadius) || 0.0, shape.transform, shape.styles)));
+                    this.addChild(Renderer.requestRectShape(new RectPath(parseFloat(shape.pathArgs.x) || 0.0, parseFloat(shape.pathArgs.y) || 0.0, parseFloat(shape.pathArgs.width) || 0.0, parseFloat(shape.pathArgs.height) || 0.0, parseFloat(shape.pathArgs.cornerRadius) || 0.0, shape.transform, shape.styles)));
                 }
             })
             this._drawedFrame = frame;
