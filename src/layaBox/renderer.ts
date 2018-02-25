@@ -11,7 +11,194 @@
 
 const validMethods = 'MLHVCSQRZmlhvcsqrz'
 
-class VectorLayer extends createjs.Container {
+class ShapeSprite extends Laya.Sprite {
+
+    customGraphics = {
+        currentPath: [],
+    };
+
+    constructor() {
+        super();
+        this.customRenderEnable = true;
+    }
+
+    getBounds() {
+        return { x: 0, y: 0, width: 3000, height: 3000 }
+    }
+
+    beginFill(fillStyle) {
+        this.customGraphics["fillStyle"] = fillStyle;
+    }
+
+    beginStroke(stroke) {
+        this.customGraphics["strokeStyle"] = stroke;
+    }
+
+    setStrokeStyle(width, caps, joints, miterLimit) {
+        this.customGraphics["lineCap"] = caps;
+        this.customGraphics["lineJoin"] = joints;
+        this.customGraphics["lineWidth"] = width;
+        this.customGraphics["miterLimit"] = miterLimit;
+    }
+
+    setStrokeDash(arr, arg) {
+        this.customGraphics["strokeDash"] = { arr, arg }
+    }
+
+    moveTo(x, y) {
+        this.customGraphics.currentPath.push(["moveTo", x, y]);
+    }
+
+    lineTo(x, y) {
+        this.customGraphics.currentPath.push(["lineTo", x, y]);
+    }
+
+    bezierCurveTo(x1, y1, x2, y2, x, y) {
+        this.customGraphics.currentPath.push(["bezierCurveTo", x1, y1, x2, y2, x, y]);
+    }
+
+    quadraticCurveTo(x1, y1, x, y) {
+        this.customGraphics.currentPath.push(["quadraticCurveTo", x1, y1, x, y]);
+    }
+
+    closePath() {
+        this.customGraphics.currentPath.push(["closePath"]);
+    }
+
+    drawEllipse(left, top, dX, dY) {
+        if (this.customGraphics.currentPath === undefined) {
+            this.customGraphics.currentPath = [];
+        }
+        this.customGraphics.currentPath.push(["ellipse", left, top, dX, dY]);
+    }
+
+    drawRoundRect(x, y, width, height, cornerRadius) {
+        if (this.customGraphics.currentPath === undefined) {
+            this.customGraphics.currentPath = [];
+        }
+        this.customGraphics.currentPath.push(["rect", x, y, width, height, cornerRadius]);
+    }
+
+    customRender(render, x, y) {
+        let tx = 0.0;
+        let ty = 0.0;
+        if (render.ctx instanceof Laya.WebGLContext2D) {
+            const mat = render.ctx._curMat;
+            tx = render.ctx._curMat.tx / render.ctx._curMat.a
+            ty = render.ctx._curMat.ty / render.ctx._curMat.d
+        }
+        if (typeof this.customGraphics["fillStyle"] === 'string') {
+            if (render.ctx instanceof Laya.WebGLContext2D) {
+                if (this.customGraphics["fillStyle"].startsWith('rgba')) {
+                    const components = this.customGraphics["fillStyle"].replace('rgba(', '').replace(')').split(',');
+                    render.ctx.fillStyle = Laya.Color.create('#' + parseInt(components[0]).toString(16) + parseInt(components[1]).toString(16) + parseInt(components[2]).toString(16))
+                }
+                else {
+                    render.ctx.fillStyle = this.customGraphics["fillStyle"];
+                }
+            }
+            else {
+                render.ctx.fillStyle = this.customGraphics["fillStyle"];
+            }
+        }
+        if (typeof this.customGraphics["strokeStyle"] === 'string') {
+            if (render.ctx instanceof Laya.WebGLContext2D) {
+                if (this.customGraphics["strokeStyle"].startsWith('rgba')) {
+                    const components = this.customGraphics["strokeStyle"].replace('rgba(', '').replace(')').split(',');
+                    render.ctx.strokeStyle = Laya.Color.create('#' + parseInt(components[0]).toString(16) + parseInt(components[1]).toString(16) + parseInt(components[2]).toString(16))
+                }
+                else {
+                    render.ctx.strokeStyle = this.customGraphics["strokeStyle"];
+                }
+            }
+            else {
+                render.ctx.strokeStyle = this.customGraphics["strokeStyle"];
+            }
+        }
+        render.ctx.lineCap = this.customGraphics["lineCap"];
+        render.ctx.lineJoin = this.customGraphics["lineJoin"];
+        render.ctx.lineWidth = this.customGraphics["lineWidth"];
+        render.ctx.miterLimit = this.customGraphics["miterLimit"];
+        if (this.customGraphics["strokeDash"] !== undefined) {
+            const { arr, arg } = this.customGraphics["strokeDash"];
+            const newArr = [];
+            arr.forEach(item => newArr.push(item));
+            newArr.push(arg);
+            render.ctx.setLineDash && render.ctx.setLineDash(newArr);
+        }
+        if (this.customGraphics.currentPath instanceof Array) {
+            render.ctx.beginPath();
+            this.customGraphics.currentPath.forEach((item) => {
+                if (item[0] === "moveTo") {
+                    const tPoint = { x: item[1], y: item[2] };
+                    render.ctx.moveTo(tPoint.x, tPoint.y);
+                }
+                else if (item[0] === "lineTo") {
+                    const tPoint = { x: item[1], y: item[2] };
+                    render.ctx.lineTo(tPoint.x, tPoint.y);
+                }
+                else if (item[0] === "bezierCurveTo") {
+                    const tPoint1 = { x: item[1], y: item[2] };
+                    const tPoint2 = { x: item[3], y: item[4] };
+                    const tPoint3 = { x: item[5], y: item[6] };
+                    render.ctx.bezierCurveTo(tPoint1.x, tPoint1.y, tPoint2.x, tPoint2.y, tPoint3.x, tPoint3.y);
+                }
+                else if (item[0] === "quadraticCurveTo") {
+                    const tPoint1 = { x: item[1], y: item[2] };
+                    const tPoint2 = { x: item[3], y: item[4] };
+                    render.ctx.quadraticCurveTo(tPoint1.x, tPoint1.y, tPoint2.x, tPoint2.y);
+                }
+                else if (item[0] === "closePath") {
+                    render.ctx.closePath();
+                }
+                else if (item[0] === "ellipse") {
+                    let x = item[1];
+                    let y = item[2];
+                    let w = item[3];
+                    let h = item[4];
+                    var kappa = .5522848,
+                        ox = (w / 2) * kappa,
+                        oy = (h / 2) * kappa,
+                        xe = x + w,
+                        ye = y + h,
+                        xm = x + w / 2,
+                        ym = y + h / 2;
+
+                    render.ctx.beginPath();
+                    render.ctx.moveTo(x, ym);
+                    render.ctx.bezierCurveTo(x, ym - oy, xm - ox, y, xm, y);
+                    render.ctx.bezierCurveTo(xm + ox, y, xe, ym - oy, xe, ym);
+                    render.ctx.bezierCurveTo(xe, ym + oy, xm + ox, ye, xm, ye);
+                    render.ctx.bezierCurveTo(xm - ox, ye, x, ym + oy, x, ym);
+                }
+                else if (item[0] === "rect") {
+                    const tPoint = { x: item[1], y: item[2] };
+                    let x = tPoint.x;
+                    let y = tPoint.y;
+                    let width = item[3];
+                    let height = item[4];
+                    let radius = item[5];
+                    render.ctx.moveTo(x + radius, y);
+                    render.ctx.lineTo(x + width - radius, y);
+                    render.ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+                    render.ctx.lineTo(x + width, y + height - radius);
+                    render.ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+                    render.ctx.lineTo(x + radius, y + height);
+                    render.ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+                    render.ctx.lineTo(x, y + radius);
+                    render.ctx.quadraticCurveTo(x, y, x + radius, y);
+                    render.ctx.lineTo(x, y);
+                    render.ctx.closePath();
+                }
+            })
+        }
+        this.customGraphics["fillStyle"] && render.ctx.fill();
+        this.customGraphics["strokeStyle"] && render.ctx.stroke();
+    }
+
+}
+
+class VectorLayer extends Laya.Sprite {
 
     _sprite;
     _drawedFrame = 0;
@@ -58,7 +245,7 @@ class VectorLayer extends createjs.Container {
                     return;
                 }
             }
-            this.removeAllChildren();
+            this.removeChildren(0, this.numChildren);
             frameItem.shapes.forEach((shape) => {
                 if (shape.type === "shape" && shape.pathArgs && shape.pathArgs.d) {
                     // this.addChild(Renderer.requestBezierShape(new BezierPath(shape.pathArgs.d, shape.transform, shape.styles)));
@@ -86,7 +273,7 @@ export class Renderer {
 
     requestContentLayer(sprite) {
         let bitmap;
-        let contentLayer = new createjs.Container();
+        let contentLayer = new Laya.Sprite();
         if (sprite.imageKey) {
             bitmap = this._owner._dynamicImage[sprite.imageKey] || this._owner._videoItem.images[sprite.imageKey];
             if (bitmap) {
@@ -104,54 +291,41 @@ export class Renderer {
                 if (frameItem.alpha > 0.0) {
                     contentLayer.alpha = frameItem.alpha;
                     contentLayer.visible = true;
-                    contentLayer.transformMatrix = new createjs.Matrix2D(frameItem.transform.a, frameItem.transform.b, frameItem.transform.c, frameItem.transform.d, frameItem.transform.tx, frameItem.transform.ty);
-                    contentLayer.setBounds(frameItem.layout.x, frameItem.layout.y, frameItem.layout.width, frameItem.layout.height );
+                    contentLayer.transform = new Laya.Matrix(frameItem.transform.a, frameItem.transform.b, frameItem.transform.c, frameItem.transform.d, frameItem.transform.tx, frameItem.transform.ty);
+                    contentLayer.setBounds(new Laya.Rectangle(frameItem.layout.x, frameItem.layout.y, frameItem.layout.width, frameItem.layout.height));
+                    contentLayer.mask = undefined;
                     if (frameItem.maskPath) {
                         contentLayer.mask = Renderer.requestBezierShape(frameItem.maskPath);
-                        contentLayer.mask.transformMatrix = contentLayer.transformMatrix;
-                    }
-                    else {
-                        contentLayer.mask = undefined;
                     }
                     if (contentLayer.textLayer) {
                         let offsetX = (contentLayer.textLayer.offset !== undefined && contentLayer.textLayer.offset.x !== undefined) ? contentLayer.textLayer.offset.x : 0;
                         let offsetY = (contentLayer.textLayer.offset !== undefined && contentLayer.textLayer.offset.y !== undefined) ? contentLayer.textLayer.offset.y : 0;
-                        contentLayer.textLayer.textBaseline = "middle";
                         contentLayer.textLayer.x = (frameItem.layout.width - contentLayer.textLayer.getBounds().width) / 2.0 + offsetX;
-                        contentLayer.textLayer.y = frameItem.layout.height / 2.0 + offsetY;
+                        contentLayer.textLayer.y = (frameItem.layout.height - contentLayer.textLayer.getBounds().height) / 2.0 + offsetY;
                     }
                 }
                 else {
                     contentLayer.visible = false;
                 }
             }
-            contentLayer.children.forEach((element) => {
-                element.stepToFrame && element.stepToFrame(frame);
-            })
+            for (let index = 0; index < contentLayer.numChildren; index++) {
+                const child = contentLayer.getChildAt(index);
+                child.stepToFrame && child.stepToFrame(frame);
+            }
         }
         return contentLayer;
     }
 
     requestBitmapLayer(bitmap, bitmapTransform, frames) {
-        let imgTag = document.createElement('img');
-        let backCanvas;
+        let layer = new Laya.Sprite();
         if (bitmap.indexOf("iVBO") === 0 || bitmap.indexOf("/9j/2w") === 0) {
-            imgTag.src = 'data:image/png;base64,' + bitmap;
+            layer.loadImage('data:image/png;base64,' + bitmap);
         }
         else {
-            imgTag.src = bitmap;
-            if (frames[0] && frames[0].layout) {
-                backCanvas = document.createElement('canvas');
-                backCanvas.width = frames[0].layout.width
-                backCanvas.height = frames[0].layout.height
-                imgTag.onload = function() {
-                    backCanvas.getContext('2d').drawImage(imgTag, 0, 0, frames[0].layout.width, frames[0].layout.height)
-                }
-            }
+            layer.loadImage(bitmap);
         }
-        let layer = new createjs.Bitmap(backCanvas || imgTag);
         if (bitmapTransform !== undefined) {
-            layer.transformMatrix = new createjs.Matrix2D(bitmapTransform[0], bitmapTransform[1], bitmapTransform[2], bitmapTransform[3], bitmapTransform[4], bitmapTransform[5]);
+            layer.transform = new Laya.Matrix(bitmapTransform[0], bitmapTransform[1], bitmapTransform[2], bitmapTransform[3], bitmapTransform[4], bitmapTransform[5]);
         }
         layer.frames = frames;
         layer.stepToFrame = (frame) => { }
@@ -163,35 +337,36 @@ export class Renderer {
     }
 
     drawFrame(frame) {
-        this._owner.children.forEach((element) => {
-            element.stepToFrame(frame);
-        });
+        for (let index = 0; index < this._owner.numChildren; index++) {
+            const child = this._owner.getChildAt(index);
+            child.stepToFrame && child.stepToFrame(frame);
+        }
     }
 
     static resetStyle(obj, shape) {
         const styles = obj._styles;
         if (!styles) { return; }
         if (styles && styles.stroke) {
-            shape.graphics.beginStroke(`rgba(${parseInt((styles.stroke[0] * 255).toString())}, ${parseInt((styles.stroke[1] * 255).toString())}, ${parseInt((styles.stroke[2] * 255).toString())}, ${styles.stroke[3]})`);
+            shape.beginStroke(`rgba(${parseInt((styles.stroke[0] * 255).toString())}, ${parseInt((styles.stroke[1] * 255).toString())}, ${parseInt((styles.stroke[2] * 255).toString())}, ${styles.stroke[3]})`);
         }
         if (styles) {
             const width = styles.strokeWidth || 0.0;
             const caps = styles.lineCap || '';
             const joints = styles.lineJoin || '';
             const miterLimit = styles.miterLimit || '';
-            shape.graphics.setStrokeStyle(width, caps, joints, miterLimit, true);
+            shape.setStrokeStyle(width, caps, joints, miterLimit, true);
         }
         if (styles && styles.fill) {
-            shape.graphics.beginFill(`rgba(${parseInt((styles.fill[0] * 255).toString())}, ${parseInt((styles.fill[1] * 255).toString())}, ${parseInt((styles.fill[2] * 255).toString())}, ${styles.fill[3]})`);
+            shape.beginFill(`rgba(${parseInt((styles.fill[0] * 255).toString())}, ${parseInt((styles.fill[1] * 255).toString())}, ${parseInt((styles.fill[2] * 255).toString())}, ${styles.fill[3]})`);
         }
         if (styles && styles.lineDash) {
-            shape.graphics.setStrokeDash([styles.lineDash[0], styles.lineDash[1]], styles.lineDash[2]);
+            shape.setStrokeDash([styles.lineDash[0], styles.lineDash[1]], styles.lineDash[2]);
         }
     }
 
     static requestBezierShape(obj) {
-        const shape = new createjs.Shape()
-        const g = shape.graphics;
+        const shape = new ShapeSprite()
+        const g = shape;
         this.resetStyle(obj, shape);
         let currentPoint = { x: 0, y: 0, x1: 0, y1: 0, x2: 0, y2: 0 }
         const d = obj._d.replace(/([a-zA-Z])/g, '|||$1 ').replace(/,/g, ' ');
@@ -204,7 +379,7 @@ export class Renderer {
             }
         })
         if (obj._transform !== undefined && obj._transform !== null) {
-            shape.transformMatrix = new createjs.Matrix2D(obj._transform.a, obj._transform.b, obj._transform.c, obj._transform.d, obj._transform.tx, obj._transform.ty);
+            shape.transform = new Laya.Matrix(obj._transform.a, obj._transform.b, obj._transform.c, obj._transform.d, obj._transform.tx, obj._transform.ty);
         }
         return shape;
     }
@@ -327,23 +502,23 @@ export class Renderer {
     }
 
     static requestEllipseShape(obj) {
-        const shape = new createjs.Shape()
-        const g = shape.graphics;
+        const shape = new ShapeSprite()
+        const g = shape;
         this.resetStyle(obj, shape);
         g.drawEllipse(obj._x - obj._radiusX, obj._y - obj._radiusY, obj._radiusX * 2, obj._radiusY * 2);
         if (obj._transform !== undefined && obj._transform !== null) {
-            shape.transformMatrix = new createjs.Matrix2D(obj._transform.a, obj._transform.b, obj._transform.c, obj._transform.d, obj._transform.tx, obj._transform.ty);
+            shape.transform = new Laya.Matrix(obj._transform.a, obj._transform.b, obj._transform.c, obj._transform.d, obj._transform.tx, obj._transform.ty);
         }
         return shape;
     }
 
     static requestRectShape(obj) {
-        const shape = new createjs.Shape()
-        const g = shape.graphics;
+        const shape = new ShapeSprite()
+        const g = shape;
         this.resetStyle(obj, shape);
         g.drawRoundRect(obj._x, obj._y, obj._width, obj._height, obj._cornerRadius);
         if (obj._transform !== undefined && obj._transform !== null) {
-            shape.transformMatrix = new createjs.Matrix2D(obj._transform.a, obj._transform.b, obj._transform.c, obj._transform.d, obj._transform.tx, obj._transform.ty);
+            shape.transform = new Laya.Matrix(obj._transform.a, obj._transform.b, obj._transform.c, obj._transform.d, obj._transform.tx, obj._transform.ty);
         }
         return shape;
     }
