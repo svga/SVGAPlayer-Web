@@ -3,17 +3,19 @@
  *  Licensed under the Apache2.0 License. See License.txt in the project root for license information.
  *----------------------------------------------------------------------------------------------------*/
 
-"use strict";
+'use strict';
 
-export class BezierPath {
-    _d
-    _transform
-    _styles
-    _shape
+ export class SVGALayer extends egret.DisplayObjectContainer{
 
-    constructor(d, transform, styles) {
-        this._d = d
-        this._transform = transform
-        this._styles = styles
-    }
-}
+     constructor(){
+         super()
+
+     }
+
+     public setFrame(x: number, y: number, width: number, height: number){
+         this.x = x
+         this.y = y
+         this.width = width
+         this.height = height
+     }
+ }

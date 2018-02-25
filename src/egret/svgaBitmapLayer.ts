@@ -5,15 +5,10 @@
 
 "use strict";
 
-export class BezierPath {
-    _d
-    _transform
-    _styles
-    _shape
+import { SVGALayer } from './svgaLayer';
 
-    constructor(d, transform, styles) {
-        this._d = d
-        this._transform = transform
-        this._styles = styles
+ export class SVGABitmapLayer extends SVGALayer {
+    constructor(){
+        super()
     }
 }
