@@ -18,7 +18,9 @@
         parser.load("./samples/kingset.svga", function (videoItem) {
             player.setImage('./samples/avatar.png', '99')
             player.setVideoItem(videoItem);
-            player.startAnimation()
+            player.startAnimation();
+            
+            // player.startAnimationWithRange({location: 20, length: 1}, false); 
         }, function(error) {
             alert(error.message);
         })
