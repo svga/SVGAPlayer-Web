@@ -120,7 +120,7 @@ player.setText('Hello, World!', 'ImageKey');
 
 ```
 player.setText({ 
-    text: 'Hello, World!, 
+    text: 'Hello, World!', 
     size: "24px", 
     color: "#ffe0a4",
     offset: {x: 0.0, y: 0.0}
