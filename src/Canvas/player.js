@@ -99,7 +99,7 @@ export class Player {
         let offset = (typeof textORMap === "object" ? textORMap.offset : { x: 0.0, y: 0.0 }) || { x: 0.0, y: 0.0 };
         this._dynamicText[forKey] = {
             text,
-            style: `${size} family`,
+            style: `${size} ${family}`,
             color,
             offset,
         };
