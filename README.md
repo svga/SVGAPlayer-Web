@@ -4,6 +4,10 @@ Language: [中文](README.zh.md)
 
 ## News
 
+* 2.1.0
+    * Add reverse animation play mode.
+    * Add range animation play mode.
+
 * 2.0.7
     * Improve: Add IE6+ Support via Flash Player.
 
@@ -33,7 +37,7 @@ SVGAPlayer 2.0.0 also supports below Game Engines.
 
 ### Prebuild JS
 
-1. Add ```<script src="https://cdn.jsdelivr.net/npm/svgaplayerweb@2.0.6/build/svga.min.js"></script>``` to your.html
+1. Add ```<script src="https://cdn.jsdelivr.net/npm/svgaplayerweb@2.1.0/build/svga.min.js"></script>``` to your.html
 
 ### NPM
 
@@ -49,7 +53,7 @@ SVGAPlayer 2.0.0 also supports below Game Engines.
 2. Add following code to your.html
 
 ```
-<!--[if lt IE 9]> 
+<!--[if lt IE 10]> 
     <script src="../build/svga.ie.min.js"></script>
 <![endif]-->
 <!--[if gte IE 10]><!-->
@@ -116,7 +120,7 @@ player.setText('Hello, World!', 'ImageKey');
 
 ```
 player.setText({ 
-    text: 'Hello, World!, 
+    text: 'Hello, World!', 
     size: "24px", 
     color: "#ffe0a4",
     offset: {x: 0.0, y: 0.0}
@@ -138,7 +142,8 @@ You use SVGA.Player controls animation play and stop.
 #### Methods
 
 * constructor (canvas); - first params could be '#id' or CanvasHTMLElement
-* startAnimation(); - start animation from zero frame.
+* startAnimation(reverse: boolean = false); - start animation from zero frame.
+* startAnimationWithRange(range: {location: number, length: number}, reverse: boolean = false); - start animation in [location, location+length] frame range.
 * pauseAnimation(); - pause animation on current frame.
 * stopAnimation(); - stop animation, clear contents while clearsAfterStop === true
 * setContentMode(mode: "ScaleToFill" | "AspectFill" | "AspectFit"); - Specific Scale Mode

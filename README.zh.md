@@ -1,6 +1,20 @@
 # SVGAPlayer-Web
 
+Language: [English](README.md)
+
 ## 版本更新
+
+* 2.1.0
+    * 新增 SVGA 动画倒序播放
+    * 新增 SVGA 动画指定片段播放
+
+* 2.0.7
+    * 新增 IE6+ 播放支持
+
+* 2.0.6
+    * 修复 Safari 上 setImage 导致的无限循环
+    * 提高 BezierPath 绘图性能
+    * 新增 设置图片和文字支持，图像的大小会根据播放器自动调整
 
 * 2.0.0
     * 新增 SVGA-Format 2.0.0 格式支持
@@ -22,8 +36,7 @@ SVGAPlayer 2.0.0 同时支持以下游戏引擎使用
 ## 安装
 
 ### 预编译 JS
-1. 进入 [https://github.com/yyued/SVGAPlayer-Web/tree/master/build](https://github.com/yyued/SVGAPlayer-Web/tree/master/build) 下载 svga.min.js
-2. 添加 ```<script src="svga.min.js"></script>``` 至 xxx.html
+1. 添加 ```<script src="https://cdn.jsdelivr.net/npm/svgaplayerweb@2.1.0/build/svga.min.js"></script>``` 到 your.html 页面
 
 ### NPM
 1. ```npm install svgaplayerweb --save```
@@ -38,7 +51,7 @@ SVGAPlayer 2.0.0 同时支持以下游戏引擎使用
 2. 添加以下代码至 your.html
 
 ```
-<!--[if lt IE 9]> 
+<!--[if lt IE 10]> 
     <script src="../build/svga.ie.min.js"></script>
 <![endif]-->
 <!--[if gte IE 10]><!-->
@@ -132,7 +145,8 @@ SVGA.Player 用于控制动画的播放和停止
 #### Methods
 
 * constructor (canvas); - 传入 #id 或者 CanvasHTMLElement 至第一个参数
-* startAnimation(); - 从第 0 帧开始播放动画
+* startAnimation(reverse: boolean = false); - 从第 0 帧开始播放动画
+* startAnimationWithRange(range: {location: number, length: number}, reverse: boolean = false); - 播放 [location, location+length] 指定区间帧动画
 * pauseAnimation(); - 暂停在当前帧
 * stopAnimation(); - 停止播放动画，如果 clearsAfterStop === true，将会清空画布
 * setContentMode(mode: "ScaleToFill" | "AspectFill" | "AspectFit"); - 设置动画的拉伸模式

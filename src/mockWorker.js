@@ -47,10 +47,6 @@ const actions = {
                         throw err;
                     }
                     else {
-                        if (typeof window === "object") {
-                            window.SVGAPerformance.networkEnd = performance.now()
-                            window.SVGAPerformance.unzipStart = performance.now()
-                        }
                         const dataHeader = new Uint8Array(data, 0, 4)
                         if (dataHeader[0] == 80 && dataHeader[1] == 75 && dataHeader[2] == 3 && dataHeader[3] == 4) {
                             JSZip.loadAsync(data).then(function (zip) {
@@ -69,10 +65,6 @@ const actions = {
             req.open("GET", url, true);
             req.responseType = "arraybuffer"
             req.onloadend = () => {
-                if (typeof window === "object") {
-                    window.SVGAPerformance.networkEnd = performance.now()
-                    window.SVGAPerformance.unzipStart = performance.now()
-                }
                 actions.load_viaProto(req.response, cb, failure);
             }
             req.send()
@@ -85,9 +77,6 @@ const actions = {
             const movieData = ProtoMovieEntity.decode(inflatedData);
             let images = {};
             actions._loadImages(images, undefined, movieData, function () {
-                if (typeof window === "object") {
-                    window.SVGAPerformance.unzipEnd = performance.now()
-                }
                 movieData.ver = "2.0";
                 cb({
                     movie: movieData,
@@ -115,9 +104,6 @@ const actions = {
             movieData.ver = version;
 
             actions._loadImages(images, zip, movieData, function () {
-                if (typeof window === "object") {
-                    window.SVGAPerformance.unzipEnd = performance.now()
-                }
                 cb({
                     movie: movieData,
                     images,

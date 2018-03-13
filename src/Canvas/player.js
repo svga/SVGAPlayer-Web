@@ -1,22 +1,7 @@
 'use strict';
 
 import { Renderer } from './renderer'
-import { Ticker } from './ticker'
-
-let performance = window.performance;
-
-if (typeof performance === "undefined") {
-    performance = {
-        now: () => {
-            return (new Date()).getTime()
-        }
-    }
-}
-else if (typeof performance.now === "undefined") {
-    performance.now = () => {
-        return (new Date()).getTime()
-    }
-}
+const ValueAnimator = require("value-animator")
 
 export class Player {
 
@@ -28,29 +13,6 @@ export class Player {
         this._container = typeof container === "string" ? document.querySelector(container) : container;
         this._asChild = container === undefined
         this._init();
-    }
-
-    _init() {
-        if (this._container instanceof HTMLDivElement || this._asChild) {
-            if (this._container) {
-                const existedCanvasElements = this._container.querySelectorAll('canvas');
-                for (let index = 0; index < existedCanvasElements.length; index++) {
-                    let element = existedCanvasElements[index];
-                    if (element !== undefined && element.__isPlayer) {
-                        this._container.removeChild(element);
-                    }
-                }
-            }
-            this._drawingCanvas = document.createElement('canvas');
-            this._drawingCanvas.__isPlayer = true
-            this._drawingCanvas.style.backgroundColor = "transparent"
-            if (this._container) {
-                this._container.appendChild(this._drawingCanvas);
-                this._container.style.textAlign = "left";
-            }
-        }
-        this._renderer = new Renderer(this);
-        this._ticker = new Ticker(this);
     }
 
     setVideoItem(videoItem) {
@@ -72,11 +34,14 @@ export class Player {
         }
     }
 
-    startAnimation() {
+    startAnimation(reverse) {
         this.stopAnimation(false);
-        this._currentFrame = 0;
-        this._loopCount = 0;
-        this._ticker.start();
+        this._doStart(undefined, reverse, undefined);
+    }
+
+    startAnimationWithRange(range, reverse) {
+        this.stopAnimation(false);
+        this._doStart(range, reverse, undefined)
     }
 
     pauseAnimation() {
@@ -84,10 +49,12 @@ export class Player {
     }
 
     stopAnimation(clear) {
+        if (this._animator !== undefined) {
+            this._animator.stop()
+        }
         if (clear === undefined) {
             clear = this.clearsAfterStop;
         }
-        this._ticker.stop();
         if (clear) {
             this.clear();
         }
@@ -105,7 +72,7 @@ export class Player {
         this._currentFrame = frame;
         this._update();
         if (andPlay) {
-            this._ticker.start();
+            this._doStart(undefined, false, this._currentFrame)
         }
     }
 
@@ -132,7 +99,7 @@ export class Player {
         let offset = (typeof textORMap === "object" ? textORMap.offset : { x: 0.0, y: 0.0 }) || { x: 0.0, y: 0.0 };
         this._dynamicText[forKey] = {
             text,
-            style: `${size} family`,
+            style: `${size} ${family}`,
             color,
             offset,
         };
@@ -169,11 +136,10 @@ export class Player {
     _asChild = false;
     _container = undefined;
     _renderer = undefined;
-    _ticker = undefined;
+    _animator = undefined;
     _drawingCanvas = undefined;
     _contentMode = "AspectFit"
     _videoItem = undefined;
-    _loopCount = 0;
     _currentFrame = 0;
     _dynamicImage = {};
     _dynamicImageTransform = {};
@@ -181,39 +147,69 @@ export class Player {
     _onFinished = undefined;
     _onFrame = undefined;
     _onPercentage = undefined;
-    _nextTickTime = 0;
 
-    _onTick() {
-        if (typeof this._videoItem === "object") {
-            if (performance.now() >= this._nextTickTime) {
-                this._nextTickTime = parseInt(1000 / this._videoItem.FPS) + performance.now() - (60 / this._videoItem.FPS) * 2
-                this._next();
+    _init() {
+        if (this._container instanceof HTMLDivElement || this._asChild) {
+            if (this._container) {
+                const existedCanvasElements = this._container.querySelectorAll('canvas');
+                for (let index = 0; index < existedCanvasElements.length; index++) {
+                    let element = existedCanvasElements[index];
+                    if (element !== undefined && element.__isPlayer) {
+                        this._container.removeChild(element);
+                    }
+                }
+            }
+            this._drawingCanvas = document.createElement('canvas');
+            this._drawingCanvas.__isPlayer = true
+            this._drawingCanvas.style.backgroundColor = "transparent"
+            if (this._container) {
+                this._container.appendChild(this._drawingCanvas);
+                this._container.style.textAlign = "left";
             }
         }
+        this._renderer = new Renderer(this);
     }
 
-    _next() {
-        this._currentFrame++;
-        if (this._currentFrame >= this._videoItem.frames) {
-            this._currentFrame = 0;
-            this._loopCount++;
-            if (this.loops > 0 && this._loopCount >= this.loops) {
-                this.stopAnimation();
-                if (!this.clearsAfterStop && this.fillMode === "Backward") {
-                    this.stepToFrame(0)
-                }
-                if (typeof this._onFinished === "function") {
-                    this._onFinished();
-                }
+    _doStart(range, reverse, fromFrame) {
+        this._animator = new ValueAnimator()
+        if (range !== undefined) {
+            this._animator.startValue = Math.max(0, range.location)
+            this._animator.endValue = Math.min(this._videoItem.frames - 1, range.location + range.length)
+            this._animator.duration = (this._animator.endValue - this._animator.startValue + 1) * (1.0 / this._videoItem.FPS) * 1000
+        }
+        else {
+            this._animator.startValue = 0
+            this._animator.endValue = this._videoItem.frames - 1
+            this._animator.duration = this._videoItem.frames * (1.0 / this._videoItem.FPS) * 1000
+        }
+        this._animator.loops = this.loops <= 0 ? Infinity : 1
+        this._animator.fillRule = this.fillMode === "Backward" ? 1 : 0
+        this._animator.onUpdate = (value) => {
+            if (this._currentFrame === Math.floor(value)) {
                 return;
             }
+            this._currentFrame = Math.floor(value)
+            this._update()
+            if (typeof this._onFrame === "function") {
+                this._onFrame(this._currentFrame);
+            }
+            if (typeof this._onPercentage === "function") {
+                this._onPercentage(parseFloat(this._currentFrame + 1) / parseFloat(this._videoItem.frames));
+            }
         }
-        this._update();
-        if (typeof this._onFrame === "function") {
-            this._onFrame(this._currentFrame);
+        this._animator.onEnd = () => {
+            if (this.clearsAfterStop === true) {
+                this.clear()
+            }
+            if (typeof this._onFinished === "function") {
+                this._onFinished();
+            }
         }
-        if (typeof this._onPercentage === "function") {
-            this._onPercentage(parseFloat(this._currentFrame + 1) / parseFloat(this._videoItem.frames));
+        if (reverse === true) {
+            this._animator.reverse(fromFrame)
+        }
+        else {
+            this._animator.start(fromFrame)
         }
     }
 
@@ -248,7 +244,7 @@ export class Player {
                 else if (this._contentMode === "AspectFit" || this._contentMode === "AspectFill") {
                     const imageRatio = imageSize.width / imageSize.height;
                     const viewRatio = targetSize.width / targetSize.height;
-                    if ((imageRatio >= viewRatio && this._contentMode === "AspectFit") || (imageRatio < viewRatio && this._contentMode === "AspectFill")) {
+                    if ((imageRatio >= viewRatio && this._contentMode === "AspectFit") || (imageRatio <= viewRatio && this._contentMode === "AspectFill")) {
                         const scale = targetSize.width / imageSize.width;
                         const translateX = (imageSize.width * scale - imageSize.width) / 2.0
                         const translateY = (imageSize.height * scale - imageSize.height) / 2.0 + (targetSize.height - imageSize.height * scale) / 2.0

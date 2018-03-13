@@ -5,8 +5,8 @@ declare global {
         VideoEntity: typeof VideoEntity,
         Parser: typeof Parser,
         Player: typeof Player,
-        createjs: typeof createjs,
-        layabox: typeof layabox,
+        CreatejsPlayer: typeof CreatejsPlayer,
+        LayaboxPlayer: typeof LayaboxPlayer,
     }
 }
 
@@ -30,7 +30,8 @@ export class Player {
     setVideoItem(videoItem: VideoEntity): void
     setContentMode(contentMode: "Fill" | "AspectFill" | "AspectFit"): void
     setClipsToBounds(clipsToBounds: boolean): void
-    startAnimation(): void
+    startAnimation(reverse?: boolean): void
+    startAnimationWithRange(range: {location: number, length: number}, reverse?: boolean): void
     pauseAnimation(): void
     stopAnimation(clear?: boolean): void
     clear(): void
@@ -52,24 +53,11 @@ export class Player {
 
 }
 
-export class createjs {
-
-    static Player: typeof CreatejsPlayer
-
-}
-
 export class CreatejsPlayer extends Player {
 
     constructor(url: string, autoplay?: boolean)
     onError(callback: (error: Error) => void): void
     setFrame(x: number, y: number, width: number, height: number): void
-
-}
-
-
-export class layabox {
-
-    static Player: typeof LayaboxPlayer
 
 }
 
