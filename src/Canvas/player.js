@@ -38,10 +38,22 @@ export class Player {
         this.stopAnimation(false);
         this._doStart(undefined, reverse, undefined);
     }
-
+    startAnimationWithRangeList(arr){
+        var self = this;
+        self.stopAnimation(false);
+        if(arr.length > 1){
+            let range = arr.shift();
+            self._doStart(range,range.reverse,undefined,function(){
+                self.startAnimationWithRangeList(arr);
+            });
+        }else{
+            let range = arr.shift();
+            self._doStart(range,range.reverse,undefined);
+        }
+    }
     startAnimationWithRange(range, reverse) {
         this.stopAnimation(false);
-        this._doStart(range, reverse, undefined)
+        this._doStart(range, reverse,undefined)
     }
 
     pauseAnimation() {
@@ -99,7 +111,7 @@ export class Player {
         let offset = (typeof textORMap === "object" ? textORMap.offset : { x: 0.0, y: 0.0 }) || { x: 0.0, y: 0.0 };
         this._dynamicText[forKey] = {
             text,
-            style: `${size} ${family}`,
+            style: family && family !== "" ? `${size} ${family}` : `${size} family`,
             color,
             offset,
         };
@@ -170,10 +182,11 @@ export class Player {
         this._renderer = new Renderer(this);
     }
 
-    _doStart(range, reverse, fromFrame) {
-        this._animator = new ValueAnimator()
+    _doStart(range, reverse, fromFrame,callback) {
+        this._animator = new ValueAnimator();
+        // console.log("range",range,this._videoItem.frames);
         if (range !== undefined) {
-            this._animator.startValue = Math.max(0, range.location)
+            this._animator.startValue = Math.max(0, range.location);
             this._animator.endValue = Math.min(this._videoItem.frames - 1, range.location + range.length)
             this._animator.duration = (this._animator.endValue - this._animator.startValue + 1) * (1.0 / this._videoItem.FPS) * 1000
         }
@@ -182,9 +195,11 @@ export class Player {
             this._animator.endValue = this._videoItem.frames - 1
             this._animator.duration = this._videoItem.frames * (1.0 / this._videoItem.FPS) * 1000
         }
+        // console.log(`startValue:${this._animator.startValue};endValue:${this._animator.endValue},duration:${this._animator.duration }`);
         this._animator.loops = this.loops <= 0 ? Infinity : 1
         this._animator.fillRule = this.fillMode === "Backward" ? 1 : 0
         this._animator.onUpdate = (value) => {
+            // console.log("onUpdate",value);
             if (this._currentFrame === Math.floor(value)) {
                 return;
             }
@@ -201,15 +216,20 @@ export class Player {
             if (this.clearsAfterStop === true) {
                 this.clear()
             }
-            if (typeof this._onFinished === "function") {
-                this._onFinished();
+            if(typeof callback === "function"){
+                callback();
+            }else{
+                if (typeof this._onFinished === "function") {
+                    this._onFinished();
+                }
             }
+            
         }
         if (reverse === true) {
             this._animator.reverse(fromFrame)
         }
         else {
-            this._animator.start(fromFrame)
+            this._animator.start(fromFrame);
         }
     }
 
@@ -244,7 +264,7 @@ export class Player {
                 else if (this._contentMode === "AspectFit" || this._contentMode === "AspectFill") {
                     const imageRatio = imageSize.width / imageSize.height;
                     const viewRatio = targetSize.width / targetSize.height;
-                    if ((imageRatio >= viewRatio && this._contentMode === "AspectFit") || (imageRatio <= viewRatio && this._contentMode === "AspectFill")) {
+                    if ((imageRatio >= viewRatio && this._contentMode === "AspectFit") || (imageRatio < viewRatio && this._contentMode === "AspectFill")) {
                         const scale = targetSize.width / imageSize.width;
                         const translateX = (imageSize.width * scale - imageSize.width) / 2.0
                         const translateY = (imageSize.height * scale - imageSize.height) / 2.0 + (targetSize.height - imageSize.height * scale) / 2.0
@@ -289,5 +309,4 @@ export class Player {
         this._resize();
         this._renderer.drawFrame(this._currentFrame);
     }
-
 }

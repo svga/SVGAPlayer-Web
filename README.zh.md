@@ -51,7 +51,7 @@ SVGAPlayer 2.0.0 同时支持以下游戏引擎使用
 2. 添加以下代码至 your.html
 
 ```
-<!--[if lt IE 10]> 
+<!--[if lt IE 9]> 
     <script src="../build/svga.ie.min.js"></script>
 <![endif]-->
 <!--[if gte IE 10]><!-->
@@ -157,6 +157,9 @@ SVGA.Player 用于控制动画的播放和停止
 * setImage(image: string, forKey: string, transform: [a, b, c, d, tx, ty]); - 设定动态图像, transform 是可选的, transform 用于变换替换图片
 * setText(text: string | {text: string, font: string, size: string, color: string, offset: {x: float, y: float}}, forKey: string); - 设定动态文本
 * clearDynamicObjects(); - 清空所有动态图像和文本
+
+#### Methods(个人需求添加)
+* startAnimationWithRangeList(rangeList:[range:{location:number,length:number,reverse:boolean=false}]) -播放[location.location+length]指定区间帧动画，对区间动画进行拼接，全部执行完才调用 onfinish。
 
 #### Callback Method
 * onFinished(callback: () => void): void; - 动画停止播放时回调
