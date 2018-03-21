@@ -141,11 +141,52 @@ export class Renderer {
                     }
                 })
                 let dynamicText = this._owner._dynamicText[sprite.imageKey];
+                console.log(sprite.imageKey);
                 if (dynamicText !== undefined) {
+                    let colorInfo = dynamicText.color;
+                    let shadowInfo = dynamicText.textShadow;
                     ctx.textBaseline = "middle";
                     ctx.font = dynamicText.style;
-                    let textWidth = ctx.measureText(dynamicText.text).width
-                    ctx.fillStyle = dynamicText.color;
+                    let textWidth = ctx.measureText(dynamicText.text).width;
+                    //text shadow
+                    if(Object.prototype.toString.call(shadowInfo) == "[object Object]"){
+                        ctx.shadowColor = shadowInfo.color;
+                        ctx.shadowOffsetX = shadowInfo.offsetX;
+                        ctx.shadowOffsetY = shadowInfo.offsetY;
+                        ctx.shadowBlur = shadowInfo.blur;
+                    }
+                    //linear-gradient
+                    if(Object.prototype.toString.call(colorInfo) == "[object Object]"){
+                        let direction;
+                        try{
+                            switch(colorInfo.direction){
+                                case "to left":
+                                    direction=[frameItem.layout.width,0,0,0];
+                                break;
+                                case "to right":
+                                    direction=[0,0,0,frameItem.layout.width];
+                                break;
+                                case "to top":
+                                    direction=[0,frameItem.layout.height,0,0];
+                                break;
+                                case "to bottom":
+                                    direction=[0,0,0,frameItem.layout.height];
+                                break;
+                                default:
+                                    direction=[frameItem.layout.width,0,0,0];
+                                break;
+
+                            }
+                            let gradient = ctx.createLinearGradient(direction[0],direction[1],direction[2],direction[3]);
+                            gradient.addColorStop(0,colorInfo.starColor);
+                            gradient.addColorStop(1,colorInfo.stopColor);
+                            ctx.fillStyle = gradient
+                        }catch(e){
+                            ctx.fillStyle = dynamicText.color;
+                        }
+                    }else{
+                        ctx.fillStyle = dynamicText.color;
+                    }
                     let offsetX = (dynamicText.offset !== undefined && dynamicText.offset.x !== undefined) ? isNaN(parseFloat(dynamicText.offset.x)) ? 0 : parseFloat(dynamicText.offset.x) : 0;
                     let offsetY = (dynamicText.offset !== undefined && dynamicText.offset.y !== undefined) ? isNaN(parseFloat(dynamicText.offset.y)) ? 0 : parseFloat(dynamicText.offset.y) : 0;
                     ctx.fillText(dynamicText.text, (frameItem.layout.width - textWidth) / 2 + offsetX, frameItem.layout.height / 2 + offsetY);
