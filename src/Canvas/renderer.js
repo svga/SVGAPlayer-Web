@@ -141,7 +141,6 @@ export class Renderer {
                     }
                 })
                 let dynamicText = this._owner._dynamicText[sprite.imageKey];
-                console.log(sprite.imageKey);
                 if (dynamicText !== undefined) {
                     let colorInfo = dynamicText.color;
                     let shadowInfo = dynamicText.textShadow;

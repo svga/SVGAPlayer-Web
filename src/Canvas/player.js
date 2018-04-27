@@ -109,13 +109,14 @@ export class Player {
         let family = (typeof textORMap === "object" ? textORMap.family : "") || "";
         let color = (typeof textORMap === "object" ? textORMap.color : "#000000") || "#000000";
         let offset = (typeof textORMap === "object" ? textORMap.offset : { x: 0.0, y: 0.0 }) || { x: 0.0, y: 0.0 };
+        let textShadow = (typeof textORMap === "object" ? textORMap.textShadow : "" ) || "";
         color = this._compterColor(color);
-        console.log(color);
         this._dynamicText[forKey] = {
             text,
             style: family && family !== "" ? `${size} ${family}` : `${size} family`,
             color,
             offset,
+            textShadow
         };
     }
 
@@ -186,7 +187,6 @@ export class Player {
 
     _doStart(range, reverse, fromFrame,callback) {
         this._animator = new ValueAnimator();
-        // console.log("range",range,this._videoItem.frames);
         if (range !== undefined) {
             this._animator.startValue = Math.max(0, range.location);
             this._animator.endValue = Math.min(this._videoItem.frames - 1, range.location + range.length)
@@ -197,11 +197,9 @@ export class Player {
             this._animator.endValue = this._videoItem.frames - 1
             this._animator.duration = this._videoItem.frames * (1.0 / this._videoItem.FPS) * 1000
         }
-        // console.log(`startValue:${this._animator.startValue};endValue:${this._animator.endValue},duration:${this._animator.duration }`);
         this._animator.loops = this.loops <= 0 ? Infinity : 1
         this._animator.fillRule = this.fillMode === "Backward" ? 1 : 0
         this._animator.onUpdate = (value) => {
-            // console.log("onUpdate",value);
             if (this._currentFrame === Math.floor(value)) {
                 return;
             }
