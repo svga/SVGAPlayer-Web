@@ -207,7 +207,7 @@ export class Player extends Laya.Sprite {
             this._animator.endValue = this._videoItem.frames - 1
             this._animator.duration = this._videoItem.frames * (1.0 / this._videoItem.FPS) * 1000
         }
-        this._animator.loops = this.loops <= 0 ? Infinity : 1
+        this._animator.loops = this.loops <= 0 ? Infinity : this.loops
         this._animator.fillRule = this.fillMode === "Backward" ? 1 : 0
         this._animator.onUpdate = (value) => {
             if (this._currentFrame === Math.floor(value)) {
