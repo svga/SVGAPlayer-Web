@@ -105,18 +105,19 @@ export class Player {
 
     setText(textORMap, forKey) {
         let text = typeof textORMap === "string" ? textORMap : textORMap.text;
+        let align = typeof textORMap === "string" ?  "" : textORMap.align || "";
         let size = (typeof textORMap === "object" ? textORMap.size : "14px") || "14px";
         let family = (typeof textORMap === "object" ? textORMap.family : "") || "";
         let color = (typeof textORMap === "object" ? textORMap.color : "#000000") || "#000000";
         let offset = (typeof textORMap === "object" ? textORMap.offset : { x: 0.0, y: 0.0 }) || { x: 0.0, y: 0.0 };
         let textShadow = (typeof textORMap === "object" ? textORMap.textShadow : "" ) || "";
-        color = this._compterColor(color);
         this._dynamicText[forKey] = {
             text,
             style: family && family !== "" ? `${size} ${family}` : `${size} family`,
             color,
             offset,
-            textShadow
+            textShadow,
+            align
         };
     }
 
@@ -308,22 +309,5 @@ export class Player {
         if (this._videoItem === undefined) { return; }
         this._resize();
         this._renderer.drawFrame(this._currentFrame);
-    }
-    _compterColor(arg){
-        var reg=/linear\-gradient\s*?\((.*?)\)/gi,
-            regRes= reg.exec(arg),
-            type,
-            width = this._videoItem.videoSize.width,
-            height = this._videoItem.videoSize.height,
-            result={};
-        if(regRes && regRes.length > 1){
-            let info = regRes[1].split(',');
-            result.starColor = info[1].trim();
-            result.stopColor = info[2].trim();
-            result.direction = info[0].trim();
-        }else{
-            result = arg;
-        }
-        return result;
     }
 }
