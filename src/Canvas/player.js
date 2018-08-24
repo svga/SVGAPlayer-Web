@@ -111,13 +111,15 @@ export class Player {
         let color = (typeof textORMap === "object" ? textORMap.color : "#000000") || "#000000";
         let offset = (typeof textORMap === "object" ? textORMap.offset : { x: 0.0, y: 0.0 }) || { x: 0.0, y: 0.0 };
         let textShadow = (typeof textORMap === "object" ? textORMap.textShadow : "" ) || "";
+        let stroke = (typeof textORMap == "object" && textORMap.stroke) ? textORMap.stroke : null ;
         this._dynamicText[forKey] = {
             text,
             style: family && family !== "" ? `${size} ${family}` : `${size} family`,
             color,
             offset,
             textShadow,
-            align
+            align,
+            stroke
         };
     }
 

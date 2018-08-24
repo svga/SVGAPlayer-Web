@@ -183,7 +183,6 @@ export class Renderer {
                                 });
                                 ctx.fillStyle = gradient
                             }
-                            // gradient.addColorStop(1,colorInfo.stopColor);
                             ctx.fillStyle = gradient
                         }catch(e){
                             ctx.fillStyle = dynamicText.color;
@@ -210,6 +209,23 @@ export class Renderer {
                         break;
                     }
                     ctx.fillText(dynamicText.text, pointX , pointY);
+                    //描边
+                    if(dynamicText.stroke){
+                        let stroke = {
+                            width:'1px',
+                            color:"#ffffff"
+                        }
+                        if(Object.prototype.toString.call(dynamicText.stroke) !== "[object Object]"){
+                            dynamicText.stroke = {};
+                        }   
+                        stroke = {
+                            ...stroke,
+                            ...dynamicText.stroke
+                        }
+                        ctx.lineWidth = stroke.width;
+                        ctx.strokeStyle = stroke.color;
+                        ctx.strokeText(dynamicText.text, pointX , pointY);
+                    }
                 }
                 ctx.restore();
             });
