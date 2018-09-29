@@ -208,7 +208,7 @@ export class Renderer {
                         pointY = frameItem.layout.height / 2 + offsetY;
                         break;
                     }
-                    ctx.fillText(dynamicText.text, pointX , pointY);
+                    
                     //描边
                     if(dynamicText.stroke){
                         let stroke = {
@@ -224,7 +224,17 @@ export class Renderer {
                         }
                         ctx.lineWidth = stroke.width;
                         ctx.strokeStyle = stroke.color;
-                        ctx.strokeText(dynamicText.text, pointX , pointY);
+                        //判断是外描边还是内描边
+                        if(stroke.style && stroke.style == 'out'){
+                            ctx.strokeText(dynamicText.text, pointX , pointY);
+                            ctx.fillText(dynamicText.text, pointX , pointY);
+                        }else{
+                            ctx.fillText(dynamicText.text, pointX , pointY);
+                            ctx.strokeText(dynamicText.text, pointX , pointY);
+                        }
+                        
+                    }else{
+                        ctx.fillText(dynamicText.text, pointX , pointY);
                     }
                 }
                 ctx.restore();

@@ -122,6 +122,7 @@ export class Player {
             align,
             stroke
         };
+        console.log(font);
     }
 
     clearDynamicObjects() {
