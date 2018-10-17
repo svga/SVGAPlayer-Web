@@ -36,6 +36,11 @@ export class VideoEntity {
      */
     sprites = []
 
+    /**
+     * AudioEntity[]
+     */
+    audios = []
+
     constructor(spec, images) {
 
         if (typeof spec === "object" && spec.$type == ProtoMovieEntity) {
@@ -47,6 +52,7 @@ export class VideoEntity {
                 this.frames = spec.params.frames || 0;
             }
             this.resetSprites(spec)
+            this.audios = spec.audios
         }
         else if (spec) {
             if (spec.movie) {

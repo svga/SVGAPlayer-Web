@@ -45,6 +45,25 @@ export class Renderer {
                     imgTag.src = 'data:image/png;base64,' + src;
                     this._bitmapCache[imageKey] = imgTag;
                 }
+                else if (src.indexOf("SUQzAw") === 0) {
+                    if (window.Howl !== undefined) {
+                        totalCount++;
+                        var sound = new Howl({
+                            src: ['data:audio/x-mpeg;base64,' + src]
+                        });
+                        sound.once("load", function () {
+                            loadedCount++;
+                            if (loadedCount == totalCount) {
+                                this._prepared = true;
+                                if (typeof this._undrawFrame === "number") {
+                                    this.drawFrame(this._undrawFrame);
+                                    this._undrawFrame = undefined;
+                                }
+                            }
+                        }.bind(this))
+                        this._bitmapCache[imageKey] = sound;
+                    }
+                }
             }
         }
     }
@@ -62,6 +81,13 @@ export class Renderer {
 
     drawFrame(frame) {
         if (this._prepared) {
+            if (this._owner._videoItem.audios instanceof Array) {
+                this._owner._videoItem.audios.forEach(audio => {
+                    if (audio.startFrame === frame && this._bitmapCache[audio.audioKey] !== undefined && typeof this._bitmapCache[audio.audioKey].play === "function") {
+                        this._bitmapCache[audio.audioKey].play()
+                    }
+                })
+            }
             const ctx = (this._owner._drawingCanvas || this._owner._container).getContext('2d')
             const areaFrame = {
                 x: 0.0,
@@ -373,8 +399,8 @@ export class Renderer {
         let height = obj._height;
         let radius = obj._cornerRadius;
 
-        if (width < 2 * radius) {radius = width / 2;}
-        if (height < 2 * radius){ radius = height / 2;}
+        if (width < 2 * radius) { radius = width / 2; }
+        if (height < 2 * radius) { radius = height / 2; }
 
         ctx.beginPath();
         ctx.moveTo(x + radius, y);

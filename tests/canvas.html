@@ -5,6 +5,7 @@
         <div id="testCanvas" style="background-color: #000000; width: 500px; height: 500px; margin: auto"></div>
         <!-- <canvas id="testCanvas" width="500" height="500" style="background-color: #000000; "></canvas> -->
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/howler@2.0.15/dist/howler.core.min.js"></script>
     <!--[if lt IE 10]> 
         <script src="../build/svga.ie.min.js"></script>
     <![endif]-->
@@ -15,8 +16,8 @@
     <script>
         var parser = new SVGA.Parser('#testCanvas')
         var player = new SVGA.Player('#testCanvas')
-        parser.load("./samples/kingset.svga", function (videoItem) {
-            player.setImage('./samples/avatar.png', '99')
+        parser.load("./samples/thunder.svga", function (videoItem) {
+            // player.setImage('./samples/avatar.png', '99')
             player.setVideoItem(videoItem);
             player.startAnimation();
             
