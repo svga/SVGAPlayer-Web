@@ -15,6 +15,15 @@ export class Renderer {
         this._owner = owner;
     }
 
+    dataURLtoBlob(dataurl) {
+        var arr = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1],
+            bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
+        while (n--) {
+            u8arr[n] = bstr.charCodeAt(n);
+        }
+        return new Blob([u8arr], { type: mime });
+    }
+
     prepare() {
         this._prepared = false;
         this._bitmapCache = undefined;
@@ -49,7 +58,10 @@ export class Renderer {
                     if (window.Howl !== undefined) {
                         totalCount++;
                         var sound = new Howl({
-                            src: ['data:audio/x-mpeg;base64,' + src]
+                            src: [(navigator.vendor === "Google Inc." ? URL.createObjectURL(this.dataURLtoBlob('data:audio/x-mpeg;base64,' + src)) : 'data:audio/x-mpeg;base64,' + src)],
+                            html5: true,
+                            preload: true,
+                            format: ["mp3"],
                         });
                         sound.once("load", function () {
                             loadedCount++;
@@ -61,6 +73,9 @@ export class Renderer {
                                 }
                             }
                         }.bind(this))
+                        sound.on("loaderror", function (e) {
+                            console.error(e)
+                        })
                         this._bitmapCache[imageKey] = sound;
                     }
                 }
