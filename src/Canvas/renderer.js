@@ -10,6 +10,7 @@ export class Renderer {
     _prepared = false;
     _undrawFrame = undefined;
     _bitmapCache = undefined;
+    _soundsQueue = [];
 
     constructor(owner) {
         this._owner = owner;
@@ -59,9 +60,9 @@ export class Renderer {
                         totalCount++;
                         var sound = new Howl({
                             src: [(navigator.vendor === "Google Inc." ? URL.createObjectURL(this.dataURLtoBlob('data:audio/x-mpeg;base64,' + src)) : 'data:audio/x-mpeg;base64,' + src)],
-                            html5: true,
-                            preload: true,
-                            format: ["mp3"],
+                            html5: navigator.vendor === "Google Inc." ? true : undefined,
+                            preload: navigator.vendor === "Google Inc." ? true : undefined,
+                            format: navigator.vendor === "Google Inc." ? ["mp3"] : undefined,
                         });
                         sound.once("load", function () {
                             loadedCount++;
@@ -94,15 +95,15 @@ export class Renderer {
         ctx.clearRect(areaFrame.x, areaFrame.y, areaFrame.width, areaFrame.height)
     }
 
+    clearAudios() {
+        this._soundsQueue.forEach(it => {
+            it.player.stop(it.playID)
+        })
+        this._soundsQueue = []
+    }
+
     drawFrame(frame) {
         if (this._prepared) {
-            if (this._owner._videoItem.audios instanceof Array) {
-                this._owner._videoItem.audios.forEach(audio => {
-                    if (audio.startFrame === frame && this._bitmapCache[audio.audioKey] !== undefined && typeof this._bitmapCache[audio.audioKey].play === "function") {
-                        this._bitmapCache[audio.audioKey].play()
-                    }
-                })
-            }
             const ctx = (this._owner._drawingCanvas || this._owner._container).getContext('2d')
             const areaFrame = {
                 x: 0.0,
@@ -196,6 +197,32 @@ export class Renderer {
         }
         else {
             this._undrawFrame = frame;
+        }
+    }
+
+    playAudio(frame) {
+        if (this._owner._forwardAnimating && this._owner._videoItem.audios instanceof Array) {
+            this._owner._videoItem.audios.forEach(audio => {
+                if (audio.startFrame === frame && this._bitmapCache[audio.audioKey] !== undefined && typeof this._bitmapCache[audio.audioKey].play === "function") {
+                    const item = {
+                        playID: this._bitmapCache[audio.audioKey].play(),
+                        player: this._bitmapCache[audio.audioKey],
+                        endFrame: audio.endFrame,
+                    }
+                    item.player.seek(audio.startTime / 1000, item.playID)
+                    this._soundsQueue.push(item)
+                }
+            })
+            let deleted = false
+            this._soundsQueue.forEach(it => {
+                if (frame >= it.endFrame) {
+                    deleted = true
+                    it.player.stop(it.playID)
+                }
+            })
+            if (deleted) {
+                this._soundsQueue = this._soundsQueue.filter(it => frame < it.endFrame)
+            }
         }
     }
 

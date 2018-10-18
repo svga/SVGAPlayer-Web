@@ -49,6 +49,7 @@ export class Player {
     }
 
     stopAnimation(clear) {
+        this._forwardAnimating = false
         if (this._animator !== undefined) {
             this._animator.stop()
         }
@@ -62,6 +63,7 @@ export class Player {
 
     clear() {
         this._renderer.clear();
+        this._renderer.clearAudios();
     }
 
     stepToFrame(frame, andPlay) {
@@ -140,6 +142,7 @@ export class Player {
     _drawingCanvas = undefined;
     _contentMode = "AspectFit"
     _videoItem = undefined;
+    _forwardAnimating = false;
     _currentFrame = 0;
     _dynamicImage = {};
     _dynamicImageTransform = {};
@@ -188,6 +191,9 @@ export class Player {
             if (this._currentFrame === Math.floor(value)) {
                 return;
             }
+            if (this._forwardAnimating && this._currentFrame > Math.floor(value)) {
+                this._renderer.clearAudios()
+            }
             this._currentFrame = Math.floor(value)
             this._update()
             if (typeof this._onFrame === "function") {
@@ -198,6 +204,7 @@ export class Player {
             }
         }
         this._animator.onEnd = () => {
+            this._forwardAnimating = false
             if (this.clearsAfterStop === true) {
                 this.clear()
             }
@@ -207,10 +214,14 @@ export class Player {
         }
         if (reverse === true) {
             this._animator.reverse(fromFrame)
+            this._forwardAnimating = false
         }
         else {
             this._animator.start(fromFrame)
+            this._forwardAnimating = true
         }
+        this._currentFrame = this._animator.startValue
+        this._update()
     }
 
     _resize() {
@@ -288,6 +299,7 @@ export class Player {
         if (this._videoItem === undefined) { return; }
         this._resize();
         this._renderer.drawFrame(this._currentFrame);
+        this._renderer.playAudio(this._currentFrame);
     }
 
 }
