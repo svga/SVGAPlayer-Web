@@ -4,21 +4,7 @@ Language: [English](README.md)
 
 ## 版本更新
 
-* 2.1.0
-    * 新增 SVGA 动画倒序播放
-    * 新增 SVGA 动画指定片段播放
-
-* 2.0.7
-    * 新增 IE6+ 播放支持
-
-* 2.0.6
-    * 修复 Safari 上 setImage 导致的无限循环
-    * 提高 BezierPath 绘图性能
-    * 新增 设置图片和文字支持，图像的大小会根据播放器自动调整
-
-* 2.0.0
-    * 新增 SVGA-Format 2.0.0 格式支持
-    * 新增 npm 支持, 使用 ```npm install svgaplayerweb --save```
+* 2.3.0 - 新增音频播放支持
 
 ## Can I Use
 
@@ -58,6 +44,16 @@ SVGAPlayer 2.0.0 同时支持以下游戏引擎使用
     <script src="../build/svga.min.js"></script>
 <!--<![endif]-->
 ```
+
+### 支持音频播放
+
+如果你需要播放 svga 文件内的音频，请将 ```howler.min.js``` 添加到 HTML 页面中。
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/howler@2.0.15/dist/howler.core.min.js"></script>
+```
+
+注意：部分浏览器要求在触摸事件发生后才能播放音频。
 
 ### 支持 SVGA-Format 1.x 格式
 

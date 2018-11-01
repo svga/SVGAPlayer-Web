@@ -4,21 +4,7 @@ Language: [中文](README.zh.md)
 
 ## News
 
-* 2.1.0
-    * Add reverse animation play mode.
-    * Add range animation play mode.
-
-* 2.0.7
-    * Improve: Add IE6+ Support via Flash Player.
-
-* 2.0.6
-    * Bug-fix: setImage on safari leads inifity loop.
-    * Improve: BezierPath drawing performance.
-    * Improve: Now can set image and text anytime. set image can be any size, it will be resize by SVGAPlayer.
-
-* 2.0.0
-    * Add SVGA-Format 2.0.0 support.
-    * Add npm support, use ```npm install svgaplayerweb --save```.
+* 2.3.0 - Add audio support.
 
 ## Can I Use
 
@@ -60,6 +46,16 @@ SVGAPlayer 2.0.0 also supports below Game Engines.
     <script src="../build/svga.min.js"></script>
 <!--<![endif]-->
 ```
+
+### Audio support
+
+If your need to play audios, add ```howler.min.js``` to your html.
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/howler@2.0.15/dist/howler.core.min.js"></script>
+```
+
+Notice: audio plays needs browser support, some browser requires user interaction before playing.
 
 ### SVGA-Format 1.x support
 
