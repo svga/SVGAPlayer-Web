@@ -22,7 +22,7 @@ SVGAPlayer 2.0.0 同时支持以下游戏引擎使用
 ## 安装
 
 ### 预编译 JS
-1. 添加 ```<script src="https://cdn.jsdelivr.net/npm/svgaplayerweb@2.1.0/build/svga.min.js"></script>``` 到 your.html 页面
+1. 添加 ```<script src="https://cdn.jsdelivr.net/npm/svgaplayerweb@2.3.0/build/svga.min.js"></script>``` 到 your.html 页面
 
 ### NPM
 1. ```npm install svgaplayerweb --save```
