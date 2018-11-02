@@ -55,7 +55,7 @@ export class Renderer {
                     imgTag.src = 'data:image/png;base64,' + src;
                     this._bitmapCache[imageKey] = imgTag;
                 }
-                else if (src.indexOf("SUQzAw") === 0) {
+                else if (src.indexOf("SUQz") === 0) {
                     if (window.Howl !== undefined) {
                         totalCount++;
                         var sound = new Howl({
