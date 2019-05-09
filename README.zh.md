@@ -4,6 +4,7 @@ Language: [English](README.md)
 
 ## 版本更新
 
+* **[Lite 版本](https://github.com/svga/SVGAPlayer-Web-Lite)**
 * 2.3.0 - 新增音频播放支持
 
 ## Can I Use
