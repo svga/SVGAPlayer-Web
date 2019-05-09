@@ -4,6 +4,7 @@ Language: [中文](README.zh.md)
 
 ## News
 
+* **[Lite Version](https://github.com/svga/SVGAPlayer-Web-Lite)**
 * 2.3.0 - Add audio support.
 
 ## Can I Use
