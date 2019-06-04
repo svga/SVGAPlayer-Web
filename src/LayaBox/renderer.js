@@ -287,9 +287,9 @@ export class Renderer {
                     contentLayer.transform = new Laya.Matrix(frameItem.transform.a, frameItem.transform.b, frameItem.transform.c, frameItem.transform.d, frameItem.transform.tx, frameItem.transform.ty);
                     contentLayer.setBounds(new Laya.Rectangle(frameItem.layout.x, frameItem.layout.y, frameItem.layout.width, frameItem.layout.height));
                     contentLayer.mask = undefined;
-                    if (frameItem.maskPath) {
-                        contentLayer.mask = Renderer.requestBezierShape(frameItem.maskPath);
-                    }
+                    // if (frameItem.maskPath) {
+                    //     contentLayer.mask = Renderer.requestBezierShape(frameItem.maskPath);
+                    // }
                     if (contentLayer.textLayer) {
                         let offsetX = (contentLayer.textLayer.offset !== undefined && contentLayer.textLayer.offset.x !== undefined) ? contentLayer.textLayer.offset.x : 0;
                         let offsetY = (contentLayer.textLayer.offset !== undefined && contentLayer.textLayer.offset.y !== undefined) ? contentLayer.textLayer.offset.y : 0;

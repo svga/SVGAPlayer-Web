@@ -10,19 +10,20 @@
         <script src="../build/svga.ie.min.js"></script>
     <![endif]-->
     <!--[if gte IE 10]><!-->
-        <script src="http://assets.dwstatic.com/common/lib/??jszip/3.1.3/jszip.min.js,jszip/3.1.3/jszip-utils.min.js" charset="utf-8"></script>
-        <script src="../build/svga.min.js"></script>
+    <script src="http://assets.dwstatic.com/common/lib/??jszip/3.1.3/jszip.min.js,jszip/3.1.3/jszip-utils.min.js"
+        charset="utf-8"></script>
+    <script src="../build/svga.min.js"></script>
     <!--<![endif]-->
     <script>
         var parser = new SVGA.Parser('#testCanvas')
         var player = new SVGA.Player('#testCanvas')
-        parser.load("./samples/heartbeat.svga", function (videoItem) {
+        parser.load("./samples/clippath.svga", function (videoItem) {
             // player.setImage('./samples/avatar.png', '99')
             player.setVideoItem(videoItem);
             player.startAnimation();
-            
+
             // player.startAnimationWithRange({location: 20, length: 1}, false); 
-        }, function(error) {
+        }, function (error) {
             alert(error.message);
         })
     </script>

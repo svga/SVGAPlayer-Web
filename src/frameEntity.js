@@ -24,10 +24,10 @@ export class FrameEntity {
 
     ny = 0.0;
 
-    /**
-     * BezierPath
-     */
-    maskPath = null;
+    // /**
+    //  * BezierPath
+    //  */
+    // maskPath = null;
 
     /**
      * Object[]
@@ -50,9 +50,9 @@ export class FrameEntity {
             this.transform.tx = parseFloat(spec.transform.tx) || 0.0;
             this.transform.ty = parseFloat(spec.transform.ty) || 0.0;
         }
-        if (spec.clipPath && spec.clipPath.length > 0) {
-            this.maskPath = new BezierPath(spec.clipPath, undefined, { fill: "#000000" });
-        }
+        // if (spec.clipPath && spec.clipPath.length > 0) {
+        //     this.maskPath = new BezierPath(spec.clipPath, undefined, { fill: "#000000" });
+        // }
         if (spec.shapes) {
             if (spec.shapes instanceof Array) {
                 spec.shapes.forEach(shape => {
