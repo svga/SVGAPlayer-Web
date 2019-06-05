@@ -21,7 +21,7 @@ export class SpriteEntity {
     frames = []
 
     constructor(spec) {
-        this.imageKey = spec.matteKey;
+        this.matteKey = spec.matteKey;
         this.imageKey = spec.imageKey;
         if (spec.frames) {
             this.frames = spec.frames.map((obj) => {

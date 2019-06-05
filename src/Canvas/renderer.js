@@ -112,87 +112,43 @@ export class Renderer {
                 height: (this._owner._drawingCanvas || this._owner._container).height,
             }
             ctx.clearRect(areaFrame.x, areaFrame.y, areaFrame.width, areaFrame.height)
-            this._owner._videoItem.sprites.forEach(sprite => {
-                let frameItem = sprite.frames[this._owner._currentFrame];
-                if (frameItem.alpha < 0.05) {
+
+            var matteSprites = new Map();
+            var isMatteing = false;
+
+            var sprites = this._owner._videoItem.sprites;
+            sprites.forEach((sprite, index) => {
+                if (sprites[0].imageKey.indexOf(".matte") == -1) {
+                    this.drawSprite(sprite, ctx, frame);
                     return;
                 }
-                ctx.save();
-                if (this._owner._globalTransform) {
-                    ctx.transform(this._owner._globalTransform.a, this._owner._globalTransform.b, this._owner._globalTransform.c, this._owner._globalTransform.d, this._owner._globalTransform.tx, this._owner._globalTransform.ty)
+                if (sprite.imageKey.indexOf(".matte") != -1) {
+                    matteSprites.set(sprite.imageKey, sprite);
+                    return;
                 }
-                ctx.globalAlpha = frameItem.alpha;
-                ctx.transform(frameItem.transform.a, frameItem.transform.b, frameItem.transform.c, frameItem.transform.d, frameItem.transform.tx, frameItem.transform.ty)
-                let src = this._owner._dynamicImage[sprite.imageKey] || this._bitmapCache[sprite.imageKey] || this._owner._videoItem.images[sprite.imageKey];
-                if (typeof src === "string") {
-                    let imgTag = this._bitmapCache[sprite.imageKey] || document.createElement('img');
-                    let targetWidth = undefined;
-                    let targetHeight = undefined;
-                    if (src.indexOf("iVBO") === 0 || src.indexOf("/9j/2w") === 0) {
-                        imgTag.src = 'data:image/png;base64,' + src;
-                    }
-                    else {
-                        if (imgTag._svgaSrc !== src) {
-                            imgTag._svgaSrc = src;
-                            imgTag.src = src;
-                        }
-                        targetWidth = frameItem.layout.width;
-                        targetHeight = frameItem.layout.height;
-                    }
-                    this._bitmapCache[sprite.imageKey] = imgTag;
-                    // if (frameItem.maskPath !== undefined && frameItem.maskPath !== null) {
-                    //     this.drawBezier(ctx, frameItem.maskPath);
-                    //     ctx.clip();
-                    // }
-                    if (this._owner._dynamicImageTransform[sprite.imageKey] !== undefined) {
-                        ctx.save();
-                        const concatTransform = this._owner._dynamicImageTransform[sprite.imageKey];
-                        ctx.transform(concatTransform[0], concatTransform[1], concatTransform[2], concatTransform[3], concatTransform[4], concatTransform[5]);
-                    }
-                    if (targetWidth && targetHeight) { ctx.drawImage(imgTag, 0, 0, targetWidth, targetHeight); }
-                    else { ctx.drawImage(imgTag, 0, 0); }
-                    if (this._owner._dynamicImageTransform[sprite.imageKey] !== undefined) {
-                        ctx.restore();
-                    }
+                var lastSprite = sprites[index - 1];
+                if (isMatteing && ((sprite.matteKey == null || sprite.matteKey.length == 0) || sprite.matteKey != lastSprite.matteKey)) {
+                    isMatteing = false;
+
+                    var matteSprite = matteSprites.get(sprite.matteKey);
+                    ctx.globalCompositeOperation = "destination-in";
+                    this.drawSprite(matteSprite, ctx, frame);
+                    ctx.globalCompositeOperation = "source-over";
+                    ctx.restore();
                 }
-                else if (typeof src === "object") {
-                    // if (frameItem.maskPath !== undefined && frameItem.maskPath !== null) {
-                    //     frameItem.maskPath._styles = undefined;
-                    //     this.drawBezier(ctx, frameItem.maskPath);
-                    //     ctx.clip();
-                    // }
-                    if (this._owner._dynamicImageTransform[sprite.imageKey] !== undefined) {
-                        ctx.save();
-                        const concatTransform = this._owner._dynamicImageTransform[sprite.imageKey];
-                        ctx.transform(concatTransform[0], concatTransform[1], concatTransform[2], concatTransform[3], concatTransform[4], concatTransform[5]);
-                    }
-                    ctx.drawImage(src, 0, 0);
-                    if (this._owner._dynamicImageTransform[sprite.imageKey] !== undefined) {
-                        ctx.restore();
-                    }
+                if (sprite.matteKey != null && ((lastSprite.matteKey == null || lastSprite.matteKey.length == 0) || lastSprite.matteKey != sprite.matteKey)) {
+                    isMatteing = true;
+                    ctx.save();
                 }
-                frameItem.shapes && frameItem.shapes.forEach(shape => {
-                    if (shape.type === "shape" && shape.pathArgs && shape.pathArgs.d) {
-                        this.drawBezier(ctx, new BezierPath(shape.pathArgs.d, shape.transform, shape.styles))
-                    }
-                    if (shape.type === "ellipse" && shape.pathArgs) {
-                        this.drawEllipse(ctx, new EllipsePath(parseFloat(shape.pathArgs.x) || 0.0, parseFloat(shape.pathArgs.y) || 0.0, parseFloat(shape.pathArgs.radiusX) || 0.0, parseFloat(shape.pathArgs.radiusY) || 0.0, shape.transform, shape.styles))
-                    }
-                    if (shape.type === "rect" && shape.pathArgs) {
-                        this.drawRect(ctx, new RectPath(parseFloat(shape.pathArgs.x) || 0.0, parseFloat(shape.pathArgs.y) || 0.0, parseFloat(shape.pathArgs.width) || 0.0, parseFloat(shape.pathArgs.height) || 0.0, parseFloat(shape.pathArgs.cornerRadius) || 0.0, shape.transform, shape.styles))
-                    }
-                })
-                let dynamicText = this._owner._dynamicText[sprite.imageKey];
-                if (dynamicText !== undefined) {
-                    ctx.textBaseline = "middle";
-                    ctx.font = dynamicText.style;
-                    let textWidth = ctx.measureText(dynamicText.text).width
-                    ctx.fillStyle = dynamicText.color;
-                    let offsetX = (dynamicText.offset !== undefined && dynamicText.offset.x !== undefined) ? isNaN(parseFloat(dynamicText.offset.x)) ? 0 : parseFloat(dynamicText.offset.x) : 0;
-                    let offsetY = (dynamicText.offset !== undefined && dynamicText.offset.y !== undefined) ? isNaN(parseFloat(dynamicText.offset.y)) ? 0 : parseFloat(dynamicText.offset.y) : 0;
-                    ctx.fillText(dynamicText.text, (frameItem.layout.width - textWidth) / 2 + offsetX, frameItem.layout.height / 2 + offsetY);
+                this.drawSprite(sprite, ctx, frame);
+
+                if (isMatteing && index == sprites.length - 1) {
+                    var matteSprite = matteSprites.get(sprite.matteKey);
+                    ctx.globalCompositeOperation = "destination-in";
+                    this.drawSprite(matteSprite, ctx, frame);
+                    ctx.globalCompositeOperation = "source-over";
+                    ctx.restore();
                 }
-                ctx.restore();
             });
         }
         else {
@@ -200,8 +156,87 @@ export class Renderer {
         }
     }
 
-    drawSprite() {
-
+    drawSprite(sprite, ctx, frameIndex) {
+        let frameItem = sprite.frames[this._owner._currentFrame];
+        if (frameItem.alpha < 0.05) {
+            return;
+        }
+        ctx.save();
+        if (this._owner._globalTransform) {
+            ctx.transform(this._owner._globalTransform.a, this._owner._globalTransform.b, this._owner._globalTransform.c, this._owner._globalTransform.d, this._owner._globalTransform.tx, this._owner._globalTransform.ty)
+        }
+        ctx.globalAlpha = frameItem.alpha;
+        ctx.transform(frameItem.transform.a, frameItem.transform.b, frameItem.transform.c, frameItem.transform.d, frameItem.transform.tx, frameItem.transform.ty)
+        let src = this._owner._dynamicImage[sprite.imageKey] || this._bitmapCache[sprite.imageKey] || this._owner._videoItem.images[sprite.imageKey];
+        if (typeof src === "string") {
+            let imgTag = this._bitmapCache[sprite.imageKey] || document.createElement('img');
+            let targetWidth = undefined;
+            let targetHeight = undefined;
+            if (src.indexOf("iVBO") === 0 || src.indexOf("/9j/2w") === 0) {
+                imgTag.src = 'data:image/png;base64,' + src;
+            }
+            else {
+                if (imgTag._svgaSrc !== src) {
+                    imgTag._svgaSrc = src;
+                    imgTag.src = src;
+                }
+                targetWidth = frameItem.layout.width;
+                targetHeight = frameItem.layout.height;
+            }
+            this._bitmapCache[sprite.imageKey] = imgTag;
+            // if (frameItem.maskPath !== undefined && frameItem.maskPath !== null) {
+            //     this.drawBezier(ctx, frameItem.maskPath);
+            //     ctx.clip();
+            // }
+            if (this._owner._dynamicImageTransform[sprite.imageKey] !== undefined) {
+                ctx.save();
+                const concatTransform = this._owner._dynamicImageTransform[sprite.imageKey];
+                ctx.transform(concatTransform[0], concatTransform[1], concatTransform[2], concatTransform[3], concatTransform[4], concatTransform[5]);
+            }
+            if (targetWidth && targetHeight) { ctx.drawImage(imgTag, 0, 0, targetWidth, targetHeight); }
+            else { ctx.drawImage(imgTag, 0, 0); }
+            if (this._owner._dynamicImageTransform[sprite.imageKey] !== undefined) {
+                ctx.restore();
+            }
+        }
+        else if (typeof src === "object") {
+            // if (frameItem.maskPath !== undefined && frameItem.maskPath !== null) {
+            //     frameItem.maskPath._styles = undefined;
+            //     this.drawBezier(ctx, frameItem.maskPath);
+            //     ctx.clip();
+            // }
+            if (this._owner._dynamicImageTransform[sprite.imageKey] !== undefined) {
+                ctx.save();
+                const concatTransform = this._owner._dynamicImageTransform[sprite.imageKey];
+                ctx.transform(concatTransform[0], concatTransform[1], concatTransform[2], concatTransform[3], concatTransform[4], concatTransform[5]);
+            }
+            ctx.drawImage(src, 0, 0);
+            if (this._owner._dynamicImageTransform[sprite.imageKey] !== undefined) {
+                ctx.restore();
+            }
+        }
+        frameItem.shapes && frameItem.shapes.forEach(shape => {
+            if (shape.type === "shape" && shape.pathArgs && shape.pathArgs.d) {
+                this.drawBezier(ctx, new BezierPath(shape.pathArgs.d, shape.transform, shape.styles))
+            }
+            if (shape.type === "ellipse" && shape.pathArgs) {
+                this.drawEllipse(ctx, new EllipsePath(parseFloat(shape.pathArgs.x) || 0.0, parseFloat(shape.pathArgs.y) || 0.0, parseFloat(shape.pathArgs.radiusX) || 0.0, parseFloat(shape.pathArgs.radiusY) || 0.0, shape.transform, shape.styles))
+            }
+            if (shape.type === "rect" && shape.pathArgs) {
+                this.drawRect(ctx, new RectPath(parseFloat(shape.pathArgs.x) || 0.0, parseFloat(shape.pathArgs.y) || 0.0, parseFloat(shape.pathArgs.width) || 0.0, parseFloat(shape.pathArgs.height) || 0.0, parseFloat(shape.pathArgs.cornerRadius) || 0.0, shape.transform, shape.styles))
+            }
+        })
+        let dynamicText = this._owner._dynamicText[sprite.imageKey];
+        if (dynamicText !== undefined) {
+            ctx.textBaseline = "middle";
+            ctx.font = dynamicText.style;
+            let textWidth = ctx.measureText(dynamicText.text).width
+            ctx.fillStyle = dynamicText.color;
+            let offsetX = (dynamicText.offset !== undefined && dynamicText.offset.x !== undefined) ? isNaN(parseFloat(dynamicText.offset.x)) ? 0 : parseFloat(dynamicText.offset.x) : 0;
+            let offsetY = (dynamicText.offset !== undefined && dynamicText.offset.y !== undefined) ? isNaN(parseFloat(dynamicText.offset.y)) ? 0 : parseFloat(dynamicText.offset.y) : 0;
+            ctx.fillText(dynamicText.text, (frameItem.layout.width - textWidth) / 2 + offsetX, frameItem.layout.height / 2 + offsetY);
+        }
+        ctx.restore();
     }
 
     playAudio(frame) {
