@@ -99,13 +99,13 @@ export class Renderer {
                     contentLayer.visible = true;
                     contentLayer.transformMatrix = new window.createjs.Matrix2D(frameItem.transform.a, frameItem.transform.b, frameItem.transform.c, frameItem.transform.d, frameItem.transform.tx, frameItem.transform.ty);
                     contentLayer.setBounds({ x: frameItem.layout.x, y: frameItem.layout.y, width: frameItem.layout.width, height: frameItem.layout.height });
-                    // if (frameItem.maskPath) {
-                    //     contentLayer.mask = Renderer.requestBezierShape(frameItem.maskPath);
-                    //     contentLayer.mask.transformMatrix = contentLayer.transformMatrix;
-                    // }
-                    // else {
-                    //     contentLayer.mask = undefined;
-                    // }
+                    if (frameItem.maskPath) {
+                        contentLayer.mask = Renderer.requestBezierShape(frameItem.maskPath);
+                        contentLayer.mask.transformMatrix = contentLayer.transformMatrix;
+                    }
+                    else {
+                        contentLayer.mask = undefined;
+                    }
                     if (contentLayer.textLayer) {
                         let offsetX = (contentLayer.textLayer.offset !== undefined && contentLayer.textLayer.offset.x !== undefined) ? contentLayer.textLayer.offset.x : 0;
                         let offsetY = (contentLayer.textLayer.offset !== undefined && contentLayer.textLayer.offset.y !== undefined) ? contentLayer.textLayer.offset.y : 0;

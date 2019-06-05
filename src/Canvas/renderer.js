@@ -184,10 +184,10 @@ export class Renderer {
                 targetHeight = frameItem.layout.height;
             }
             this._bitmapCache[sprite.imageKey] = imgTag;
-            // if (frameItem.maskPath !== undefined && frameItem.maskPath !== null) {
-            //     this.drawBezier(ctx, frameItem.maskPath);
-            //     ctx.clip();
-            // }
+            if (frameItem.maskPath !== undefined && frameItem.maskPath !== null) {
+                this.drawBezier(ctx, frameItem.maskPath);
+                ctx.clip();
+            }
             if (this._owner._dynamicImageTransform[sprite.imageKey] !== undefined) {
                 ctx.save();
                 const concatTransform = this._owner._dynamicImageTransform[sprite.imageKey];
@@ -200,11 +200,11 @@ export class Renderer {
             }
         }
         else if (typeof src === "object") {
-            // if (frameItem.maskPath !== undefined && frameItem.maskPath !== null) {
-            //     frameItem.maskPath._styles = undefined;
-            //     this.drawBezier(ctx, frameItem.maskPath);
-            //     ctx.clip();
-            // }
+            if (frameItem.maskPath !== undefined && frameItem.maskPath !== null) {
+                frameItem.maskPath._styles = undefined;
+                this.drawBezier(ctx, frameItem.maskPath);
+                ctx.clip();
+            }
             if (this._owner._dynamicImageTransform[sprite.imageKey] !== undefined) {
                 ctx.save();
                 const concatTransform = this._owner._dynamicImageTransform[sprite.imageKey];
