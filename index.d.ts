@@ -47,8 +47,8 @@ export class Player {
     }, forKey: string): void
     clearDynamicObjects(): void
     onFinished(callback: () => void): void
-    onFrame(callback: () => void): void
-    onPercentage(callback: () => void): void
+    onFrame(callback: (frame: number) => void): void
+    onPercentage(callback: (percentage: number) => void): void
     drawOnContext(ctx: CanvasRenderingContext2D, x: number, y: number, width?: number, height?: number): void
 
 }
