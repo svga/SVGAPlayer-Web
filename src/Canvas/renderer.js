@@ -53,7 +53,8 @@ export class Renderer {
                         }
                     }.bind(this);
                     imgTag.src = 'data:image/png;base64,' + src;
-                    this._bitmapCache[imageKey] = imgTag;
+                    let bitmapKey = imageKey.replace(".matte", "");
+                    this._bitmapCache[bitmapKey] = imgTag;
                 }
                 else if (src.indexOf("SUQz") === 0) {
                     if (window.Howl !== undefined) {
@@ -167,7 +168,8 @@ export class Renderer {
         }
         ctx.globalAlpha = frameItem.alpha;
         ctx.transform(frameItem.transform.a, frameItem.transform.b, frameItem.transform.c, frameItem.transform.d, frameItem.transform.tx, frameItem.transform.ty)
-        let src = this._owner._dynamicImage[sprite.imageKey] || this._bitmapCache[sprite.imageKey] || this._owner._videoItem.images[sprite.imageKey];
+        let bitmapKey = sprite.imageKey.replace(".matte", "");
+        let src = this._owner._dynamicImage[bitmapKey] || this._bitmapCache[bitmapKey] || this._owner._videoItem.images[bitmapKey];
         if (typeof src === "string") {
             let imgTag = this._bitmapCache[sprite.imageKey] || document.createElement('img');
             let targetWidth = undefined;
