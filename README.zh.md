@@ -27,7 +27,7 @@ SVGAPlayer 2.0.0 同时支持以下游戏引擎使用
 
 ### NPM
 1. ```npm install svgaplayerweb --save```
-2. 添加 ``` require('svgaplayerweb') ``` 至 ```xxx.js```
+2. 添加 ```const SVGA = require('svgaplayerweb'); ``` 或 ```import SVGA from 'svgaplayerweb';``` 至 ```xxx.js```
 
 ### IE6 ~ IE9
 
