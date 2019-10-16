@@ -2,6 +2,8 @@
 
 Language: [中文](README.zh.md)
 
+SVGAPlayer 现已支持在微信小程序播放动画，详情请[参阅](https://github.com/yyued/SVGAPlayer-Web/tree/mp)。
+
 ## News
 
 * **[Lite Version](https://github.com/svga/SVGAPlayer-Web-Lite)**
