@@ -1,115 +1,70 @@
-# SVGAPlayer-Web
+# SVGAPlayer-MP
 
-Language: [中文](README.zh.md)
+本分支用于适用于在微信小程序中播放 SVGA 动画，至少要求基础库 >= 2.8.0
 
-## News
+## 代码片段示例
 
-* **[Lite Version](https://github.com/svga/SVGAPlayer-Web-Lite)**
-* 2.3.0 - Add audio support.
+https://developers.weixin.qq.com/s/txEl7amN7dc2
 
-## Can I Use
+## 安装
 
-SVGAPlayer 2.0.0 only supports below browsers.
-
-* Edge / IE 6+
-* Safari / Chrome
-* iOS 6.0+ / Android 4.0+
-
-SVGAPlayer 2.0.0 also supports below Game Engines.
-
-* CreateJS [Usage](CreateJS.README.md)
-* LayaBox [Usage](LayaBox.README.md)
-
-## Install
-
-### Prebuild JS
-
-1. Add ```<script src="https://cdn.jsdelivr.net/npm/svgaplayerweb@2.3.0/build/svga.min.js"></script>``` to your.html
-
-### NPM
-
-1. ```npm install svgaplayerweb --save```
-2. Add ``` require('svgaplayerweb') ``` to ```xxx.js```
-
-### IE6 ~ IE9
-
-* IE6+ only supports 2.x format.
-* You couldn't use npm to install SVGA library.
-
-1. Add [SVGAPlayerWeb.swf](https://github.com/yyued/SVGAPlayer-Web/blob/master/tests/SVGAPlayerWeb.swf) to your.html locate directory.
-2. Add following code to your.html
+直接下载本仓库下的 `build/svga.min.js` 并放置到小程序工程适当目录下，在需要使用的地方，使用以下方式引入。
 
 ```
-<!--[if lt IE 10]> 
-    <script src="../build/svga.ie.min.js"></script>
-<![endif]-->
-<!--[if gte IE 10]><!-->
-    <script src="../build/svga.min.js"></script>
-<!--<![endif]-->
+const SVGA = require("../svga.min.js")
 ```
 
-### Audio support
+## 使用
 
-If your need to play audios, add ```howler.min.js``` to your html.
+### 添加 Canvas 组件
+
+在需要播放动画的页面 wxml 中，添加以下 canvas，其中 type 必须为 2d，width 和 height 必须指定具体值，id 为任意值。
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/howler@2.0.15/dist/howler.core.min.js"></script>
+<canvas type="2d" style="width: 300px; height:300px; background-color: black" id="myCanvas"></canvas>
 ```
 
-Notice: audio plays needs browser support, some browser requires user interaction before playing.
+### 加载动画并播放
 
-### SVGA-Format 1.x support
-
-Both Prebuild & NPM, if you need to support SVGA-Format 1.x, add JSZip script to html.
-
-```html
-<script src="//s1.yy.com/ued_web_static/lib/jszip/3.1.4/??jszip.min.js,jszip-utils.min.js" charset="utf-8"></script>
-```
-
-## Usage
-
-### Load Animation Mannally
-
-You may create Player and Parser by yourself.
-
-1. Add Div Tag.
-
-```html
-<div id="demoCanvas" style="styles..."></div>
-```
-
-2. Load Animation
+在适当的地址使用以下方式加载并播放动画，注意安全域名问题。
 
 ```js
-var player = new SVGA.Player('#demoCanvas');
-var parser = new SVGA.Parser('#demoCanvas'); // Must Provide same selector eg:#demoCanvas IF support IE6+
-parser.load('rose_2.0.0.svga', function(videoItem) {
-    player.setVideoItem(videoItem);
-    player.startAnimation();
+const SVGA = require("../svga.min.js")
+
+const app = getApp()
+
+Page({
+  data: {
+
+  },
+  onReady: function () {
+    let parser = new SVGA.Parser()
+    let player = new SVGA.Player("#myCanvas")
+    parser.load("https://github.com/svga/SVGA-Samples/raw/master/angel.svga", function (videoItem) {
+      player.setVideoItem(videoItem);
+      player.startAnimation();
+    })
+  },
 })
+
 ```
 
-### Load Animation Automatically
+### 动态图像
 
-Assign canvas element properties as below.
+你可以动态替换动画中的指定元素，询问你的动画设计师以获取 ImageKey。
 
-```html
-<div src="rose_2.0.0.svga" loops="0" clearsAfterStop="true" style="styles..."></div>
-```
-
-Animation will play after Web-Page onload.
-
-### Replace Animation Images Dynamically
-
-You can replace specific image by yourself, ask your designer tell you the ImageKey.
+* 用于替换的图片，宽、高必须与原图一致。
+* setImage 操作必须在 startAnimation 之前执行。
 
 ```
 player.setImage('http://yourserver.com/xxx.png', 'ImageKey');
 ```
 
-### Add Text on Animation Image Dynamically
+### 动态文本
 
-You can add text on specific image, ask your designer tell you the ImageKey.
+你可以在指定元素上添加文本，询问你的动画设计师以获取 ImageKey。
+
+* setText 操作必须在 startAnimation 之前执行。
 
 ```
 player.setText('Hello, World!', 'ImageKey');
@@ -117,65 +72,52 @@ player.setText('Hello, World!', 'ImageKey');
 
 ```
 player.setText({ 
-    text: 'Hello, World!', 
+    text: 'Hello, World!, 
     size: "24px", 
+    family: "Arial",
     color: "#ffe0a4",
     offset: {x: 0.0, y: 0.0}
-}, 'ImageKey'); // customize text styles.
+}, 'ImageKey'); // 可自定义文本样式
 ```
 
 ## Classes
 
 ### SVGA.Player
 
-You use SVGA.Player controls animation play and stop.
+SVGA.Player 用于控制动画的播放和停止
 
 #### Properties
 
-* int loops; - Animation loop count, defaults to 0 means infinity loop.
-* BOOL clearsAfterStop; - defaults to true, means player will clear all contents after stop.
-* string fillMode; - defaults to Forward，optional Forward / Backward，fillMode = Forward，Animation will pause on last frame while finished，fillMode = Backward , Animation will pause on first frame.
+* int loops; - 动画循环次数，默认值为 0，表示无限循环。
+* BOOL clearsAfterStop; - 默认值为 true，表示当动画结束时，清空画布。
+* string fillMode; - 默认值为 Forward，可选值 Forward / Backward，当 clearsAfterStop 为 false 时，Forward 表示动画会在结束后停留在最后一帧，Backward 则会在动画结束后停留在第一帧。
 
 #### Methods
 
-* constructor (canvas); - first params could be '#id' or CanvasHTMLElement
-* startAnimation(reverse: boolean = false); - start animation from zero frame.
-* startAnimationWithRange(range: {location: number, length: number}, reverse: boolean = false); - start animation in [location, location+length] frame range.
-* pauseAnimation(); - pause animation on current frame.
-* stopAnimation(); - stop animation, clear contents while clearsAfterStop === true
-* setContentMode(mode: "ScaleToFill" | "AspectFill" | "AspectFit"); - Specific Scale Mode
-* setClipsToBounds(clipsToBounds: boolean); - Clips if image render out of box.
-* clear(); - force clear contents.
-* stepToFrame(frame: int, andPlay: Boolean); - stop to specific frame, play animation while andPlay === true
-* stepToPercentage(percentage: float, andPlay: Boolean); - stop to specific percentage, play animation while andPlay === true
-* setImage(image: string, forKey: string, transform: [a, b, c, d, tx, ty]); - Replace Animation Images Dynamically, transform is optional, transform could adjust replacing image.
-* setText(text: string | {text: string, font: string, size: string, color: string, offset: {x: float, y: float}}, forKey: string); - Add Text on Animation Image Dynamically
-* clearDynamicObjects(); - clear all dynamic objects.
+* constructor (canvas); - 传入 #id 或者 CanvasHTMLElement 至第一个参数
+* startAnimation(reverse: boolean = false); - 从第 0 帧开始播放动画
+* startAnimationWithRange(range: {location: number, length: number}, reverse: boolean = false); - 播放 [location, location+length] 指定区间帧动画
+* pauseAnimation(); - 暂停在当前帧
+* stopAnimation(); - 停止播放动画，如果 clearsAfterStop === true，将会清空画布
+* setContentMode(mode: "ScaleToFill" | "AspectFill" | "AspectFit"); - 设置动画的拉伸模式
+* setClipsToBounds(clipsToBounds: boolean); - 如果超出盒子边界，将会进行裁剪
+* clear(); - 强制清空画布
+* stepToFrame(frame: int, andPlay: Boolean); - 跳到指定帧，如果 andPlay === true，则在指定帧开始播放动画
+* stepToPercentage(percentage: float, andPlay: Boolean); - 跳到指定百分比，如果 andPlay === true，则在指定百分比开始播放动画
+* setImage(image: string, forKey: string, transform: [a, b, c, d, tx, ty]); - 设定动态图像, transform 是可选的, transform 用于变换替换图片
+* setText(text: string | {text: string, font: string, size: string, color: string, offset: {x: float, y: float}}, forKey: string); - 设定动态文本
+* clearDynamicObjects(); - 清空所有动态图像和文本
 
 #### Callback Method
-* onFinished(callback: () => void): void; - call after animation stop.
-* onFrame(callback: (frame: number): void): void; - call after animation specific frame rendered.
-* onPercentage(callback: (percentage: number): void): void; - call after animation specific percentage rendered.
+* onFinished(callback: () => void): void; - 动画停止播放时回调
+* onFrame(callback: (frame: number): void): void; - 动画播放至某帧后回调
+* onPercentage(callback: (percentage: number): void): void; - 动画播放至某进度后回调
 
 ### SVGA.Parser
 
-You use SVGA.Parser load VideoItem from remote or Base64 string.
-
-Only Cross-Domain allow files could be loaded.
-
-If you eager to load resources from Base64 or File, deliver as ```load(File)``` or ```load('data:svga/2.0;base64,xxxxxx')```.
+SVGA.Parser 用于加载远端动画，并转换成 VideoItem。
 
 #### Methods
 
 * constructor();
 * load(url: string, success: (videoItem: VideoEntity) => void, failure: (error: Error) => void): void;
-
-## Issues
-
-### Android 4.x Breaks
-
-As known, some Android OS lack Blob support, add Blob Polyfill by yourself.
-
-```
-<script src="//cdn.bootcss.com/blob-polyfill/1.0.20150320/Blob.min.js"></script>
-```
