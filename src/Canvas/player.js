@@ -10,9 +10,15 @@ export class Player {
     fillMode = "Forward";
 
     constructor(container) {
-        this._container = typeof container === "string" ? document.querySelector(container) : container;
-        this._asChild = container === undefined
-        this._init();
+        if (typeof wx !== "undefined") {
+            this._container = container;
+            this._init();
+        }
+        else {
+            this._container = typeof container === "string" ? document.querySelector(container) : container;
+            this._asChild = container === undefined
+            this._init();
+        }
     }
 
     setVideoItem(videoItem) {
@@ -28,11 +34,7 @@ export class Player {
         this._update();
     }
 
-    setClipsToBounds(clipsToBounds) {
-        if (this._container instanceof HTMLDivElement) {
-            this._container.style.overflowX = this._container.style.overflowY = clipsToBounds ? "hidden" : undefined;
-        }
-    }
+    setClipsToBounds(clipsToBounds) { }
 
     startAnimation(reverse) {
         this.stopAnimation(false);
@@ -126,9 +128,7 @@ export class Player {
     }
 
     drawOnContext(ctx, x, y, width, height) {
-        if (this._drawingCanvas && this._videoItem) {
-            ctx.drawImage(this._drawingCanvas, x, y, width || this._videoItem.videoSize.width, height || this._videoItem.videoSize.height);
-        }
+        console.error("Not implemented.")
     }
 
     /**
@@ -152,7 +152,12 @@ export class Player {
     _onPercentage = undefined;
 
     _init() {
-        if (this._container instanceof HTMLDivElement || this._asChild) {
+        if (typeof wx !== "undefined") {
+            wx.createSelectorQuery().select(this._container).node(res => {
+                this._drawingCanvas = res.node
+            }).exec()
+        }
+        else if (this._container instanceof HTMLDivElement || this._asChild) {
             if (this._container) {
                 const existedCanvasElements = this._container.querySelectorAll('canvas');
                 for (let index = 0; index < existedCanvasElements.length; index++) {
@@ -239,7 +244,7 @@ export class Player {
             if (targetSize.width >= imageSize.width && targetSize.height >= imageSize.height) {
                 this._drawingCanvas.width = targetSize.width;
                 this._drawingCanvas.height = targetSize.height;
-                this._drawingCanvas.style.webkitTransform = this._drawingCanvas.style.transform = "";
+                this._drawingCanvas.getContext('2d').setTransform(1, 0, 0, 1, 0, 0)
                 asParent = true;
             }
             else {
@@ -250,7 +255,7 @@ export class Player {
                     const scaleY = targetSize.height / imageSize.height;
                     const translateX = (imageSize.width * scaleX - imageSize.width) / 2.0
                     const translateY = (imageSize.height * scaleY - imageSize.height) / 2.0
-                    this._drawingCanvas.style.webkitTransform = this._drawingCanvas.style.transform = "matrix(" + scaleX + ", 0.0, 0.0, " + scaleY + ", " + translateX + ", " + translateY + ")"
+                    this._drawingCanvas.getContext('2d').setTransform(scaleX, 0, 0, scaleY, translateX, translateY)
                 }
                 else if (this._contentMode === "AspectFit" || this._contentMode === "AspectFill") {
                     const imageRatio = imageSize.width / imageSize.height;
@@ -259,13 +264,13 @@ export class Player {
                         const scale = targetSize.width / imageSize.width;
                         const translateX = (imageSize.width * scale - imageSize.width) / 2.0
                         const translateY = (imageSize.height * scale - imageSize.height) / 2.0 + (targetSize.height - imageSize.height * scale) / 2.0
-                        this._drawingCanvas.style.webkitTransform = this._drawingCanvas.style.transform = "matrix(" + scale + ", 0.0, 0.0, " + scale + ", " + translateX + ", " + translateY + ")"
+                        this._drawingCanvas.getContext('2d').setTransform(scaleX, 0, 0, scaleY, translateX, translateY)
                     }
                     else if ((imageRatio < viewRatio && this._contentMode === "AspectFit") || (imageRatio > viewRatio && this._contentMode === "AspectFill")) {
                         const scale = targetSize.height / imageSize.height;
                         const translateX = (imageSize.width * scale - imageSize.width) / 2.0 + (targetSize.width - imageSize.width * scale) / 2.0
                         const translateY = (imageSize.height * scale - imageSize.height) / 2.0
-                        this._drawingCanvas.style.webkitTransform = this._drawingCanvas.style.transform = "matrix(" + scale + ", 0.0, 0.0, " + scale + ", " + translateX + ", " + translateY + ")"
+                        this._drawingCanvas.getContext('2d').setTransform(scaleX, 0, 0, scaleY, translateX, translateY)
                     }
                 }
                 this._globalTransform = undefined;
@@ -297,6 +302,7 @@ export class Player {
 
     _update() {
         if (this._videoItem === undefined) { return; }
+        if (this._drawingCanvas === undefined) { return; }
         this._resize();
         this._renderer.drawFrame(this._currentFrame);
         this._renderer.playAudio(this._currentFrame);

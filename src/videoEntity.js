@@ -42,30 +42,15 @@ export class VideoEntity {
     audios = []
 
     constructor(spec, images) {
-
-        if (typeof spec === "object" && spec.$type == ProtoMovieEntity) {
-            if (typeof spec.params === "object") {
-                this.version = spec.ver;
-                this.videoSize.width = spec.params.viewBoxWidth || 0.0;
-                this.videoSize.height = spec.params.viewBoxHeight || 0.0;
-                this.FPS = spec.params.fps || 20;
-                this.frames = spec.params.frames || 0;
-            }
-            this.resetSprites(spec)
-            this.audios = spec.audios
+        if (typeof spec.params === "object") {
+            this.version = spec.ver;
+            this.videoSize.width = spec.params.viewBoxWidth || 0.0;
+            this.videoSize.height = spec.params.viewBoxHeight || 0.0;
+            this.FPS = spec.params.fps || 20;
+            this.frames = spec.params.frames || 0;
         }
-        else if (spec) {
-            if (spec.movie) {
-                if (spec.movie.viewBox) {
-                    this.videoSize.width = parseFloat(spec.movie.viewBox.width) || 0.0;
-                    this.videoSize.height = parseFloat(spec.movie.viewBox.height) || 0.0;
-                }
-                this.version = spec.ver;
-                this.FPS = parseInt(spec.movie.fps) || 20;
-                this.frames = parseInt(spec.movie.frames) || 0;
-            }
-            this.resetSprites(spec)
-        }
+        this.resetSprites(spec)
+        this.audios = spec.audios
         if (images) {
             this.images = images
         }

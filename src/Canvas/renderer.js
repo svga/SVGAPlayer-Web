@@ -4,6 +4,29 @@ import { RectPath } from '../rectPath'
 
 const validMethods = 'MLHVCSQRZmlhvcsqrz'
 
+function wxCreateImage(canvas, arraybuffer, callback) {
+    const randomName = Math.random().toString() + ".png"
+    console.log(`${wx.env.USER_DATA_PATH}/${randomName}`)
+    wx.getFileSystemManager().writeFile(
+      {
+        filePath: `${wx.env.USER_DATA_PATH}/${randomName}`, 
+        data: arraybuffer, 
+        encoding: typeof arraybuffer === "string" ? 'base64' : 'binary',
+        success: () => {
+          const img = canvas.createImage()
+          img.onload = function() {
+            callback(img)
+            wx.getFileSystemManager().unlink({ filePath: `${wx.env.USER_DATA_PATH}/${randomName}`})
+          }
+          img.src = `${wx.env.USER_DATA_PATH}/${randomName}`
+        },
+        fail: function(e) {
+          console.error(e)
+        }
+      }
+    )
+  }
+
 export class Renderer {
 
     _owner = undefined;
@@ -14,15 +37,6 @@ export class Renderer {
 
     constructor(owner) {
         this._owner = owner;
-    }
-
-    dataURLtoBlob(dataurl) {
-        var arr = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1],
-            bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
-        while (n--) {
-            u8arr[n] = bstr.charCodeAt(n);
-        }
-        return new Blob([u8arr], { type: mime });
     }
 
     prepare() {
@@ -37,35 +51,14 @@ export class Renderer {
             this._bitmapCache = {};
             let totalCount = 0
             let loadedCount = 0
-            for (var imageKey in this._owner._videoItem.images) {
+            for (let imageKey in this._owner._videoItem.images) {
                 let src = this._owner._videoItem.images[imageKey];
                 if (src.indexOf("iVBO") === 0 || src.indexOf("/9j/2w") === 0) {
                     totalCount++;
-                    let imgTag = document.createElement('img');
-                    imgTag.onload = function () {
-                        loadedCount++;
-                        if (loadedCount == totalCount) {
-                            this._prepared = true;
-                            if (typeof this._undrawFrame === "number") {
-                                this.drawFrame(this._undrawFrame);
-                                this._undrawFrame = undefined;
-                            }
-                        }
-                    }.bind(this);
-                    imgTag.src = 'data:image/png;base64,' + src;
-                    let bitmapKey = imageKey.replace(".matte", "");
-                    this._bitmapCache[bitmapKey] = imgTag;
-                }
-                else if (src.indexOf("SUQz") === 0) {
-                    if (window.Howl !== undefined) {
-                        totalCount++;
-                        var sound = new Howl({
-                            src: [(navigator.vendor === "Google Inc." ? URL.createObjectURL(this.dataURLtoBlob('data:audio/x-mpeg;base64,' + src)) : 'data:audio/x-mpeg;base64,' + src)],
-                            html5: navigator.vendor === "Google Inc." ? true : undefined,
-                            preload: navigator.vendor === "Google Inc." ? true : undefined,
-                            format: navigator.vendor === "Google Inc." ? ["mp3"] : undefined,
-                        });
-                        sound.once("load", function () {
+                    if (typeof this._owner._drawingCanvas !== "undefined" && typeof this._owner._drawingCanvas.createImage !== "undefined") {
+                        wxCreateImage(this._owner._drawingCanvas, src, (imgTag) => {
+                            let bitmapKey = imageKey.replace(".matte", "");
+                            this._bitmapCache[bitmapKey] = imgTag;
                             loadedCount++;
                             if (loadedCount == totalCount) {
                                 this._prepared = true;
@@ -74,11 +67,23 @@ export class Renderer {
                                     this._undrawFrame = undefined;
                                 }
                             }
-                        }.bind(this))
-                        sound.on("loaderror", function (e) {
-                            console.error(e)
                         })
-                        this._bitmapCache[imageKey] = sound;
+                    }
+                    else {
+                        let imgTag = document.createElement('img');
+                        imgTag.onload = function () {
+                            loadedCount++;
+                            if (loadedCount == totalCount) {
+                                this._prepared = true;
+                                if (typeof this._undrawFrame === "number") {
+                                    this.drawFrame(this._undrawFrame);
+                                    this._undrawFrame = undefined;
+                                }
+                            }
+                        }.bind(this);
+                        imgTag.src = 'data:image/png;base64,' + src;
+                        let bitmapKey = imageKey.replace(".matte", "");
+                        this._bitmapCache[bitmapKey] = imgTag;
                     }
                 }
             }
@@ -106,6 +111,7 @@ export class Renderer {
     drawFrame(frame) {
         if (this._prepared) {
             const ctx = (this._owner._drawingCanvas || this._owner._container).getContext('2d')
+            console.log("draw frame " + ctx + frame)
             const areaFrame = {
                 x: 0.0,
                 y: 0.0,
@@ -171,35 +177,35 @@ export class Renderer {
         let bitmapKey = sprite.imageKey.replace(".matte", "");
         let src = this._owner._dynamicImage[bitmapKey] || this._bitmapCache[bitmapKey] || this._owner._videoItem.images[bitmapKey];
         if (typeof src === "string") {
-            let imgTag = this._bitmapCache[sprite.imageKey] || document.createElement('img');
-            let targetWidth = undefined;
-            let targetHeight = undefined;
-            if (src.indexOf("iVBO") === 0 || src.indexOf("/9j/2w") === 0) {
-                imgTag.src = 'data:image/png;base64,' + src;
-            }
-            else {
-                if (imgTag._svgaSrc !== src) {
-                    imgTag._svgaSrc = src;
-                    imgTag.src = src;
-                }
-                targetWidth = frameItem.layout.width;
-                targetHeight = frameItem.layout.height;
-            }
-            this._bitmapCache[sprite.imageKey] = imgTag;
-            if (frameItem.maskPath !== undefined && frameItem.maskPath !== null) {
-                this.drawBezier(ctx, frameItem.maskPath);
-                ctx.clip();
-            }
-            if (this._owner._dynamicImageTransform[sprite.imageKey] !== undefined) {
-                ctx.save();
-                const concatTransform = this._owner._dynamicImageTransform[sprite.imageKey];
-                ctx.transform(concatTransform[0], concatTransform[1], concatTransform[2], concatTransform[3], concatTransform[4], concatTransform[5]);
-            }
-            if (targetWidth && targetHeight) { ctx.drawImage(imgTag, 0, 0, targetWidth, targetHeight); }
-            else { ctx.drawImage(imgTag, 0, 0); }
-            if (this._owner._dynamicImageTransform[sprite.imageKey] !== undefined) {
-                ctx.restore();
-            }
+            // let imgTag = this._bitmapCache[sprite.imageKey] || document.createElement('img');
+            // let targetWidth = undefined;
+            // let targetHeight = undefined;
+            // if (src.indexOf("iVBO") === 0 || src.indexOf("/9j/2w") === 0) {
+            //     imgTag.src = 'data:image/png;base64,' + src;
+            // }
+            // else {
+            //     if (imgTag._svgaSrc !== src) {
+            //         imgTag._svgaSrc = src;
+            //         imgTag.src = src;
+            //     }
+            //     targetWidth = frameItem.layout.width;
+            //     targetHeight = frameItem.layout.height;
+            // }
+            // this._bitmapCache[sprite.imageKey] = imgTag;
+            // if (frameItem.maskPath !== undefined && frameItem.maskPath !== null) {
+            //     this.drawBezier(ctx, frameItem.maskPath);
+            //     ctx.clip();
+            // }
+            // if (this._owner._dynamicImageTransform[sprite.imageKey] !== undefined) {
+            //     ctx.save();
+            //     const concatTransform = this._owner._dynamicImageTransform[sprite.imageKey];
+            //     ctx.transform(concatTransform[0], concatTransform[1], concatTransform[2], concatTransform[3], concatTransform[4], concatTransform[5]);
+            // }
+            // if (targetWidth && targetHeight) { ctx.drawImage(imgTag, 0, 0, targetWidth, targetHeight); }
+            // else { ctx.drawImage(imgTag, 0, 0); }
+            // if (this._owner._dynamicImageTransform[sprite.imageKey] !== undefined) {
+            //     ctx.restore();
+            // }
         }
         else if (typeof src === "object") {
             if (frameItem.maskPath !== undefined && frameItem.maskPath !== null) {
@@ -241,31 +247,7 @@ export class Renderer {
         ctx.restore();
     }
 
-    playAudio(frame) {
-        if (this._owner._forwardAnimating && this._owner._videoItem.audios instanceof Array) {
-            this._owner._videoItem.audios.forEach(audio => {
-                if (audio.startFrame === frame && this._bitmapCache[audio.audioKey] !== undefined && typeof this._bitmapCache[audio.audioKey].play === "function") {
-                    const item = {
-                        playID: this._bitmapCache[audio.audioKey].play(),
-                        player: this._bitmapCache[audio.audioKey],
-                        endFrame: audio.endFrame,
-                    }
-                    item.player.seek(audio.startTime / 1000, item.playID)
-                    this._soundsQueue.push(item)
-                }
-            })
-            let deleted = false
-            this._soundsQueue.forEach(it => {
-                if (frame >= it.endFrame) {
-                    deleted = true
-                    it.player.stop(it.playID)
-                }
-            })
-            if (deleted) {
-                this._soundsQueue = this._soundsQueue.filter(it => frame < it.endFrame)
-            }
-        }
-    }
+    playAudio(frame) { }
 
     resetShapeStyles(ctx, obj) {
         const styles = obj._styles;
