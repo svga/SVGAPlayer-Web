@@ -6,26 +6,25 @@ const validMethods = 'MLHVCSQRZmlhvcsqrz'
 
 function wxCreateImage(canvas, arraybuffer, callback) {
     const randomName = Math.random().toString() + ".png"
-    console.log(`${wx.env.USER_DATA_PATH}/${randomName}`)
     wx.getFileSystemManager().writeFile(
-      {
-        filePath: `${wx.env.USER_DATA_PATH}/${randomName}`, 
-        data: arraybuffer, 
-        encoding: typeof arraybuffer === "string" ? 'base64' : 'binary',
-        success: () => {
-          const img = canvas.createImage()
-          img.onload = function() {
-            callback(img)
-            wx.getFileSystemManager().unlink({ filePath: `${wx.env.USER_DATA_PATH}/${randomName}`})
-          }
-          img.src = `${wx.env.USER_DATA_PATH}/${randomName}`
-        },
-        fail: function(e) {
-          console.error(e)
+        {
+            filePath: `${wx.env.USER_DATA_PATH}/${randomName}`,
+            data: arraybuffer,
+            encoding: typeof arraybuffer === "string" ? 'base64' : 'binary',
+            success: () => {
+                const img = canvas.createImage()
+                img.onload = function () {
+                    callback(img)
+                    wx.getFileSystemManager().unlink({ filePath: `${wx.env.USER_DATA_PATH}/${randomName}` })
+                }
+                img.src = `${wx.env.USER_DATA_PATH}/${randomName}`
+            },
+            fail: function (e) {
+                console.error(e)
+            }
         }
-      }
     )
-  }
+}
 
 export class Renderer {
 
@@ -55,7 +54,7 @@ export class Renderer {
                 let src = this._owner._videoItem.images[imageKey];
                 if (src.indexOf("iVBO") === 0 || src.indexOf("/9j/2w") === 0) {
                     totalCount++;
-                    if (typeof this._owner._drawingCanvas !== "undefined" && typeof this._owner._drawingCanvas.createImage !== "undefined") {
+                    if (this._owner._drawingCanvas && this._owner._drawingCanvas.createImage) {
                         wxCreateImage(this._owner._drawingCanvas, src, (imgTag) => {
                             let bitmapKey = imageKey.replace(".matte", "");
                             this._bitmapCache[bitmapKey] = imgTag;
@@ -70,20 +69,22 @@ export class Renderer {
                         })
                     }
                     else {
-                        let imgTag = document.createElement('img');
-                        imgTag.onload = function () {
-                            loadedCount++;
-                            if (loadedCount == totalCount) {
-                                this._prepared = true;
-                                if (typeof this._undrawFrame === "number") {
-                                    this.drawFrame(this._undrawFrame);
-                                    this._undrawFrame = undefined;
+                        try {
+                            let imgTag = document.createElement('img');
+                            imgTag.onload = function () {
+                                loadedCount++;
+                                if (loadedCount == totalCount) {
+                                    this._prepared = true;
+                                    if (typeof this._undrawFrame === "number") {
+                                        this.drawFrame(this._undrawFrame);
+                                        this._undrawFrame = undefined;
+                                    }
                                 }
-                            }
-                        }.bind(this);
-                        imgTag.src = 'data:image/png;base64,' + src;
-                        let bitmapKey = imageKey.replace(".matte", "");
-                        this._bitmapCache[bitmapKey] = imgTag;
+                            }.bind(this);
+                            imgTag.src = 'data:image/png;base64,' + src;
+                            let bitmapKey = imageKey.replace(".matte", "");
+                            this._bitmapCache[bitmapKey] = imgTag;
+                        } catch (error) { }
                     }
                 }
             }
@@ -111,7 +112,6 @@ export class Renderer {
     drawFrame(frame) {
         if (this._prepared) {
             const ctx = (this._owner._drawingCanvas || this._owner._container).getContext('2d')
-            console.log("draw frame " + ctx + frame)
             const areaFrame = {
                 x: 0.0,
                 y: 0.0,
@@ -176,36 +176,10 @@ export class Renderer {
         ctx.transform(frameItem.transform.a, frameItem.transform.b, frameItem.transform.c, frameItem.transform.d, frameItem.transform.tx, frameItem.transform.ty)
         let bitmapKey = sprite.imageKey.replace(".matte", "");
         let src = this._owner._dynamicImage[bitmapKey] || this._bitmapCache[bitmapKey] || this._owner._videoItem.images[bitmapKey];
-        if (typeof src === "string") {
-            // let imgTag = this._bitmapCache[sprite.imageKey] || document.createElement('img');
-            // let targetWidth = undefined;
-            // let targetHeight = undefined;
-            // if (src.indexOf("iVBO") === 0 || src.indexOf("/9j/2w") === 0) {
-            //     imgTag.src = 'data:image/png;base64,' + src;
-            // }
-            // else {
-            //     if (imgTag._svgaSrc !== src) {
-            //         imgTag._svgaSrc = src;
-            //         imgTag.src = src;
-            //     }
-            //     targetWidth = frameItem.layout.width;
-            //     targetHeight = frameItem.layout.height;
-            // }
-            // this._bitmapCache[sprite.imageKey] = imgTag;
-            // if (frameItem.maskPath !== undefined && frameItem.maskPath !== null) {
-            //     this.drawBezier(ctx, frameItem.maskPath);
-            //     ctx.clip();
-            // }
-            // if (this._owner._dynamicImageTransform[sprite.imageKey] !== undefined) {
-            //     ctx.save();
-            //     const concatTransform = this._owner._dynamicImageTransform[sprite.imageKey];
-            //     ctx.transform(concatTransform[0], concatTransform[1], concatTransform[2], concatTransform[3], concatTransform[4], concatTransform[5]);
-            // }
-            // if (targetWidth && targetHeight) { ctx.drawImage(imgTag, 0, 0, targetWidth, targetHeight); }
-            // else { ctx.drawImage(imgTag, 0, 0); }
-            // if (this._owner._dynamicImageTransform[sprite.imageKey] !== undefined) {
-            //     ctx.restore();
-            // }
+        if (typeof src === "string" && (src.indexOf("http://") === 0 || src.indexOf("https://") === 0)) {
+            const imgTag = this._owner._drawingCanvas.createImage()
+            imgTag.src = src
+            this._owner._dynamicImage[sprite.imageKey] = imgTag;
         }
         else if (typeof src === "object") {
             if (frameItem.maskPath !== undefined && frameItem.maskPath !== null) {

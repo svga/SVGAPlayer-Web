@@ -64,8 +64,10 @@ export class Player {
     }
 
     clear() {
-        this._renderer.clear();
-        this._renderer.clearAudios();
+        if (this._drawingCanvas) {
+            this._renderer.clear();
+            this._renderer.clearAudios();
+        }
     }
 
     stepToFrame(frame, andPlay) {
@@ -98,7 +100,7 @@ export class Player {
     setText(textORMap, forKey) {
         let text = typeof textORMap === "string" ? textORMap : textORMap.text;
         let size = (typeof textORMap === "object" ? textORMap.size : "14px") || "14px";
-        let family = (typeof textORMap === "object" ? textORMap.family : "") || "";
+        let family = (typeof textORMap === "object" ? textORMap.family : "Arial") || "Arial";
         let color = (typeof textORMap === "object" ? textORMap.color : "#000000") || "#000000";
         let offset = (typeof textORMap === "object" ? textORMap.offset : { x: 0.0, y: 0.0 }) || { x: 0.0, y: 0.0 };
         this._dynamicText[forKey] = {
@@ -155,6 +157,9 @@ export class Player {
         if (typeof wx !== "undefined") {
             wx.createSelectorQuery().select(this._container).node(res => {
                 this._drawingCanvas = res.node
+                if (this._animator !== undefined) {
+                    this._animator.requestAnimationFrame = this._drawingCanvas.requestAnimationFrame
+                }
             }).exec()
         }
         else if (this._container instanceof HTMLDivElement || this._asChild) {
@@ -180,6 +185,9 @@ export class Player {
 
     _doStart(range, reverse, fromFrame) {
         this._animator = new ValueAnimator()
+        if (this._drawingCanvas !== undefined && this._drawingCanvas !== null) {
+            this._animator.requestAnimationFrame = this._drawingCanvas.requestAnimationFrame
+        }
         if (range !== undefined) {
             this._animator.startValue = Math.max(0, range.location)
             this._animator.endValue = Math.min(this._videoItem.frames - 1, range.location + range.length)
