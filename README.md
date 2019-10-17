@@ -16,6 +16,8 @@ const SVGA = require("../svga.min.js")
 
 ## 使用
 
+只支持 svga 2.0 格式动画，如果无法播放动画，请联系设计师要求导出 2.0 格式，或者进入 https://svga.io 预览页自助转换。
+
 ### 添加 Canvas 组件
 
 在需要播放动画的页面 wxml 中，添加以下 canvas，其中 type 必须为 2d，width 和 height 必须指定具体值，id 为任意值。
