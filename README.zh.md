@@ -121,6 +121,7 @@ player.setText('Hello, World!', 'ImageKey');
 ```
 player.setText({ 
     text: 'Hello, World!, 
+    family: 'Arial',
     size: "24px", 
     color: "#ffe0a4",
     offset: {x: 0.0, y: 0.0}
@@ -152,7 +153,7 @@ SVGA.Player 用于控制动画的播放和停止
 * stepToFrame(frame: int, andPlay: Boolean); - 跳到指定帧，如果 andPlay === true，则在指定帧开始播放动画
 * stepToPercentage(percentage: float, andPlay: Boolean); - 跳到指定百分比，如果 andPlay === true，则在指定百分比开始播放动画
 * setImage(image: string, forKey: string, transform: [a, b, c, d, tx, ty]); - 设定动态图像, transform 是可选的, transform 用于变换替换图片
-* setText(text: string | {text: string, font: string, size: string, color: string, offset: {x: float, y: float}}, forKey: string); - 设定动态文本
+* setText(text: string | {text: string, family: string, size: string, color: string, offset: {x: float, y: float}}, forKey: string); - 设定动态文本
 * clearDynamicObjects(); - 清空所有动态图像和文本
 
 #### Callback Method
