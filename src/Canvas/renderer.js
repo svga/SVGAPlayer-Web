@@ -196,11 +196,11 @@ export class Renderer {
                         pointY = 0;
                     switch(dynamicText.align){
                         case "left":
-                        pointX = 0;
+                        pointX = 0 + offsetX;
                         pointY = frameItem.layout.height / 2 + offsetY;
                         break;
                         case "right":
-                        pointX = frameItem.layout.width - textWidth;
+                        pointX = frameItem.layout.width - textWidth +offsetX;
                         pointY = frameItem.layout.height / 2 + offsetY;
                         break;
                         default:

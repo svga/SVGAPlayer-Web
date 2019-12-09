@@ -107,12 +107,12 @@ export class Player {
         let text = typeof textORMap === "string" ? textORMap : textORMap.text;
         let align = typeof textORMap === "string" ?  "" : textORMap.align || "";
         let size = (typeof textORMap === "object" ? textORMap.size : "14px") || "14px";
-        let family = (typeof textORMap === "object" ? textORMap.family : "") || "";
+        let family = (typeof textORMap === "object" ? textORMap.family : "Helvetica,Sans-Serif") || "Helvetica,Sans-Serif";
         let color = (typeof textORMap === "object" ? textORMap.color : "#000000") || "#000000";
         let offset = (typeof textORMap === "object" ? textORMap.offset : { x: 0.0, y: 0.0 }) || { x: 0.0, y: 0.0 };
         let textShadow = (typeof textORMap === "object" ? textORMap.textShadow : "" ) || "";
         let stroke = (typeof textORMap == "object" && textORMap.stroke) ? textORMap.stroke : null ;
-        let font = (typeof textORMap == "object" && textORMap.font && typeof textORMap.font == "string" ? textORMap.font : `${size} ${family}` )
+        let font = (typeof textORMap == "object" && textORMap.font && typeof textORMap.font == "string" ? textORMap.font : `${size} ${family}`.trim() );
         this._dynamicText[forKey] = {
             text,
             style: font,
@@ -122,7 +122,6 @@ export class Player {
             align,
             stroke
         };
-        console.log(font);
     }
 
     clearDynamicObjects() {
