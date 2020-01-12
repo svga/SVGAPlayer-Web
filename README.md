@@ -4,7 +4,7 @@
 
 ## 代码片段示例
 
-https://developers.weixin.qq.com/s/txEl7amN7dc2
+https://developers.weixin.qq.com/s/57sWDkmq7Eeu
 
 ## 安装
 
