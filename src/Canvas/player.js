@@ -1,7 +1,7 @@
 'use strict';
 
 import { Renderer } from './renderer'
-const ValueAnimator = require("value-animator")
+const { ValueAnimator } = require("../value_animator")
 
 export class Player {
 
@@ -155,12 +155,15 @@ export class Player {
 
     _init() {
         if (typeof wx !== "undefined") {
-            wx.createSelectorQuery().select(this._container).node(res => {
-                this._drawingCanvas = res.node
+            wx.createSelectorQuery().select(this._container).fields({ node: true, size: true }).exec(res => {
+                this._drawingCanvas = res[0].node
+                const dpr = wx.getSystemInfoSync().pixelRatio
+                this._drawingCanvas.width = res[0].width * dpr
+                this._drawingCanvas.height = res[0].height * dpr
                 if (this._animator !== undefined) {
-                    this._animator.requestAnimationFrame = this._drawingCanvas.requestAnimationFrame
+                    this._animator.canvas = this._drawingCanvas
                 }
-            }).exec()
+            })
         }
         else if (this._container instanceof HTMLDivElement || this._asChild) {
             if (this._container) {
@@ -186,7 +189,7 @@ export class Player {
     _doStart(range, reverse, fromFrame) {
         this._animator = new ValueAnimator()
         if (this._drawingCanvas !== undefined && this._drawingCanvas !== null) {
-            this._animator.requestAnimationFrame = this._drawingCanvas.requestAnimationFrame
+            this._animator.canvas = this._drawingCanvas
         }
         if (range !== undefined) {
             this._animator.startValue = Math.max(0, range.location)
@@ -239,6 +242,8 @@ export class Player {
 
     _resize() {
         let asParent = false;
+        const ctx = this.ctx || this._drawingCanvas.getContext('2d')
+        if (this.ctx === undefined) this.ctx = ctx;
         if (this._drawingCanvas) {
             let scaleX = 1.0; let scaleY = 1.0; let translateX = 0.0; let translateY = 0.0;
             let targetSize;
@@ -252,7 +257,7 @@ export class Player {
             if (targetSize.width >= imageSize.width && targetSize.height >= imageSize.height) {
                 this._drawingCanvas.width = targetSize.width;
                 this._drawingCanvas.height = targetSize.height;
-                this._drawingCanvas.getContext('2d').setTransform(1, 0, 0, 1, 0, 0)
+                ctx.setTransform(1, 0, 0, 1, 0, 0)
                 asParent = true;
             }
             else {
@@ -263,7 +268,7 @@ export class Player {
                     const scaleY = targetSize.height / imageSize.height;
                     const translateX = (imageSize.width * scaleX - imageSize.width) / 2.0
                     const translateY = (imageSize.height * scaleY - imageSize.height) / 2.0
-                    this._drawingCanvas.getContext('2d').setTransform(scaleX, 0, 0, scaleY, translateX, translateY)
+                    ctx.setTransform(scaleX, 0, 0, scaleY, translateX, translateY)
                 }
                 else if (this._contentMode === "AspectFit" || this._contentMode === "AspectFill") {
                     const imageRatio = imageSize.width / imageSize.height;
@@ -272,13 +277,13 @@ export class Player {
                         const scale = targetSize.width / imageSize.width;
                         const translateX = (imageSize.width * scale - imageSize.width) / 2.0
                         const translateY = (imageSize.height * scale - imageSize.height) / 2.0 + (targetSize.height - imageSize.height * scale) / 2.0
-                        this._drawingCanvas.getContext('2d').setTransform(scaleX, 0, 0, scaleY, translateX, translateY)
+                        ctx.setTransform(scaleX, 0, 0, scaleY, translateX, translateY)
                     }
                     else if ((imageRatio < viewRatio && this._contentMode === "AspectFit") || (imageRatio > viewRatio && this._contentMode === "AspectFill")) {
                         const scale = targetSize.height / imageSize.height;
                         const translateX = (imageSize.width * scale - imageSize.width) / 2.0 + (targetSize.width - imageSize.width * scale) / 2.0
                         const translateY = (imageSize.height * scale - imageSize.height) / 2.0
-                        this._drawingCanvas.getContext('2d').setTransform(scaleX, 0, 0, scaleY, translateX, translateY)
+                        ctx.setTransform(scaleX, 0, 0, scaleY, translateX, translateY)
                     }
                 }
                 this._globalTransform = undefined;

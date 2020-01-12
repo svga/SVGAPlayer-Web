@@ -92,7 +92,8 @@ export class Renderer {
     }
 
     clear() {
-        const ctx = (this._owner._drawingCanvas || this._owner._container).getContext('2d')
+        const ctx = this.ctx || (this._owner._drawingCanvas || this._owner._container).getContext('2d')
+        if (this.ctx === undefined) this.ctx = ctx;
         const areaFrame = {
             x: 0.0,
             y: 0.0,
@@ -111,7 +112,8 @@ export class Renderer {
 
     drawFrame(frame) {
         if (this._prepared) {
-            const ctx = (this._owner._drawingCanvas || this._owner._container).getContext('2d')
+            const ctx = this.ctx || (this._owner._drawingCanvas || this._owner._container).getContext('2d')
+            if (this.ctx === undefined) this.ctx = ctx;
             const areaFrame = {
                 x: 0.0,
                 y: 0.0,
