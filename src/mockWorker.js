@@ -119,8 +119,14 @@ const actions = {
                 for (const key in movieData.images) {
                     if (movieData.images.hasOwnProperty(key)) {
                         const element = movieData.images[key];
-                        const value = Uint8ToString(element);
-                        images[key] = btoa(value)
+                        let value;
+                        try {
+                          value = Uint8ToString(element);
+                        } catch(e) {
+                          // fix windows xp chrome 下首次执行 String.fromCharCode.apply报错问题
+                          value = Uint8ToString(element);
+                        }
+                        images[key] = btoa(value);
                     }
                 }
             }
