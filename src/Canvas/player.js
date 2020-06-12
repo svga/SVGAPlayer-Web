@@ -11,7 +11,7 @@ export class Player {
 
     constructor(container) {
         if (typeof wx !== "undefined") {
-            this._container = container;
+            this._container = typeof container == "string" ? wx.createSelectorQuery().select(container) : container
             this._init();
         }
         else {
@@ -155,7 +155,7 @@ export class Player {
 
     _init() {
         if (typeof wx !== "undefined") {
-            wx.createSelectorQuery().select(this._container).fields({ node: true, size: true }).exec(res => {
+            this._container.fields({ node: true, size: true }).exec(res => {
                 this._drawingCanvas = res[0].node
                 const dpr = wx.getSystemInfoSync().pixelRatio
                 this._drawingCanvas.width = res[0].width * dpr
