@@ -42,6 +42,8 @@ Page({
   onReady: function () {
     let parser = new SVGA.Parser()
     let player = new SVGA.Player("#myCanvas")
+    // 在组件中
+    // let player = new SVGA.Player(wx.createSelectorQuery().in(this).select("#myCanvas"))
     parser.load("https://github.com/svga/SVGA-Samples/raw/master/angel.svga", function (videoItem) {
       player.setVideoItem(videoItem);
       player.startAnimation();
