@@ -64,9 +64,20 @@ const actions = {
             const req = new XMLHttpRequest()
             req.open("GET", url, true);
             req.responseType = "arraybuffer"
-            req.onloadend = () => {
+            // load success
+            req.onload = () => {
                 actions.load_viaProto(req.response, cb, failure);
-            }
+            };
+            // load error
+            req.onerror = (err) => {
+                // Do not log to console or throw, if failure() exists
+                if (failure) {
+                    failure(err);
+                    return;
+                }
+                console.error(err);
+                throw err;
+            };
             req.send()
         }
     },
@@ -84,7 +95,11 @@ const actions = {
                 })
             })
         } catch (err) {
-            failure && failure(err);
+            // Do not log to console or throw, if failure() exists
+            if (failure) {
+                failure(err);
+                return;
+            }
             console.error(err);
             throw err;
         }
