@@ -147,7 +147,7 @@ SVGA.Player 用于控制动画的播放和停止
 * startAnimationWithRange(range: {location: number, length: number}, reverse: boolean = false); - 播放 [location, location+length] 指定区间帧动画
 * pauseAnimation(); - 暂停在当前帧
 * stopAnimation(); - 停止播放动画，如果 clearsAfterStop === true，将会清空画布
-* setContentMode(mode: "ScaleToFill" | "AspectFill" | "AspectFit"); - 设置动画的拉伸模式
+* setContentMode(mode: "Fill" | "AspectFill" | "AspectFit"); - 设置动画的拉伸模式
 * setClipsToBounds(clipsToBounds: boolean); - 如果超出盒子边界，将会进行裁剪
 * clear(); - 强制清空画布
 * stepToFrame(frame: int, andPlay: Boolean); - 跳到指定帧，如果 andPlay === true，则在指定帧开始播放动画
