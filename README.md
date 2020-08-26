@@ -146,7 +146,7 @@ You use SVGA.Player controls animation play and stop.
 * startAnimationWithRange(range: {location: number, length: number}, reverse: boolean = false); - start animation in [location, location+length] frame range.
 * pauseAnimation(); - pause animation on current frame.
 * stopAnimation(); - stop animation, clear contents while clearsAfterStop === true
-* setContentMode(mode: "ScaleToFill" | "AspectFill" | "AspectFit"); - Specific Scale Mode
+* setContentMode(mode: "Fill" | "AspectFill" | "AspectFit"); - Specific Scale Mode
 * setClipsToBounds(clipsToBounds: boolean); - Clips if image render out of box.
 * clear(); - force clear contents.
 * stepToFrame(frame: int, andPlay: Boolean); - stop to specific frame, play animation while andPlay === true
