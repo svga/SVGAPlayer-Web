@@ -61,24 +61,31 @@ const actions = {
             }
         }
         else {
-            const req = new XMLHttpRequest()
-            req.open("GET", url, true);
-            req.responseType = "arraybuffer"
-            // load success
-            req.onload = () => {
-                actions.load_viaProto(req.response, cb, failure);
-            };
-            // load error
-            req.onerror = (err) => {
-                // Do not log to console or throw, if failure() exists
-                if (failure) {
-                    failure(err);
-                    return;
-                }
-                console.error(err);
-                throw err;
-            };
-            req.send()
+            const base64ExecResult = typeof url === "string" && /^data:(.{0,});base64,(.+)/.exec(url);
+            if (base64ExecResult) {
+                const arrayBufferSVGA = actions._base64ToArrayBuffer(base64ExecResult[2]);
+                actions.load_viaProto(arrayBufferSVGA, cb, failure);
+            }
+            else {
+                const req = new XMLHttpRequest()
+                req.open("GET", url, true);
+                req.responseType = "arraybuffer"
+                // load success
+                req.onload = () => {
+                    actions.load_viaProto(req.response, cb, failure);
+                };
+                // load error
+                req.onerror = (err) => {
+                    // Do not log to console or throw, if failure() exists
+                    if (failure) {
+                        failure(err);
+                        return;
+                    }
+                    console.error(err);
+                    throw err;
+                };
+                req.send()
+            }
         }
     },
 
