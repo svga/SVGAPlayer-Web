@@ -96,7 +96,7 @@ export class Player {
     setText(textORMap, forKey) {
         let text = typeof textORMap === "string" ? textORMap : textORMap.text;
         let size = (typeof textORMap === "object" ? textORMap.size : "14px") || "14px";
-        let family = (typeof textORMap === "object" ? textORMap.family : "") || "";
+        let family = (typeof textORMap === "object" ? textORMap.family : "Arial") || "Arial";
         let color = (typeof textORMap === "object" ? textORMap.color : "#000000") || "#000000";
         let offset = (typeof textORMap === "object" ? textORMap.offset : { x: 0.0, y: 0.0 }) || { x: 0.0, y: 0.0 };
         this._dynamicText[forKey] = {
