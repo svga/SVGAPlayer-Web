@@ -89,10 +89,14 @@ parser.load('rose_2.0.0.svga', function(videoItem) {
 
 ### 自动加载
 
-为 canvas 元素添加以下属性
+为 canvas 元素添加`src`属性
 
 ```html
-<div src="rose_2.0.0.svga" loops="0" clearsAfterStop="true" style="styles..."></div>
+<div src="rose_2.0.0.svga" id="demoCanvas" style="styles..."></div>
+```
+
+```js
+new SVGA.autoload(document.querySelector('#demoCanvas'))
 ```
 
 动画会在页面加载完成后播放
