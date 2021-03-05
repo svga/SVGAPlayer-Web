@@ -14,7 +14,7 @@ module.exports = {
         library: 'SVGA',
     },
     module: {
-        loaders: [
+        rules: [
             {
                 test: path.join(__dirname, 'src'),
                 loader: 'babel-loader',
