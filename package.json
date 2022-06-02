@@ -16,7 +16,7 @@
   "dependencies": {},
   "devDependencies": {
     "pako": "^1.0.6",
-    "protobufjs": "^6.8.0",
+    "protobufjs": "^6.11.3",
     "babel-core": "^6.26.0",
     "babel-loader": "^7.1.2",
     "babel-preset-es2015": "^6.24.1",
