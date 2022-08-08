@@ -124,7 +124,7 @@ player.setText('Hello, World!', 'ImageKey');
 
 ```
 player.setText({ 
-    text: 'Hello, World!, 
+    text: 'Hello, World!', 
     family: 'Arial',
     size: "24px", 
     color: "#ffe0a4",
