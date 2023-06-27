@@ -41,7 +41,7 @@ SVGAPlayer 2.0.0 also supports below Game Engines.
 ### NPM
 
 1. ```npm install svgaplayerweb --save```
-2. Add ``` require('svgaplayerweb') ``` to ```xxx.js```
+2. Add ```const SVGA = require('svgaplayerweb'); ``` or ```import SVGA from 'svgaplayerweb';``` to ```xxx.js```
 
 ### IE6 ~ IE9
 
